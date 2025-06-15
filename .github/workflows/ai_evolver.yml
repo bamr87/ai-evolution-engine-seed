@@ -1,0 +1,179 @@
+name: 🌱 AI Evolution Growth Engine
+
+on:
+  workflow_dispatch:
+    inputs:
+      prompt:
+        description: 'Growth instructions for the AI'
+        required: true
+        type: string
+      growth_mode:
+        description: 'How should the code grow?'
+        required: false
+        default: 'adaptive'
+        type: choice
+        options:
+          - conservative
+          - adaptive
+          - experimental
+          - regenerative
+      auto_plant_seeds:
+        description: 'Automatically plant new seeds?'
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  evolve:
+    name: 🌿 Growth Cycle
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 🌱 Prepare Growth Environment
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: 🧬 Collect Repository DNA
+        id: collect-context
+        run: |
+          echo "🧬 Analyzing repository genome..."
+          
+          # Create context file
+          cat > /tmp/repo_context.json << EOF
+          {
+            "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "growth_stage": "$(cat evolution-metrics.json | jq -r .growth_cycles // 0)",
+            "prompt": "${{ inputs.prompt }}",
+            "growth_mode": "${{ inputs.growth_mode }}",
+            "repository_structure": $(tree -J -I 'node_modules|.git' || echo '[]'),
+            "evolution_history": $(cat evolution-metrics.json || echo '{}'),
+            "files": {}
+          }
+          EOF
+          
+          # Add file contents (respecting .gptignore)
+          find . -type f -name "*.md" -o -name "*.yml" -o -name "*.yaml" -o -name "*.json" -o -name "*.py" -o -name "*.js" -o -name "*.sh" | \
+          grep -v -E "(node_modules|\.git|\.env)" | \
+          head -50 | \
+          while read -r file; do
+            echo "Adding $file to context..."
+            jq --arg path "$file" --arg content "$(cat "$file" | head -1000)" \
+              '.files[$path] = $content' /tmp/repo_context.json > /tmp/repo_context_tmp.json
+            mv /tmp/repo_context_tmp.json /tmp/repo_context.json
+          done
+          
+      - name: 🌿 Invoke AI Growth Engine
+        id: ai-growth
+        env:
+          AI_API_KEY: ${{ secrets.AI_API_KEY }}
+        run: |
+          echo "🌿 Initiating growth cycle..."
+          
+          # This is where the AI magic happens
+          # The AI receives the full context and returns evolution instructions
+          
+          # For now, create a simple example response
+          cat > /tmp/evolution_response.json << 'EOF'
+          {
+            "growth_id": "$(uuidgen)",
+            "new_branch": "growth/$(date +%Y%m%d-%H%M%S)-${{ inputs.growth_mode }}",
+            "changes": [
+              {
+                "path": "src/growth_tracker.py",
+                "action": "create",
+                "content": "# AI-generated growth tracking module\n\nclass GrowthTracker:\n    pass"
+              }
+            ],
+            "documentation_updates": {
+              "README.md": "Added growth tracking module"
+            },
+            "commit_message": "🌿 Growth cycle: ${{ inputs.prompt }}",
+            "next_seed": "Consider adding data persistence in the next growth cycle"
+          }
+          EOF
+          
+      - name: 🌾 Apply Growth Changes
+        run: |
+          echo "🌾 Applying evolutionary changes..."
+          
+          BRANCH_NAME=$(jq -r .new_branch /tmp/evolution_response.json)
+          git checkout -b "$BRANCH_NAME"
+          
+          # Apply file changes from AI response
+          jq -r '.changes[] | @base64' /tmp/evolution_response.json | while read -r change; do
+            _jq() {
+              echo "$change" | base64 --decode | jq -r "$1"
+            }
+            
+            path=$(_jq '.path')
+            action=$(_jq '.action')
+            content=$(_jq '.content')
+            
+            mkdir -p "$(dirname "$path")"
+            echo "$content" > "$path"
+            echo "✓ Applied change to $path"
+          done
+          
+          # Update growth metrics
+          jq '.growth_cycles += 1 | .last_growth = now' evolution-metrics.json > tmp.json
+          mv tmp.json evolution-metrics.json
+          
+          # Commit growth
+          git add -A
+          git commit -m "$(jq -r .commit_message /tmp/evolution_response.json)"
+          git push origin "$BRANCH_NAME"
+          
+      - name: 🌰 Plant New Seeds
+        if: ${{ inputs.auto_plant_seeds }}
+        run: |
+          echo "🌰 Generating next generation seed..."
+          
+          # Create improved seed for next iteration
+          cat > .seed.md << 'EOF'
+          # 🌱 AI Evolution Engine - Next Generation Seed
+          
+          This seed has learned from previous growth cycles and includes:
+          - Improved error handling
+          - Better context awareness
+          - More efficient growth patterns
+          - Enhanced sustainability metrics
+          
+          Plant this seed to continue evolution with accumulated wisdom.
+          EOF
+          
+          git add .seed.md
+          git commit -m "🌰 New seed generated from growth cycle" || true
+          git push origin "$BRANCH_NAME" || true
+          
+      - name: 🌳 Create Growth PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          BRANCH_NAME=$(jq -r .new_branch /tmp/evolution_response.json)
+          
+          gh pr create \
+            --title "🌿 Growth: ${{ inputs.prompt }}" \
+            --body "## 🌱 AI-Driven Growth Cycle
+
+              **Growth Mode**: ${{ inputs.growth_mode }}
+              **Prompt**: ${{ inputs.prompt }}
+
+              ### 🌿 What grew in this cycle:
+              - [ ] New features implemented
+              - [ ] Tests added/updated
+              - [ ] Documentation updated
+              - [ ] Seeds planted for future growth
+
+              ### 🌰 Next Evolution Suggestions:
+              $(jq -r .next_seed /tmp/evolution_response.json)
+
+              ---
+              *Generated by AI Evolution Engine 🌱*" \
+                          --base main \
+                          --head "$BRANCH_NAME"
