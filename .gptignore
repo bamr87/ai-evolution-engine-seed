@@ -1,0 +1,20 @@
+# Exclude version control
+.git/
+
+# Exclude sensitive environment files
+*.env
+*.secret
+
+# Exclude large dependency directories
+node_modules/
+venv/
+env/
+
+# Build outputs
+build/
+dist/
+
+# Temporary files
+*.tmp
+*.swp
+*.bak

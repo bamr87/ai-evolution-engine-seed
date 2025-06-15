@@ -1,1 +1,26 @@
+# General ignores
 .DS_Store
+*.log
+*.tmp
+*.swp
+
+# Python
+*.pyc
+__pycache__/
+*.env
+venv/
+env/
+
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Build artifacts
+build/
+dist/
+
+# IDE specific
+.vscode/
+.idea/
+*.iml

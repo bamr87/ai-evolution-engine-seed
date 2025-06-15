@@ -1,7 +1,10 @@
 {
-  "seed_version": "0.1.0",
-  "planted_at": "2025-06-15T20:34:48Z",
+  "seed_version": "0.2.0-seed",
+  "planted_at": "2025-06-15T21:13:13Z",
   "growth_cycles": 0,
-  "adaptations": [],
-  "next_evolution": null
+  "current_generation": 0,
+  "adaptations_logged": 0,
+  "last_growth_spurt": "Never",
+  "last_prompt": null,
+  "evolution_history": []
 }

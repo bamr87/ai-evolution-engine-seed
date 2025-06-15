@@ -43,10 +43,8 @@ We believe in software that grows organically, much like a plant from a seed. Th
 ```bash
 # 1. Plant the v0.2.0 seed (if you haven't already)
 # Ensure you're in an empty directory for a new project
-curl -fsSL https://raw.githubusercontent.com/bamr87/ai-evolution-engine/main/init_setup.sh -o init_setup.sh
-# Note: For a real setup, you'd clone the repo or use a specific version tag.
-# This curl command fetches the latest init_setup.sh from main, which might be ahead.
-# For this specific v0.2.0, you'd use the v0.2.0 version of init_setup.sh.
+# curl -fsSL https://raw.githubusercontent.com/bamr87/ai-evolution-engine/main/init_setup.sh -o init_setup.sh # Get latest
+# For this specific v0.2.0, ensure you're using the v0.2.0 version of this script.
 bash init_setup.sh
 
 # 2. Set your AI API Key (if using a real AI in the future)

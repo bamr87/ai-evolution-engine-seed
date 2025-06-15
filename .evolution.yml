@@ -1,21 +1,22 @@
 # 🌱 Evolution Configuration
 version: 1.0
 growth:
-  stage: germination
+  stage: sapling # Updated from germination
   strategy: adaptive
-  auto_evolve: true
-  
+  auto_evolve: true # Corresponds to auto_plant_seeds in workflow?
+
 ai:
-  provider: ${AI_PROVIDER:-openai}
-  model: ${AI_MODEL:-gpt-4}
-  temperature: 0.7
-  
+  provider: ${AI_PROVIDER:-openai} # Placeholder, actual AI call not in v0.2.0 workflow
+  model: ${AI_MODEL:-gpt-4-turbo}
+  temperature: 0.6
+
 evolution:
-  max_tokens_per_growth: 100000
-  require_tests: true
-  preserve_core: true
-  
+  max_context_files: 50
+  max_context_line_per_file: 1000
+  require_tests_for_features: true # Aspirational
+  preserve_core_logic: true
+
 sustainability:
-  track_growth: true
-  optimize_resources: true
-  share_seeds: true
+  track_growth_metrics: true
+  optimize_for_maintainability: true
+  share_seed_improvements: true # Via the .seed.md mechanism
