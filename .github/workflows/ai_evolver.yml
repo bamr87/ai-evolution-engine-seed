@@ -46,6 +46,11 @@ jobs:
           
           # Initialize context with metadata and metrics
           METRICS_CONTENT=$(cat evolution-metrics.json || echo '{}')
+          # Ensure METRICS_CONTENT is valid JSON
+          if ! echo "$METRICS_CONTENT" | jq empty > /dev/null 2>&1; then
+              echo "Warning: evolution-metrics.json contains invalid JSON, using default structure"
+              METRICS_CONTENT='{"seed_version": "0.2.0-seed", "growth_cycles": 0, "current_generation": 0, "adaptations_logged": 0, "last_growth_spurt": "Never", "last_prompt": null, "evolution_history": []}'
+          fi
           # Collect repository structure using tree command
           REPO_STRUCTURE=$(tree -J -L 3 -I ".git|node_modules|venv|dist|build" || echo "[]")
           jq -n \
@@ -90,30 +95,44 @@ jobs:
           CONTEXT_FILE="/tmp/repo_context.json"
           RESPONSE_FILE="/tmp/evolution_response.json"
           
-          CURRENT_METRICS_JSON=$(jq -r '.current_metrics' "$CONTEXT_FILE")
+          # Safely extract current metrics with proper JSON handling
+          CURRENT_METRICS_JSON=$(jq -r '.current_metrics // {}' "$CONTEXT_FILE")
+          # Ensure we have a valid JSON object, not a string
+          if ! echo "$CURRENT_METRICS_JSON" | jq empty > /dev/null 2>&1; then
+              echo "Warning: Invalid metrics JSON detected, using defaults"
+              CURRENT_METRICS_JSON='{"growth_cycles": 0, "current_generation": 0, "adaptations_logged": 0}'
+          fi
+          
           CURRENT_CYCLE=$(echo "$CURRENT_METRICS_JSON" | jq -r '.growth_cycles // 0')
           CURRENT_GENERATION=$(echo "$CURRENT_METRICS_JSON" | jq -r '.current_generation // 0')
           NEW_CYCLE=$((CURRENT_CYCLE + 1))
           NEW_GENERATION=$((CURRENT_GENERATION + 1)) # Simple increment for simulation
 
-          # Simulate updating evolution-metrics.json
+          # Simulate updating evolution-metrics.json with safer jq operations
           NEW_METRICS_CONTENT=$(echo "$CURRENT_METRICS_JSON" | jq \
             --arg new_cycle "$NEW_CYCLE" \
             --arg new_gen "$NEW_GENERATION" \
             --arg last_prompt "${{ inputs.prompt }}" \
             --arg last_growth "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-            '.growth_cycles = ($new_cycle | tonumber) |
-             .current_generation = ($new_gen | tonumber) |
-             .adaptations_logged += 1 |
-             .last_growth_spurt = $last_growth |
-             .last_prompt = $last_prompt |
-             .evolution_history += [{"cycle": ($new_cycle | tonumber), "prompt": $last_prompt, "timestamp": $last_growth}]')
+            '{
+              "seed_version": (.seed_version // "0.2.0-seed"),
+              "planted_at": (.planted_at // $last_growth),
+              "growth_cycles": ($new_cycle | tonumber),
+              "current_generation": ($new_gen | tonumber),
+              "adaptations_logged": ((.adaptations_logged // 0) | tonumber + 1),
+              "last_growth_spurt": $last_growth,
+              "last_prompt": $last_prompt,
+              "evolution_history": ((.evolution_history // []) + [{"cycle": ($new_cycle | tonumber), "prompt": $last_prompt, "timestamp": $last_growth}])
+            }')
           
           # Simulate updating README.md
           # This will replace the content between the markers
           README_MARKER_START="<!-- AI-EVOLUTION-MARKER:START -->"
           README_MARKER_END="<!-- AI-EVOLUTION-MARKER:END -->"
-          NEW_README_DYNAMIC_CONTENT="**Evolutionary State:**\n- Generation: $NEW_GENERATION\n- Adaptations Logged: $(echo "$NEW_METRICS_CONTENT" | jq .adaptations_logged)\n- Last Growth Spurt: $(echo "$NEW_METRICS_CONTENT" | jq .last_growth_spurt)\n- Last Prompt: ${{ inputs.prompt }}"
+          # Extract values safely for README content
+          ADAPTATIONS_COUNT=$(echo "$NEW_METRICS_CONTENT" | jq -r '.adaptations_logged // 0')
+          LAST_GROWTH=$(echo "$NEW_METRICS_CONTENT" | jq -r '.last_growth_spurt // "Never"')
+          NEW_README_DYNAMIC_CONTENT="**Evolutionary State:**\n- Generation: $NEW_GENERATION\n- Adaptations Logged: $ADAPTATIONS_COUNT\n- Last Growth Spurt: $LAST_GROWTH\n- Last Prompt: ${{ inputs.prompt }}"
           
           # Read existing README, replace marker section (crude sed for multiline)
           # A more robust solution would use a proper templating engine or smarter AI replacement
@@ -158,8 +177,10 @@ jobs:
           
           # Read the original README content
           ORIGINAL_README_CONTENT=$(cat README.md)
-          # Prepare the new dynamic content block
-          DYNAMIC_BLOCK_CONTENT="    **Evolutionary State:**\n    - Generation: $NEW_GENERATION\n    - Adaptations Logged: $(echo "$NEW_METRICS_CONTENT" | jq -r .adaptations_logged)\n    - Last Growth Spurt: $(echo "$NEW_METRICS_CONTENT" | jq -r .last_growth_spurt)\n    - Last Prompt: ${{ inputs.prompt }}"
+          # Prepare the new dynamic content block with safe jq extraction
+          ADAPTATIONS_COUNT=$(echo "$NEW_METRICS_CONTENT" | jq -r '.adaptations_logged // 0')
+          LAST_GROWTH=$(echo "$NEW_METRICS_CONTENT" | jq -r '.last_growth_spurt // "Never"')
+          DYNAMIC_BLOCK_CONTENT="    **Evolutionary State:**\n    - Generation: $NEW_GENERATION\n    - Adaptations Logged: $ADAPTATIONS_COUNT\n    - Last Growth Spurt: $LAST_GROWTH\n    - Last Prompt: ${{ inputs.prompt }}"
           # Use awk to replace content between markers. Relies on markers being on their own lines.
           # This is still fragile. If AI provides full content, it's more robust.
           # Let's go with: AI provides the *full* new README.md content.
@@ -177,7 +198,9 @@ jobs:
           # And the apply step will use sed. This is more realistic for an AI.
 
           # Simulated AI generates new content for the dynamic block in README.md
-          README_DYNAMIC_CONTENT_FOR_AI_RESPONSE="    **Evolutionary State:**\\n    - Generation: $NEW_GENERATION\\n    - Adaptations Logged: $(echo \"$NEW_METRICS_CONTENT\" | jq -r .adaptations_logged)\\n    - Last Growth Spurt: $(echo \"$NEW_METRICS_CONTENT\" | jq -r .last_growth_spurt)\\n    - Last Prompt: ${{ inputs.prompt }}"
+          ADAPTATIONS_COUNT=$(echo "$NEW_METRICS_CONTENT" | jq -r '.adaptations_logged // 0')
+          LAST_GROWTH=$(echo "$NEW_METRICS_CONTENT" | jq -r '.last_growth_spurt // "Never"')
+          README_DYNAMIC_CONTENT_FOR_AI_RESPONSE="    **Evolutionary State:**\\n    - Generation: $NEW_GENERATION\\n    - Adaptations Logged: $ADAPTATIONS_COUNT\\n    - Last Growth Spurt: $LAST_GROWTH\\n    - Last Prompt: ${{ inputs.prompt }}"
 
           # Content for the next .seed.md is now generated by an external script to avoid YAML/heredoc issues
           NEXT_SEED_CONTENT=$(scripts/generate_seed.sh "$NEW_CYCLE" "$NEW_GENERATION" "${{ inputs.prompt }}" "${{ inputs.growth_mode }}")

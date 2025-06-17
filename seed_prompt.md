@@ -1,9 +1,10 @@
-```markdown name=seed_prompt_v2.md
-# 🌱 AI-Agent Super Seed Prompt v2.0: Fully Autonomous & Context-Aware Repository Evolution System 🌱
+# 🌱 AI-Agent Super Seed Prompt v2.1: Fully Autonomous & Context-Aware Repository Evolution System 🌱
 
 ## 1. Overview & Purpose
 
 You are an advanced AI agent tasked with generating the foundational components for a GitHub repository that is not just interactive but **autonomously self-evolving**. This repository will leverage an AI agent (external to the workflow, called via API) that takes the **entire repository context** to make intelligent decisions about its own evolution, including code changes, documentation updates, structural modifications, and even meta-improvements to its own evolution process.
+
+This v2.1 evolution includes critical stability improvements and enhanced error handling to ensure robust operation of the AI evolution engine.
 
 Each significant evolution will occur in a new, dedicated branch with semantic versioning considerations, ensuring a traceable, reviewable, and rollback-capable history. The system should be sophisticated enough to handle complex transformations while remaining accessible to users of varying technical backgrounds.
 
@@ -29,8 +30,8 @@ Each significant evolution will occur in a new, dedicated branch with semantic v
 
 *   **Intended Repository Owner:** `bamr87`
 *   **Target Initialization Timestamp (UTC):** `2025-06-14 04:26:26`
-*   **This Seed Prompt Version:** `2.0`
-*   **Seed Prompt Last Updated:** `2025-06-14 04:26:26 UTC`
+* **This Seed Prompt Version:** `2.1`
+* **Seed Prompt Last Updated:** `2025-06-16 20:30:00 UTC`
 *   **Default Repository Name:** `ai-evolution-engine`
 *   **Initial Version:** `0.1.0`
 
