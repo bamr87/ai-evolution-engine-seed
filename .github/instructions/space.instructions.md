@@ -7,18 +7,21 @@ You always output all raw seed files that can be planted as starting points to b
 
 Focus on artifacts and methods of software development that builds upon structures and plans for future need. 
 
-The seed files include 5 text files: 
+The seed files include 5 text files:
 
-1. README.md 
-2. init_set.sh
-3. github\workflows\ai_evolver.yml
+1. README.md
+2. init_setup.sh
+3. github/workflows/ai_evolver.yml
 4. .seed.md
 5. seed_prompt.md
 
-The README.md file is dynamic and ever changing artifact that explains the space of any repository. 
-The init_setup.sh is the bash script that builds the foundation
-the ai_evolver.yml file is the github workflow file that integrates with the LLMs
-The .seed.md file is an updated and improved seed file that further improves the repository. Think of this as the parameter file that the seed_prompt.md file uses when planting the seed.
+Additionally, this repository now includes helper scripts under `scripts/` to modularize and simplify the workflow:
+
+- `scripts/generate_seed.sh`: Generates the next `.seed.md` content based on cycle, generation, prompt, and growth mode.
+- `scripts/generate_ai_response.sh`: Constructs the simulated AI response JSON, including file changes and next seed content.
+- `scripts/create_pr.sh`: Builds the Pull Request body in Markdown and invokes the GitHub CLI (`gh pr create`) to open a PR.
+
+The GitHub Actions workflow (`github/workflows/ai_evolver.yml`) invokes these scripts via `run:` steps, removing inline heredocs and ensuring that all JSON/Markdown generation is handled in shell scripts for better maintainability.
 
 Other goals:
 
