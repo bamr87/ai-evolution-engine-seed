@@ -46,16 +46,19 @@ jobs:
           
           # Initialize context with metadata and metrics
           METRICS_CONTENT=$(cat evolution-metrics.json || echo '{}')
+          # Collect repository structure using tree command
+          REPO_STRUCTURE=$(tree -J -L 3 -I ".git|node_modules|venv|dist|build" || echo "[]")
           jq -n \
             --argjson metrics "$METRICS_CONTENT" \
             --arg prompt "${{ inputs.prompt }}" \
             --arg growth_mode "${{ inputs.growth_mode }}" \
+            --argjson repository_structure "$REPO_STRUCTURE" \
             '{
               "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
               "user_prompt": $prompt,
               "growth_mode": $growth_mode,
               "current_metrics": $metrics,
-              "repository_structure": $(tree -J -L 3 -I ".git|node_modules|venv|dist|build" || echo "[]"),
+              "repository_structure": $repository_structure,
               "files": {}
             }' > "$CONTEXT_FILE"
 
