@@ -1,0 +1,78 @@
+name: AI Evolution - Testing & Build Automation
+
+on:
+  workflow_dispatch:
+    inputs:
+      growth_mode:
+        description: 'Growth mode for evolution'
+        required: true
+        default: 'test-automation'
+        type: choice
+        options:
+          - test-automation
+          - build-optimization
+          - error-resilience
+          - ci-cd-enhancement
+      
+jobs:
+  evolve:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        
+    - name: Install dependencies
+      run: |
+        npm install -g jq
+        sudo apt-get update
+        sudo apt-get install -y ruby-full
+        
+    - name: Generate evolution seed
+      run: |
+        ./scripts/generate_seed.sh \
+          --cycle 3 \
+          --generation 1 \
+          --prompt "Enhanced testing and build automation with error resolution patterns from zer0-mistakes Jekyll theme" \
+          --growth-mode ${{ github.event.inputs.growth_mode }}
+          
+    - name: Generate AI response
+      run: |
+        ./scripts/generate_ai_response.sh \
+          --cycle 3 \
+          --generation 1 \
+          --growth-mode ${{ github.event.inputs.growth_mode }}
+          
+    - name: Create evolution PR
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        ./scripts/create_pr.sh \
+          --cycle 3 \
+          --generation 1 \
+          --growth-mode ${{ github.event.inputs.growth_mode }}
+          
+    - name: Test evolved seed
+      run: |
+        if [ -f "testing_automation_init.sh" ]; then
+          chmod +x testing_automation_init.sh
+          # Create a test directory and run the seed
+          mkdir -p test-evolution
+          cd test-evolution
+          ../testing_automation_init.sh
+          
+          # Run the generated tests
+          if [ -x "scripts/test.sh" ]; then
+            ./scripts/test.sh --verbose
+          fi
+          
+          # Test the build process
+          if [ -x "scripts/build.sh" ]; then
+            ./scripts/build.sh --dry-run
+          fi
+        fi
