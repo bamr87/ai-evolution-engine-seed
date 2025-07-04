@@ -67,6 +67,14 @@ When generating code for Azure, running terminal commands for Azure, or performi
 
 ### Documentation Standards
 - Generate comprehensive README files for all projects
+- **Directory-Level Documentation**: Ensure every directory contains a README.md file that:
+  - Fully describes the purpose and contents of the directory
+  - Explains how the directory fits within the overall repository structure
+  - Documents any special usage patterns or conventions for that directory
+  - Includes links to related directories or external resources when relevant
+  - Lists and describes key files and subdirectories within that directory
+  - Provides examples of how to use or interact with directory contents
+  - Maintains current and accurate information as directory contents evolve
 - Include installation, usage, and contribution guidelines
 - Add inline code documentation for complex logic
 - Create user guides and API documentation when relevant
@@ -140,4 +148,38 @@ When generating code for Azure, running terminal commands for Azure, or performi
 - Use AI feedback loops for continuous improvement
 - Maintain human oversight for critical decisions
 - Document AI tool usage and configurations
+
+### Content Management & Documentation Evolution
+
+### Directory Structure Documentation
+- **Mandatory README.md Files**: Every directory must contain a README.md file, no exceptions
+- **Directory Purpose Documentation**: Each README.md must clearly explain:
+  - The specific role and responsibility of that directory within the repository
+  - How the directory's contents are organized and structured
+  - Dependencies and relationships with other directories
+  - Any special conventions, naming patterns, or organizational rules
+  - Entry points for users or developers new to that directory
+- **Content Inventory**: Directory README.md files should include:
+  - Comprehensive listing of all files and subdirectories
+  - Brief description of each item's purpose and function
+  - Status indicators (active, deprecated, experimental, etc.)
+  - Last updated information and maintenance responsibility
+- **Navigation and Discovery**: Directory documentation should facilitate:
+  - Easy navigation between related directories
+  - Clear paths for different user personas (developers, users, contributors)
+  - Search-friendly content with appropriate keywords and tags
+  - Integration with repository-wide navigation and index systems
+
+### Markdown Page Lifecycle Management
+
+### Content Quality Assurance
+- **Directory Documentation Audit**: Regularly verify that every directory has a current README.md file
+- **Consistency Checks**: Ensure terminology, formatting, and style remain consistent across all .md files
+- **Cross-Directory Links**: Validate that directory README.md files properly reference related directories
+- **Repository Navigation**: Ensure directory documentation supports intuitive repository exploration
+- **Documentation Completeness**: Verify that directory README.md files accurately reflect current contents
+- **Accessibility Standards**: Follow markdown accessibility best practices (proper heading hierarchy, alt text for images)
+- **SEO Optimization**: Use appropriate frontmatter, meta descriptions, and structured content
+- **Multi-format Support**: Consider how content will render across different platforms (GitHub, Jekyll, static site generators)
+- **Internationalization Ready**: Structure content to support future localization efforts
 
