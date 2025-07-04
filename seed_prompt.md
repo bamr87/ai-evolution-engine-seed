@@ -1,52 +1,81 @@
-# 🌱 AI-Agent Super Seed Prompt v2.1: Fully Autonomous & Context-Aware Repository Evolution System 🌱
+# 🌱 AI Evolution Engine - Enhanced Testing & Terminal Management Seed Prompt v0.3.1 🌱
 
-## 1. Overview & Purpose
+## Evolution Context & Purpose
 
-You are an advanced AI agent tasked with generating the foundational components for a GitHub repository that is not just interactive but **autonomously self-evolving**. This repository will leverage an AI agent (external to the workflow, called via API) that takes the **entire repository context** to make intelligent decisions about its own evolution, including code changes, documentation updates, structural modifications, and even meta-improvements to its own evolution process.
+This enhanced seed prompt addresses the successful implementation of comprehensive testing frameworks and terminal workflow management capabilities. The AI Evolution Engine has evolved into a robust, well-tested system with intuitive terminal interfaces for manual workflow execution and monitoring.
 
-This v2.1 evolution includes critical stability improvements and enhanced error handling to ensure robust operation of the AI evolution engine.
+### Key Evolution Achievements
 
-Each significant evolution will occur in a new, dedicated branch with semantic versioning considerations, ensuring a traceable, reviewable, and rollback-capable history. The system should be sophisticated enough to handle complex transformations while remaining accessible to users of varying technical backgrounds.
+**Testing Framework Implementation:**
+- Multi-tier testing framework (unit, integration, workflow)
+- Comprehensive test runner with verbose output and error handling
+- Automated validation of project structure, scripts, and configurations
+- Shell script syntax validation and JSON/YAML structure checks
 
-## 2. Core Principles & Advanced Features
+**Terminal Workflow Management:**
+- Interactive workflow execution script with colored output and progress indicators
+- Real-time monitoring capabilities for workflow runs and logs
+- Quick reference documentation and comprehensive usage guides
+- GitHub CLI integration with proper error handling and authentication
 
-### 2.1 Foundational Principles
-*   **Autonomous Evolution:** The system should be capable of evolving with minimal human intervention beyond providing high-level prompts or goals.
-*   **Full Repository Context:** The AI agent guiding the evolution will receive a comprehensive snapshot of the entire repository to make informed decisions.
-*   **Traceable Changes:** Evolutions are isolated into timestamped and descriptively named branches, allowing for review before integration.
-*   **Self-Updating Documentation:** The `README.md` is a living document, updated by the AI as the repository evolves, reflecting new features, structure, and usage instructions.
-*   **Extensibility:** The initial setup should be a robust foundation, designed for future enhancements in AI interaction, context handling, and workflow capabilities.
+**Documentation Enhancement:**
+- Complete manual workflow execution guide with examples
+- Quick reference cards for common operations
+- Comprehensive troubleshooting and debugging sections
+- Integration guides for development workflow adoption
 
-### 2.2 Advanced Features to Implement
-*   **Multi-Model AI Support:** Configuration for different AI providers (OpenAI, Anthropic, Google, local models)
-*   **Evolution Strategies:** Different evolution modes (conservative, experimental, refactor-focused)
-*   **Semantic Versioning:** AI-aware version bumping based on change impact
-*   **Change Impact Analysis:** AI assessment of how changes affect the overall system
-*   **Rollback Capabilities:** Easy reversion of unsuccessful evolutions
-*   **Evolution Metrics:** Track success/failure rates, common patterns, and improvement areas
-*   **Self-Healing:** AI can detect and fix its own errors or inconsistencies
-*   **Comprehensive Testing Framework:** Unit and integration tests for all GitHub Actions workflows with automated validation
+## Core Evolution Principles (Updated)
 
-### 2.3 Testing and Quality Assurance Standards
-*   **Workflow Testing:** All GitHub Actions workflows must have comprehensive unit tests
-*   **Integration Testing:** End-to-end testing of workflow components and scripts
-*   **Documentation Testing:** Validate that all workflow documentation is accurate and up-to-date
-*   **Security Testing:** Verify proper permissions, secret handling, and action version currency
-*   **Performance Testing:** Monitor workflow execution times and resource usage
-*   **Automated Test Execution:** Tests run automatically in CI/CD pipelines and during evolution cycles
+### Design for Failure (DFF) - Enhanced
+- Comprehensive error handling with meaningful messages and recovery suggestions
+- Dry-run capabilities for safe testing before actual execution
+- Graceful degradation and fallback mechanisms
+- Extensive logging and monitoring for debugging and optimization
 
-## 3. Repository Meta-Information
+### Don't Repeat Yourself (DRY) - Expanded  
+- Modular script architecture with reusable components
+- Template-based documentation generation
+- Shared configuration and common patterns
+- Helper functions and utility libraries
 
-*   **Intended Repository Owner:** `bamr87`
-*   **Target Initialization Timestamp (UTC):** `2025-06-14 04:26:26`
-* **This Seed Prompt Version:** `2.1`
-* **Seed Prompt Last Updated:** `2025-06-16 20:30:00 UTC`
-*   **Default Repository Name:** `ai-evolution-engine`
-*   **Initial Version:** `0.1.0`
+### Keep It Simple (KIS) - Refined
+- Clear command-line interfaces with intuitive syntax
+- Well-structured code with descriptive naming
+- Focused functionality with single-responsibility modules
+- Accessible documentation for users of all skill levels
 
-## 4. Required Deliverables with Enhanced Specifications
+### AI-Powered Development (AIPD) - Advanced
+- Intelligent evolution strategy selection based on repository context
+- AI-assisted documentation generation and maintenance
+- Automated testing pattern recognition and improvement
+- Context-aware change impact analysis
 
-### 4.1. `README.md` (The Living Manual & Evolution Chronicle)
+## Testing & Quality Standards
+
+### Testing Framework Requirements
+- **Unit Tests**: Project structure validation, script permissions, syntax checking
+- **Integration Tests**: Workflow component integration, context collection, metrics tracking
+- **Workflow Tests**: GitHub Actions validation, input/output verification, script integration
+- **Performance Tests**: Execution time monitoring, resource usage analysis
+- **Security Tests**: Permission validation, secret handling, authentication verification
+
+### Test Execution Standards
+- All tests must pass before evolution completion
+- Comprehensive test coverage for all new functionality
+- Automated test execution in CI/CD pipelines
+- Test result reporting with detailed failure analysis
+- Performance regression detection and alerting
+
+### Documentation Quality Standards
+- Every directory must contain comprehensive README.md files
+- All scripts must have usage examples and parameter documentation
+- Quick reference guides for common operations
+- Troubleshooting sections with solution examples
+- Integration guides for development workflow adoption
+
+## Evolution Seed Requirements
+
+### 1. Enhanced README.md
 
 Create a comprehensive, visually appealing Markdown document with:
 

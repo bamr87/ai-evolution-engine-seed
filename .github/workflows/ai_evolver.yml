@@ -118,6 +118,8 @@ jobs:
       - name: 🌰 Plant New Seeds
         if: env.AUTO_PLANT_SEEDS == 'true' && env.DRY_RUN != 'true'
         run: |
+          # Generate new seed content using helper script
+          ./scripts/generate_seed.sh "$PROMPT" "$GROWTH_MODE" "3" "4" > "/tmp/next_seed.md"
           ./scripts/plant-new-seeds.sh "/tmp/evolution_response.json" "$AUTO_PLANT_SEEDS"
           
       - name: 🌳 Create Growth Pull Request
@@ -130,7 +132,9 @@ jobs:
           git config --global user.name "AI Evolution Engine"
           git config --global user.email "ai-evolution@users.noreply.github.com"
           
-          ./scripts/create_pr.sh "/tmp/evolution_response.json" "$PROMPT" "$GROWTH_MODE"
+          # Generate AI response and create PR using helper scripts
+          ./scripts/generate_ai_response.sh "/tmp/evolution_response.json" "$PROMPT" "$GROWTH_MODE" > "/tmp/ai_response.json"
+          ./scripts/create_pr.sh "/tmp/ai_response.json" "$PROMPT" "$GROWTH_MODE"
           
       - name: 📊 Evolution Summary
         if: always()
