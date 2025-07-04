@@ -89,19 +89,21 @@ Usage: $0 [OPTIONS]
 
 Options:
     -v, --verbose       Enable verbose output
-    -t, --type TYPE     Run specific test type (unit|integration|all)
+    -t, --type TYPE     Run specific test type (unit|integration|workflow|all)
     --fail-fast         Stop on first failure
     -h, --help          Show this help message
 
 Test Types:
     unit                Run unit tests only
     integration         Run integration tests only
+    workflow            Run GitHub Actions workflow tests only
     all                 Run all tests (default)
 
 Examples:
     $0                          # Run all tests
     $0 --verbose               # Run all tests with verbose output
     $0 -t unit                 # Run only unit tests
+    $0 -t workflow             # Run only workflow tests
     $0 --fail-fast             # Stop on first failure
 EOF
 }
@@ -229,6 +231,21 @@ run_integration_tests() {
     fi
 }
 
+# Run workflow tests
+run_workflow_tests() {
+    log "Running GitHub Actions workflow tests..."
+    
+    # Check if workflow test runner exists
+    local workflow_test_runner="$PROJECT_ROOT/tests/workflow_test_runner.sh"
+    if [[ -f "$workflow_test_runner" ]]; then
+        run_test "GitHub Actions workflows" "bash '$workflow_test_runner'"
+    else
+        warn "Workflow test runner not found: $workflow_test_runner"
+        # Fallback to basic workflow validation
+        test_yaml_validity
+    fi
+}
+
 # Show test results
 show_results() {
     echo
@@ -264,9 +281,13 @@ main() {
         integration)
             run_integration_tests
             ;;
+        workflow)
+            run_workflow_tests
+            ;;
         all)
             run_unit_tests
             run_integration_tests
+            run_workflow_tests
             ;;
         *)
             error "Invalid test type: $TEST_TYPE"

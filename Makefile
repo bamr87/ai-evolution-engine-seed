@@ -8,9 +8,10 @@ help:
 	@echo "AI Evolution Engine - Available Commands:"
 	@echo ""
 	@echo "Testing:"
-	@echo "  make test              - Run all tests (unit + integration)"
+	@echo "  make test              - Run all tests (unit + integration + workflow)"
 	@echo "  make test-unit         - Run only unit tests"
 	@echo "  make test-integration  - Run only integration tests"
+	@echo "  make test-workflow     - Run only GitHub Actions workflow tests"
 	@echo "  make test-verbose      - Run all tests with verbose output"
 	@echo ""
 	@echo "Setup:"
@@ -42,6 +43,10 @@ test-unit:
 test-integration:
 	@echo "🔗 Running integration tests..."
 	@./tests/test_runner.sh --type integration
+
+test-workflow:
+	@echo "⚙️ Running GitHub Actions workflow tests..."
+	@./tests/test_runner.sh --type workflow
 
 test-verbose:
 	@echo "🔊 Running all tests with verbose output..."

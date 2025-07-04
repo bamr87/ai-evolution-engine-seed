@@ -127,6 +127,42 @@ graph TD
     L -- Merge --> A_NEXT[🌱 Evolved Seed (ready for next cycle)]
 ```
 
+## 🧪 Comprehensive Testing Framework
+
+The AI Evolution Engine includes a robust testing framework that ensures reliability and quality across all components, with special focus on GitHub Actions workflow validation.
+
+### 🔬 Testing Categories
+
+| Test Type | Purpose | Coverage |
+|-----------|---------|----------|
+| **Unit Tests** | Individual component validation | ✅ Workflow YAML structure<br>✅ Script syntax validation<br>✅ JSON/YAML file integrity |
+| **Integration Tests** | End-to-end workflow testing | ✅ Context collection simulation<br>✅ Metrics update verification<br>✅ Script integration validation |
+| **Workflow Tests** | GitHub Actions specific | ✅ Security permissions<br>✅ Input/output validation<br>✅ Error handling patterns |
+| **Security Tests** | Safety and compliance | ✅ Secret handling<br>✅ Permission scoping<br>✅ Action version currency |
+
+### 🚀 Running Tests
+
+```bash
+# Run all tests (unit + integration + workflow)
+make test
+
+# Run specific test categories
+make test-unit          # Unit tests only
+make test-integration   # Integration tests only
+make test-workflow      # GitHub Actions workflow tests only
+
+# Enhanced test runner with detailed options
+./tests/test_runner.sh --type all --verbose
+./tests/workflow_test_runner.sh
+```
+
+### 📊 Test Documentation
+
+Comprehensive testing documentation is available at:
+- [Workflow Testing Guide](docs/workflow-testing.md) - Complete framework documentation
+- [Test Standards](tests/unit/workflows/README.md) - Unit testing guidelines
+- [Integration Patterns](tests/integration/README.md) - End-to-end testing approaches
+
 ## 🧪 Evolution Generation 3.1: Testing & Build Automation
 
 This evolution cycle focused on **real-world problem-solving** in CI/CD automation, derived from fixing actual issues in the zer0-mistakes Jekyll theme project.
