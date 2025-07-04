@@ -93,7 +93,7 @@ jobs:
       - name: 🚀 Trigger Evolution Workflow
         if: steps.health_check.outputs.should_evolve == 'true'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           ./scripts/trigger-evolution-workflow.sh \
             "$EVOLUTION_TYPE" \
