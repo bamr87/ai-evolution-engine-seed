@@ -26,6 +26,11 @@ on:
         required: false
         default: false
         type: boolean
+      use_container:
+        description: 'Run in containerized environment (recommended for CI)'
+        required: false
+        default: true
+        type: boolean
 
 permissions:
   contents: write
@@ -35,43 +40,54 @@ permissions:
 env:
   EVOLUTION_VERSION: "0.3.0"
   WORKFLOW_TYPE: "manual_evolution"
+  # Set environment context for cross-compatibility
+  CI_ENVIRONMENT: "true"
+  GITHUB_WORKSPACE: ${{ github.workspace }}
 
 jobs:
   evolve:
     name: 🌿 Growth Cycle v0.3.0
     runs-on: ubuntu-latest
+    container: 
+      image: ${{ inputs.use_container && 'ghcr.io/cli/cli:latest' || '' }}
+      options: --user root
     
     env:
       PROMPT: ${{ inputs.prompt }}
       GROWTH_MODE: ${{ inputs.growth_mode }}
       AUTO_PLANT_SEEDS: ${{ inputs.auto_plant_seeds }}
       DRY_RUN: ${{ inputs.dry_run }}
+      USE_CONTAINER: ${{ inputs.use_container }}
+      # GitHub CLI authentication
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Fallback to PAT if GITHUB_TOKEN insufficient
+      PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
     
     steps:
       - name: 🌱 Prepare Growth Environment
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.PAT_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
           
       - name: 🛠️ Setup Environment
         run: |
+          # Make scripts executable first
+          find ./scripts -name "*.sh" -exec chmod +x {} \;
+          
           if [ ! -f "./scripts/setup-environment.sh" ]; then
             echo "❌ Setup script not found!"
             exit 1
           fi
-          chmod +x ./scripts/setup-environment.sh
           ./scripts/setup-environment.sh
           
       - name: 🔍 Validate Prerequisites
         run: |
-          chmod +x ./scripts/check-prereqs.sh
-          ./scripts/check-prereqs.sh "$GROWTH_MODE"
+          ./scripts/check-prereqs.sh "$GROWTH_MODE" "$CI_ENVIRONMENT"
           
       - name: 🧬 Collect Repository DNA & Metrics
         id: collect_context
         run: |
-          chmod +x ./scripts/collect-context.sh
           ./scripts/collect-context.sh \
             "$PROMPT" \
             "$GROWTH_MODE" \
@@ -80,7 +96,6 @@ jobs:
       - name: 🧠 Invoke AI Growth Engine
         id: ai_growth_simulation
         run: |
-          chmod +x ./scripts/simulate-ai-growth.sh
           ./scripts/simulate-ai-growth.sh \
             "$PROMPT" \
             "$GROWTH_MODE" \
@@ -90,7 +105,6 @@ jobs:
       - name: 🌾 Apply Growth Changes
         if: env.DRY_RUN != 'true'
         run: |
-          chmod +x ./scripts/apply-growth-changes.sh
           ./scripts/apply-growth-changes.sh "/tmp/evolution_response.json"
           
       - name: 🔍 Dry Run - Preview Changes
@@ -104,13 +118,30 @@ jobs:
       - name: 🌰 Plant New Seeds
         if: env.AUTO_PLANT_SEEDS == 'true' && env.DRY_RUN != 'true'
         run: |
-          chmod +x ./scripts/plant-new-seeds.sh
           ./scripts/plant-new-seeds.sh "/tmp/evolution_response.json" "$AUTO_PLANT_SEEDS"
           
       - name: 🌳 Create Growth Pull Request
         if: env.DRY_RUN != 'true'
         env:
-          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
+          # Ensure GitHub CLI has proper authentication
+          GH_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
-          chmod +x ./scripts/create_pr.sh
+          # Configure git for PR creation if needed
+          git config --global user.name "AI Evolution Engine"
+          git config --global user.email "ai-evolution@users.noreply.github.com"
+          
           ./scripts/create_pr.sh "/tmp/evolution_response.json" "$PROMPT" "$GROWTH_MODE"
+          
+      - name: 📊 Evolution Summary
+        if: always()
+        run: |
+          echo "🌱 Evolution Cycle Complete!"
+          echo "  - Version: $EVOLUTION_VERSION"
+          echo "  - Prompt: $PROMPT"
+          echo "  - Growth Mode: $GROWTH_MODE"
+          echo "  - Dry Run: $DRY_RUN"
+          echo "  - Auto Plant Seeds: $AUTO_PLANT_SEEDS"
+          
+          if [ -f "/tmp/evolution_response.json" ]; then
+            echo "  - Changes Applied: $(jq -r '.changes | length' /tmp/evolution_response.json)"
+          fi

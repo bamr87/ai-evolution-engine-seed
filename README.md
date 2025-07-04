@@ -4,15 +4,15 @@
 ╔═══════════════════════════════════════════════════════════════╗
 ║                   AI EVOLUTION ENGINE                         ║
 ║         Where Seeds Grow Into Intelligent Software            ║
-║                      v0.2.1-seed                              ║
+║                      v0.3.0-seed                              ║
 ╚═══════════════════════════════════════════════════════════════╝
 ```
 
-[![Version](https://img.shields.io/badge/version-0.2.1--seed-blue.svg)](https://github.com/bamr87/ai-evolution-engine)
-![Evolution Status](https://img.shields.io/badge/status-stabilized-green.svg)
-![Growth Potential](https://img.shields.io/badge/potential-robust-purple.svg)
+[![Version](https://img.shields.io/badge/version-0.3.0--seed-blue.svg)](https://github.com/bamr87/ai-evolution-engine)
+![Evolution Status](https://img.shields.io/badge/status-cross--platform-green.svg)
+![Growth Potential](https://img.shields.io/badge/potential-universal-purple.svg)
 
-> 🌱 **This seed is alive and now more stable. Plant it, nurture it with prompts, and watch AI guide its growth.**
+> 🌱 **Now cross-platform ready! This seed grows everywhere - locally, in containers, or in the cloud. Plant it anywhere and watch AI guide its evolution.**
 
 This repository is a living experiment in AI-driven software evolution. It's designed to adapt, learn, and improve itself with each "growth cycle," guided by your prompts and an AI engine.
 
@@ -22,6 +22,40 @@ We believe in software that grows organically, much like a plant from a seed. Th
 - **Sustainability**: Each evolution builds upon stable foundations.
 - **Adaptability**: The system learns and refines its growth patterns.
 - **Acceleration**: AI handles boilerplate and complex transformations, letting humans focus on vision.
+
+## 🌍 Cross-Platform Evolution (New in v0.3.0!)
+
+The AI Evolution Engine now runs everywhere with full cross-platform support:
+
+### 🏠 Local Development
+- **Native execution** on macOS, Linux, and Windows
+- **Automatic dependency management** with OS-specific package managers
+- **Interactive local runner** with `./scripts/local-evolution.sh`
+
+### 🐳 Containerized Environment
+- **Docker support** for isolated, reproducible environments
+- **Pre-built container** with all dependencies included
+- **Volume mounting** for seamless local development integration
+
+### ☁️ CI/CD Ready
+- **GitHub Actions** with enhanced authentication handling
+- **Multiple token strategies** (PAT_TOKEN, GITHUB_TOKEN)
+- **Container option** for pipeline isolation
+
+**Quick Start Options:**
+```bash
+# Local development (native)
+./scripts/local-evolution.sh -p "Your evolution prompt"
+
+# Container development
+docker-compose -f docker/docker-compose.yml run evolution-engine \
+  ./scripts/local-evolution.sh -p "Your prompt"
+
+# CI/CD (GitHub Actions)
+# Use the workflow_dispatch trigger in GitHub
+```
+
+➡️ **[Cross-Platform Setup Guide](CROSS_PLATFORM_UPDATE.md)**
 
 ## 📁 Repository Structure
 
@@ -39,26 +73,28 @@ The repository is now organized following software engineering best practices:
 
 For detailed structure information, see [`docs/ORGANIZATION.md`](docs/ORGANIZATION.md).
 
-## 🧬 Seed Anatomy (v0.2.1)
+## 🧬 Seed Anatomy (v0.3.0)
 
 1. **`README.md` (This file)**: A dynamic chronicle of the repository's evolution. The section below is updated by the AI.
     <!-- AI-EVOLUTION-MARKER:START -->
     **Evolutionary State:**
-    - Generation: 3.1 (Testing & Build Automation Evolution)
-    - Adaptations Logged: 7 major issue categories resolved
-    - Last Growth Spurt: 2025-07-03 (comprehensive testing & build automation)
-    - Last Prompt: Enhanced testing and build automation with error resolution patterns from zer0-mistakes Jekyll theme
-    - Build Success Rate: 100% (26/26 tests passing)
-    - Authentication Handling: Robust (credential file validation)
-    - Version Conflict Prevention: Active (proactive RubyGems checking)
-    - Error Resolution: Automated (permission fixes, dependency corrections)
+    - Generation: 4.0 (Cross-Platform Evolution)
+    - Adaptations Logged: 12 major enhancement categories implemented
+    - Last Growth Spurt: 2025-07-04 (comprehensive cross-platform compatibility)
+    - Last Prompt: Enhanced cross-platform compatibility with containerization and local development support
+    - Cross-Platform Support: Universal (macOS, Linux, Windows, Container)
+    - Authentication Handling: Multi-strategy (PAT_TOKEN, GITHUB_TOKEN, local gh auth)
+    - Container Ready: Full Docker support with isolated execution
+    - Local Development: Enhanced CLI with ./scripts/local-evolution.sh
+    - CI/CD Integration: Robust GitHub Actions with fallback strategies
     <!-- AI-EVOLUTION-MARKER:END -->
-2. **`init_setup.sh`**: The germination script. It now sets up a complete v0.2.1 environment, including this README, the AI workflow, and initial configurations.
-3. **`.github/workflows/ai_evolver.yml`**: The heart of the growth engine. In v0.2.1, it includes critical bug fixes for JSON handling and improved stability.
-4. **`.seed.md`**: The blueprint for the *next* generation. The v0.2.1 workflow generates a `.seed.md` that outlines the path towards v0.3.0, based on the current cycle's "learnings."
-5. **`evolution-metrics.json`**: Tracks the quantitative aspects of growth with validated JSON structure.
-6. **`.gptignore`**: A file to help guide the AI's focus by excluding irrelevant files from its context.
-7. **Daily Evolution System**: Automated daily maintenance cycles that keep the repository healthy and up-to-date.
+2. **`init_setup.sh`**: The germination script. Now supports cross-platform setup with OS detection and proper dependency management.
+3. **`.github/workflows/ai_evolver.yml`**: The heart of the growth engine. v0.3.0 includes container support, enhanced authentication, and cross-platform compatibility.
+4. **`.seed.md`**: The blueprint for the *next* generation. The v0.3.0 workflow generates advanced evolution strategies.
+5. **`evolution-metrics.json`**: Tracks quantitative and qualitative aspects of growth with environment awareness.
+6. **`docker/`**: Complete containerization support with Dockerfile, docker-compose, and documentation.
+7. **`scripts/local-evolution.sh`**: Cross-platform local development runner with comprehensive CLI interface.
+8. **Enhanced Scripts**: All scripts now support multiple platforms and execution environments.
 
 ## 🤖 Automated Daily Evolution (New in v0.2.1!)
 

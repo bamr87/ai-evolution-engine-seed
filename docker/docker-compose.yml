@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  evolution-engine:
+    build:
+      context: ..
+      dockerfile: docker/evolution.Dockerfile
+    container_name: ai-evolution-engine
+    working_dir: /workspace
+    volumes:
+      # Mount the entire repository
+      - ..:/workspace
+      # Mount git config for authentication (optional)
+      - ~/.gitconfig:/home/evolution/.gitconfig:ro
+      # Mount GitHub CLI config if available
+      - ~/.config/gh:/home/evolution/.config/gh:ro
+    environment:
+      # Set container mode
+      - USE_CONTAINER=true
+      - CI_ENVIRONMENT=false
+      # Pass through GitHub tokens if available
+      - GH_TOKEN=${GH_TOKEN:-}
+      - PAT_TOKEN=${PAT_TOKEN:-}
+      # Pass through AI API key if available
+      - AI_API_KEY=${AI_API_KEY:-}
+    stdin_open: true
+    tty: true
+    command: /bin/bash
+    networks:
+      - evolution-network
+
+  # Optional: Redis for future caching features
+  redis:
+    image: redis:7-alpine
+    container_name: evolution-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - evolution-network
+    profiles:
+      - with-cache
+
+networks:
+  evolution-network:
+    driver: bridge
+
+# Usage:
+# - Standard development: docker-compose up evolution-engine
+# - With caching: docker-compose --profile with-cache up
+# - Interactive shell: docker-compose run evolution-engine /bin/bash
+# - Run evolution: docker-compose run evolution-engine ./scripts/evolve.sh --prompt "your prompt here"

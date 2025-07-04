@@ -1,34 +1,64 @@
 #!/bin/bash
 
 # 🌱 AI Evolution Engine: Prerequisite Checker
-# Version: v0.2.0-seed
+# Version: v0.3.0-seed
 # Description: Validates environment setup for the AI Evolution Engine
+# Supports both CI/CD and local development environments
 
 set -e
 
-# Color codes for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-PURPLE='\033[0;35m'
-NC='\033[0m' # No Color
+# Input parameters
+GROWTH_MODE="${1:-adaptive}"
+CI_ENVIRONMENT="${2:-${CI_ENVIRONMENT:-false}}"
 
-# Unicode symbols
-CHECK_MARK="✅"
-CROSS_MARK="❌"
-WARNING="⚠️"
-INFO="ℹ️"
+# Color codes for output (disabled in CI for cleaner logs)
+if [ "$CI_ENVIRONMENT" = "true" ]; then
+    RED=''
+    GREEN=''
+    YELLOW=''
+    BLUE=''
+    PURPLE=''
+    NC=''
+else
+    RED='\033[0;31m'
+    GREEN='\033[0;32m'
+    YELLOW='\033[1;33m'
+    BLUE='\033[0;34m'
+    PURPLE='\033[0;35m'
+    NC='\033[0m' # No Color
+fi
+
+# Unicode symbols (fallback for CI)
+if [ "$CI_ENVIRONMENT" = "true" ]; then
+    CHECK_MARK="[OK]"
+    CROSS_MARK="[FAIL]"
+    WARNING="[WARN]"
+    INFO="[INFO]"
+else
+    CHECK_MARK="✅"
+    CROSS_MARK="❌"
+    WARNING="⚠️"
+    INFO="ℹ️"
+fi
 
 # Global status tracking
 PREREQ_FAILED=0
 WARNINGS=0
 
 echo -e "${BLUE}"
-echo "╔═══════════════════════════════════════════════════════════════╗"
-echo "║              AI EVOLUTION ENGINE PREREQUISITE CHECKER         ║"
-echo "║                         v0.2.0-seed                           ║"
-echo "╚═══════════════════════════════════════════════════════════════╝"
+if [ "$CI_ENVIRONMENT" = "true" ]; then
+    echo "=========================================================="
+    echo "  AI Evolution Engine Prerequisite Checker v0.3.0"
+    echo "  Environment: CI/CD Pipeline"
+    echo "  Growth Mode: $GROWTH_MODE"
+    echo "=========================================================="
+else
+    echo "╔═══════════════════════════════════════════════════════════════╗"
+    echo "║              AI EVOLUTION ENGINE PREREQUISITE CHECKER         ║"
+    echo "║                         v0.3.0-seed                           ║"
+    echo "║                    Environment: Local Dev                     ║"
+    echo "╚═══════════════════════════════════════════════════════════════╝"
+fi
 echo -e "${NC}"
 
 print_status() {
@@ -118,14 +148,26 @@ echo -e "\n${PURPLE}🔍 Checking GitHub Integration...${NC}"
 # Check GitHub CLI
 check_command "gh" "GitHub CLI" "true" "Install from: https://cli.github.com/"
 
-# Check if GitHub CLI is authenticated (if available)
+# Check if GitHub CLI is authenticated (context-aware)
 if command -v gh >/dev/null 2>&1; then
-    if gh auth status >/dev/null 2>&1; then
-        local gh_user=$(gh api user --jq '.login' 2>/dev/null || echo "Unknown")
-        print_status "pass" "GitHub CLI is authenticated" "Logged in as: $gh_user"
+    if [ "$CI_ENVIRONMENT" = "true" ]; then
+        # In CI, check for token availability
+        if [ -n "${GH_TOKEN:-}" ] || [ -n "${PAT_TOKEN:-}" ]; then
+            print_status "pass" "GitHub authentication configured" "Token available in environment"
+        else
+            print_status "fail" "GitHub authentication not configured" "Set PAT_TOKEN or GH_TOKEN secret"
+        fi
     else
-        print_status "fail" "GitHub CLI is not authenticated" "Run: gh auth login"
+        # Local development - check auth status
+        if gh auth status >/dev/null 2>&1; then
+            local gh_user=$(gh api user --jq '.login' 2>/dev/null || echo "Unknown")
+            print_status "pass" "GitHub CLI is authenticated" "Logged in as: $gh_user"
+        else
+            print_status "fail" "GitHub CLI is not authenticated" "Run: gh auth login"
+        fi
     fi
+else
+    print_status "fail" "GitHub CLI not available" "Required for PR creation"
 fi
 
 echo -e "\n${PURPLE}🔍 Checking Git Configuration...${NC}"
@@ -163,16 +205,27 @@ check_file_permissions "./check-prereqs.sh" "This prerequisite checker"
 
 echo -e "\n${PURPLE}🔍 Checking Environment Variables...${NC}"
 
-# Check for AI API key (optional for now)
-if [ -n "$AI_API_KEY" ]; then
-    print_status "pass" "AI_API_KEY environment variable is set" "Value: ${AI_API_KEY:0:8}..."
+# Check for AI API key (environment-aware)
+if [ "$CI_ENVIRONMENT" = "true" ]; then
+    print_status "info" "AI API integration" "Using simulated AI for CI pipeline"
 else
-    print_status "info" "AI_API_KEY environment variable is not set" "This is optional for v0.2.0 (simulated AI)"
+    if [ -n "${AI_API_KEY:-}" ]; then
+        print_status "pass" "AI_API_KEY environment variable is set" "Value: ${AI_API_KEY:0:8}..."
+    else
+        print_status "info" "AI_API_KEY environment variable is not set" "Using simulated AI (v0.3.0)"
+    fi
 fi
 
 # Check shell
-current_shell=$(basename "$SHELL")
+current_shell=$(basename "$SHELL" 2>/dev/null || echo "unknown")
 print_status "info" "Current shell detected" "$current_shell"
+
+# Check container environment
+if [ -n "${KUBERNETES_SERVICE_HOST:-}" ] || [ -f "/.dockerenv" ]; then
+    print_status "info" "Container environment detected" "Running in containerized environment"
+elif [ "$CI_ENVIRONMENT" = "true" ]; then
+    print_status "info" "CI environment detected" "GitHub Actions runner"
+fi
 
 echo -e "\n${PURPLE}🔍 System Information...${NC}"
 
