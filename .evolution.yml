@@ -1,22 +1,56 @@
 # 🌱 Evolution Configuration
-version: 1.0
+version: 1.1
 growth:
-  stage: sapling # Updated from germination
+  stage: mature # Updated from sapling to reflect daily automation capability
   strategy: adaptive
-  auto_evolve: true # Corresponds to auto_plant_seeds in workflow?
+  auto_evolve: true
+
+# Daily automation settings
+daily_evolution:
+  enabled: true
+  schedule: "0 3 * * *" # 3 AM UTC daily
+  default_type: "consistency"
+  default_intensity: "minimal"
+  skip_if_recent_changes: false # Set to true to skip if commits in last 24h
+  max_issues_threshold: 10 # Skip if more than this many issues detected
 
 ai:
-  provider: ${AI_PROVIDER:-openai} # Placeholder, actual AI call not in v0.2.0 workflow
+  provider: ${AI_PROVIDER:-openai}
   model: ${AI_MODEL:-gpt-4-turbo}
   temperature: 0.6
 
 evolution:
   max_context_files: 50
   max_context_line_per_file: 1000
-  require_tests_for_features: true # Aspirational
+  require_tests_for_features: true
   preserve_core_logic: true
+  
+  # Evolution type configurations
+  types:
+    consistency:
+      safe_mode: true
+      focus_areas: ["formatting", "naming", "structure"]
+    error_fixing:
+      safe_mode: true
+      focus_areas: ["bugs", "validation", "error_handling"]
+    documentation:
+      safe_mode: false
+      focus_areas: ["accuracy", "completeness", "examples"]
+    code_quality:
+      safe_mode: false
+      focus_areas: ["readability", "performance", "maintainability"]
+    security_updates:
+      safe_mode: true
+      focus_areas: ["dependencies", "permissions", "validation"]
 
 sustainability:
   track_growth_metrics: true
   optimize_for_maintainability: true
-  share_seed_improvements: true # Via the .seed.md mechanism
+  share_seed_improvements: true
+  
+# Quality gates
+quality_gates:
+  require_tests_pass: true
+  require_lint_pass: true
+  max_evolution_time: "30m"
+  rollback_on_failure: true

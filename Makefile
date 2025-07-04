@@ -21,6 +21,14 @@ help:
 	@echo "Templates:"
 	@echo "  make template-testing  - Initialize testing automation template"
 	@echo ""
+	@echo "Evolution:"
+	@echo "  make evolve            - Run default evolution cycle (consistency, minimal)"
+	@echo "  make evolve-docs       - Update documentation (moderate intensity)"
+	@echo "  make evolve-quality    - Improve code quality (moderate intensity)"
+	@echo "  make evolve-security   - Apply security updates (minimal intensity)"
+	@echo "  make evolve-custom     - Run custom evolution (set PROMPT variable)"
+	@echo "  make evolve-dry-run    - Preview evolution changes without applying"
+	@echo ""
 
 # Testing commands
 test:
@@ -87,3 +95,37 @@ quickstart: setup test
 	@echo "🚀 AI Evolution Engine is ready!"
 	@echo "📖 Read docs/ORGANIZATION.md for detailed information"
 	@echo "🧪 Run 'make test' to verify everything is working"
+
+# Evolution commands
+evolve:
+	@echo "🌱 Running default evolution cycle..."
+	@./scripts/evolve.sh --type consistency --intensity minimal
+
+evolve-docs:
+	@echo "📚 Updating documentation..."
+	@./scripts/evolve.sh --type documentation --intensity moderate
+
+evolve-quality:
+	@echo "⚡ Improving code quality..."
+	@./scripts/evolve.sh --type code_quality --intensity moderate
+
+evolve-security:
+	@echo "🔒 Applying security updates..."
+	@./scripts/evolve.sh --type security_updates --intensity minimal
+
+evolve-custom:
+	@if [ -z "$(PROMPT)" ]; then \
+		echo "❌ Error: PROMPT variable is required for custom evolution"; \
+		echo "Usage: make evolve-custom PROMPT='your custom prompt here'"; \
+		exit 1; \
+	fi
+	@echo "🎯 Running custom evolution: $(PROMPT)"
+	@./scripts/evolve.sh --type custom --prompt "$(PROMPT)"
+
+evolve-dry-run:
+	@echo "🔍 Previewing evolution changes (dry run)..."
+	@./scripts/evolve.sh --type consistency --intensity minimal --dry-run
+
+evolve-force:
+	@echo "🚀 Force running evolution cycle..."
+	@./scripts/evolve.sh --type consistency --intensity minimal --force-run

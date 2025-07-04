@@ -58,6 +58,39 @@ For detailed structure information, see [`docs/ORGANIZATION.md`](docs/ORGANIZATI
 4. **`.seed.md`**: The blueprint for the *next* generation. The v0.2.1 workflow generates a `.seed.md` that outlines the path towards v0.3.0, based on the current cycle's "learnings."
 5. **`evolution-metrics.json`**: Tracks the quantitative aspects of growth with validated JSON structure.
 6. **`.gptignore`**: A file to help guide the AI's focus by excluding irrelevant files from its context.
+7. **Daily Evolution System**: Automated daily maintenance cycles that keep the repository healthy and up-to-date.
+
+## 🤖 Automated Daily Evolution (New in v0.2.1!)
+
+The repository now includes an intelligent daily evolution system that automatically maintains code quality and consistency:
+
+### 🌅 Daily Maintenance Features
+
+- **Automated Health Checks**: Scans for inconsistencies, errors, and improvement opportunities
+- **Smart Triggering**: Only runs when actual improvements are detected
+- **Conservative Approach**: Focuses on safe, minimal changes by default
+- **Command Line Interface**: On-demand evolution cycles with full control
+
+### 🚀 Quick Daily Evolution Commands
+
+```bash
+# Run quick consistency check and fixes
+./scripts/evolve.sh
+
+# Documentation improvements
+./scripts/evolve.sh --type documentation --intensity moderate
+
+# Custom evolution with specific goals
+./scripts/evolve.sh --type custom --prompt "Improve error handling in scripts"
+
+# Dry run to preview changes
+./scripts/evolve.sh --type code_quality --dry-run
+```
+
+**Daily Schedule**: Automatically runs at 3 AM UTC daily (configurable)
+**On-Demand**: Use `./scripts/evolve.sh` anytime for immediate improvements
+
+➡️ **[Complete Daily Evolution Guide](docs/DAILY_EVOLUTION.md)**
 
 ## 🚀 Quick Germination & Growth
 
