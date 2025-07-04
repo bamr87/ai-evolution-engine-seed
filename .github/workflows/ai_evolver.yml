@@ -49,7 +49,7 @@ jobs:
     name: 🌿 Growth Cycle v0.3.0
     runs-on: ubuntu-latest
     container: 
-      image: ${{ inputs.use_container && 'ghcr.io/cli/cli:latest' || '' }}
+      image: ${{ inputs.use_container && 'ghcr.io/github/gh-cli:latest' || '' }}
       options: --user root
     
     env:
