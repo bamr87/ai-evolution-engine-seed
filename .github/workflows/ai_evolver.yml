@@ -1,4 +1,4 @@
-name: 🌱 AI Evolution Growth Engine (v0.2.0)
+name: 🌱 AI Evolution Growth Engine (v0.3.0)
 
 on:
   workflow_dispatch:
@@ -16,56 +16,101 @@ on:
           - conservative
           - adaptive
           - experimental
-      auto_plant_seeds: # This now refers to auto-committing the new .seed.md
+      auto_plant_seeds:
         description: 'Automatically commit the newly generated .seed.md for next evolution?'
         required: false
         default: true
+        type: boolean
+      dry_run:
+        description: 'Run in simulation mode without making actual changes'
+        required: false
+        default: false
         type: boolean
 
 permissions:
   contents: write
   pull-requests: write
-  issues: write # If AI needs to create issues for complex tasks
+  issues: write
+
+env:
+  EVOLUTION_VERSION: "0.3.0"
+  WORKFLOW_TYPE: "manual_evolution"
 
 jobs:
   evolve:
-    name: 🌿 Growth Cycle v0.2.0
+    name: 🌿 Growth Cycle v0.3.0
     runs-on: ubuntu-latest
+    
+    env:
+      PROMPT: ${{ inputs.prompt }}
+      GROWTH_MODE: ${{ inputs.growth_mode }}
+      AUTO_PLANT_SEEDS: ${{ inputs.auto_plant_seeds }}
+      DRY_RUN: ${{ inputs.dry_run }}
     
     steps:
       - name: 🌱 Prepare Growth Environment
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Need full history for some context, potentially
+          fetch-depth: 0
+          token: ${{ secrets.PAT_TOKEN_TOKEN }}
           
       - name: 🛠️ Setup Environment
-        run: ./scripts/setup-environment.sh
+        run: |
+          if [ ! -f "./scripts/setup-environment.sh" ]; then
+            echo "❌ Setup script not found!"
+            exit 1
+          fi
+          chmod +x ./scripts/setup-environment.sh
+          ./scripts/setup-environment.sh
+          
+      - name: 🔍 Validate Prerequisites
+        run: |
+          chmod +x ./scripts/check-prereqs.sh
+          ./scripts/check-prereqs.sh "$GROWTH_MODE"
           
       - name: 🧬 Collect Repository DNA & Metrics
         id: collect_context
         run: |
+          chmod +x ./scripts/collect-context.sh
           ./scripts/collect-context.sh \
-            "${{ inputs.prompt }}" \
-            "${{ inputs.growth_mode }}" \
+            "$PROMPT" \
+            "$GROWTH_MODE" \
             "/tmp/repo_context.json"
           
-      - name: 🧠 Invoke Simulated AI Growth Engine
+      - name: 🧠 Invoke AI Growth Engine
         id: ai_growth_simulation
         run: |
+          chmod +x ./scripts/simulate-ai-growth.sh
           ./scripts/simulate-ai-growth.sh \
-            "${{ inputs.prompt }}" \
-            "${{ inputs.growth_mode }}" \
+            "$PROMPT" \
+            "$GROWTH_MODE" \
             "/tmp/repo_context.json" \
             "/tmp/evolution_response.json"
 
       - name: 🌾 Apply Growth Changes
-        run: ./scripts/apply-growth-changes.sh "/tmp/evolution_response.json"
+        if: env.DRY_RUN != 'true'
+        run: |
+          chmod +x ./scripts/apply-growth-changes.sh
+          ./scripts/apply-growth-changes.sh "/tmp/evolution_response.json"
           
-      - name: 🌰 Plant New Seeds (Generate .seed.md for next evolution)
-        if: ${{ inputs.auto_plant_seeds == true }}
-        run: ./scripts/plant-new-seeds.sh "/tmp/evolution_response.json" "${{ inputs.auto_plant_seeds }}"
+      - name: 🔍 Dry Run - Preview Changes
+        if: env.DRY_RUN == 'true'
+        run: |
+          echo "🔍 DRY RUN MODE - Changes that would be applied:"
+          if [ -f "/tmp/evolution_response.json" ]; then
+            cat "/tmp/evolution_response.json" | jq -r '.changes[] | "\(.type): \(.file)"'
+          fi
+          
+      - name: 🌰 Plant New Seeds
+        if: env.AUTO_PLANT_SEEDS == 'true' && env.DRY_RUN != 'true'
+        run: |
+          chmod +x ./scripts/plant-new-seeds.sh
+          ./scripts/plant-new-seeds.sh "/tmp/evolution_response.json" "$AUTO_PLANT_SEEDS"
           
       - name: 🌳 Create Growth Pull Request
+        if: env.DRY_RUN != 'true'
         env:
-          GH_TOKEN: ${{ github.token }}
-        run: ./scripts/create_pr.sh "/tmp/evolution_response.json" "${{ inputs.prompt }}" "${{ inputs.growth_mode }}"
+          GH_TOKEN: ${{ secrets.PAT_TOKEN_TOKEN }}
+        run: |
+          chmod +x ./scripts/create_pr.sh
+          ./scripts/create_pr.sh "/tmp/evolution_response.json" "$PROMPT" "$GROWTH_MODE"

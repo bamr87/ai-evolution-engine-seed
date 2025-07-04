@@ -1,4 +1,4 @@
-name: AI Evolution - Testing & Build Automation
+name: 🌱 AI Evolution - Testing & Build Automation (v0.3.0)
 
 on:
   workflow_dispatch:
@@ -13,41 +13,109 @@ on:
           - build-optimization
           - error-resilience
           - ci-cd-enhancement
-      
+      cycle:
+        description: 'Evolution cycle number'
+        required: false
+        default: '3'
+        type: string
+      generation:
+        description: 'Evolution generation number'
+        required: false
+        default: '1'
+        type: string
+      dry_run:
+        description: 'Run in simulation mode without making actual changes'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+env:
+  EVOLUTION_VERSION: "0.3.0"
+  WORKFLOW_TYPE: "testing_automation"
+  
 jobs:
   evolve:
+    name: 🧪 Testing & Build Evolution
     runs-on: ubuntu-latest
     
+    env:
+      GROWTH_MODE: ${{ inputs.growth_mode }}
+      CYCLE: ${{ inputs.cycle }}
+      GENERATION: ${{ inputs.generation }}
+      DRY_RUN: ${{ inputs.dry_run }}
+      EVOLUTION_PROMPT: "Enhanced testing and build automation with error resolution patterns from zer0-mistakes Jekyll theme"
+    
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: 🌱 Prepare Evolution Environment
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.PAT_TOKEN_TOKEN }}
       
-    - name: Setup environment
-      run: ./scripts/setup-environment.sh
+      - name: 🛠️ Setup Environment
+        run: |
+          if [ ! -f "./scripts/setup-environment.sh" ]; then
+            echo "❌ Setup script not found!"
+            exit 1
+          fi
+          chmod +x ./scripts/setup-environment.sh
+          ./scripts/setup-environment.sh
+          
+      - name: 🔍 Validate Prerequisites
+        run: |
+          chmod +x ./scripts/check-prereqs.sh
+          ./scripts/check-prereqs.sh "$GROWTH_MODE"
         
-    - name: Generate evolution seed
-      run: |
-        ./scripts/generate_seed.sh \
-          --cycle 3 \
-          --generation 1 \
-          --prompt "Enhanced testing and build automation with error resolution patterns from zer0-mistakes Jekyll theme" \
-          --growth-mode ${{ github.event.inputs.growth_mode }}
+      - name: 🧬 Generate Evolution Seed
+        id: generate_seed
+        run: |
+          chmod +x ./scripts/generate_seed.sh
+          ./scripts/generate_seed.sh \
+            --cycle "$CYCLE" \
+            --generation "$GENERATION" \
+            --prompt "$EVOLUTION_PROMPT" \
+            --growth-mode "$GROWTH_MODE"
           
-    - name: Generate AI response
-      run: |
-        ./scripts/generate_ai_response.sh \
-          --cycle 3 \
-          --generation 1 \
-          --growth-mode ${{ github.event.inputs.growth_mode }}
+      - name: 🧠 Generate AI Response
+        id: generate_response
+        run: |
+          chmod +x ./scripts/generate_ai_response.sh
+          ./scripts/generate_ai_response.sh \
+            --cycle "$CYCLE" \
+            --generation "$GENERATION" \
+            --growth-mode "$GROWTH_MODE"
           
-    - name: Create evolution PR
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        ./scripts/create_pr.sh \
-          --cycle 3 \
-          --generation 1 \
-          --growth-mode ${{ github.event.inputs.growth_mode }}
+      - name: 🌾 Apply Evolution Changes
+        if: env.DRY_RUN != 'true'
+        run: |
+          chmod +x ./scripts/apply-growth-changes.sh
+          ./scripts/apply-growth-changes.sh "/tmp/evolution_response.json"
           
-    - name: Test evolved seed
-      run: ./scripts/test-evolved-seed.sh ${{ github.event.inputs.growth_mode }}
+      - name: 🔍 Dry Run - Preview Changes
+        if: env.DRY_RUN == 'true'
+        run: |
+          echo "🔍 DRY RUN MODE - Changes that would be applied:"
+          if [ -f "/tmp/evolution_response.json" ]; then
+            cat "/tmp/evolution_response.json" | jq -r '.changes[] | "\(.type): \(.file)"' 2>/dev/null || echo "No changes preview available"
+          fi
+          
+      - name: 🌳 Create Evolution Pull Request
+        if: env.DRY_RUN != 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN_TOKEN }}
+        run: |
+          chmod +x ./scripts/create_pr.sh
+          ./scripts/create_pr.sh \
+            --cycle "$CYCLE" \
+            --generation "$GENERATION" \
+            --growth-mode "$GROWTH_MODE"
+          
+      - name: 🧪 Test Evolved Seed
+        run: |
+          chmod +x ./scripts/test-evolved-seed.sh
+          ./scripts/test-evolved-seed.sh "$GROWTH_MODE"

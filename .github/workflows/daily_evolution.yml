@@ -1,4 +1,4 @@
-name: 🌱 Daily Evolution & Maintenance (v0.2.1)
+name: 🌱 Daily Evolution & Maintenance (v0.3.0)
 
 on:
   schedule:
@@ -31,6 +31,11 @@ on:
         required: false
         default: false
         type: boolean
+      dry_run:
+        description: 'Run in simulation mode without making actual changes'
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: write
@@ -38,33 +43,51 @@ permissions:
   issues: write
 
 env:
-  EVOLUTION_TYPE: ${{ github.event.inputs.evolution_type || 'consistency' }}
-  INTENSITY: ${{ github.event.inputs.intensity || 'minimal' }}
-  FORCE_RUN: ${{ github.event.inputs.force_run || 'false' }}
+  EVOLUTION_VERSION: "0.3.0"
+  WORKFLOW_TYPE: "scheduled_evolution"
 
 jobs:
   daily_evolution:
     name: 🌿 Daily Growth & Maintenance
     runs-on: ubuntu-latest
     
+    env:
+      EVOLUTION_TYPE: ${{ github.event.inputs.evolution_type || 'consistency' }}
+      INTENSITY: ${{ github.event.inputs.intensity || 'minimal' }}
+      FORCE_RUN: ${{ github.event.inputs.force_run || 'false' }}
+      DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+    
     steps:
       - name: 🌱 Prepare Evolution Environment
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.PAT_TOKEN_TOKEN }}
+          
+      - name: 🛠️ Setup Environment
+        run: |
+          if [ ! -f "./scripts/setup-environment.sh" ]; then
+            echo "❌ Setup script not found!"
+            exit 1
+          fi
+          chmod +x ./scripts/setup-environment.sh
+          ./scripts/setup-environment.sh
           
       - name: 📊 Analyze Repository Health
         id: health_check
         run: |
+          chmod +x ./scripts/analyze-repository-health.sh
           ./scripts/analyze-repository-health.sh \
             "$EVOLUTION_TYPE" \
             "$INTENSITY" \
             "$FORCE_RUN"
           
           # Load results for GitHub Actions output
-          source /tmp/health_check_results.env
-          echo "issues_found=$ISSUES_FOUND" >> $GITHUB_OUTPUT
-          echo "should_evolve=$SHOULD_EVOLVE" >> $GITHUB_OUTPUT
+          if [ -f "/tmp/health_check_results.env" ]; then
+            source /tmp/health_check_results.env
+            echo "issues_found=${ISSUES_FOUND:-0}" >> $GITHUB_OUTPUT
+            echo "should_evolve=${SHOULD_EVOLVE:-false}" >> $GITHUB_OUTPUT
+          fi
           
           # Format suggestions for GitHub Actions
           if [ -f "/tmp/health_check_suggestions.txt" ]; then
@@ -79,29 +102,46 @@ jobs:
         id: generate_prompt
         if: steps.health_check.outputs.should_evolve == 'true'
         run: |
+          chmod +x ./scripts/generate-evolution-prompt.sh
           ./scripts/generate-evolution-prompt.sh \
             "$EVOLUTION_TYPE" \
             "$INTENSITY"
           
           # Load the generated prompt for GitHub Actions output
-          {
-            echo 'evolution_prompt<<EOF'
-            cat /tmp/evolution_prompt.txt
-            echo 'EOF'
-          } >> $GITHUB_OUTPUT
+          if [ -f "/tmp/evolution_prompt.txt" ]; then
+            {
+              echo 'evolution_prompt<<EOF'
+              cat /tmp/evolution_prompt.txt
+              echo 'EOF'
+            } >> $GITHUB_OUTPUT
+          fi
 
       - name: 🚀 Trigger Evolution Workflow
-        if: steps.health_check.outputs.should_evolve == 'true'
+        if: steps.health_check.outputs.should_evolve == 'true' && env.DRY_RUN != 'true'
         env:
-          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
+          GH_TOKEN: ${{ secrets.PAT_TOKEN_TOKEN }}
         run: |
+          chmod +x ./scripts/trigger-evolution-workflow.sh
           ./scripts/trigger-evolution-workflow.sh \
             "$EVOLUTION_TYPE" \
             "conservative"
 
-      - name: 📊 Update Daily Evolution Metrics
-        if: steps.health_check.outputs.should_evolve == 'true'
-        run: ./scripts/update-evolution-metrics.sh
+      - name: 🔍 Dry Run - Preview Evolution
+        if: steps.health_check.outputs.should_evolve == 'true' && env.DRY_RUN == 'true'
+        run: |
+          echo "� DRY RUN MODE - Evolution that would be triggered:"
+          echo "Evolution Type: $EVOLUTION_TYPE"
+          echo "Intensity: $INTENSITY"
+          echo "Suggestions:"
+          if [ -f "/tmp/health_check_suggestions.txt" ]; then
+            cat /tmp/health_check_suggestions.txt
+          fi
+
+      - name: �📊 Update Daily Evolution Metrics
+        if: steps.health_check.outputs.should_evolve == 'true' && env.DRY_RUN != 'true'
+        run: |
+          chmod +x ./scripts/update-evolution-metrics.sh
+          ./scripts/update-evolution-metrics.sh
 
       - name: 🌱 No Evolution Needed
         if: steps.health_check.outputs.should_evolve == 'false'
