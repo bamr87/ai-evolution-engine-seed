@@ -55,7 +55,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.PAT_TOKEN_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN }}
       
       - name: 🛠️ Setup Environment
         run: |
@@ -107,7 +107,7 @@ jobs:
       - name: 🌳 Create Evolution Pull Request
         if: env.DRY_RUN != 'true'
         env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           chmod +x ./scripts/create_pr.sh
           ./scripts/create_pr.sh \

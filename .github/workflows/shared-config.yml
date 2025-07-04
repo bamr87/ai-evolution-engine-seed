@@ -23,7 +23,7 @@
 #   uses: actions/checkout@v4
 #   with:
 #     fetch-depth: 0
-#     token: ${{ secrets.PAT_TOKEN_TOKEN }}
+#     token: ${{ secrets.PAT_TOKEN }}
 
 # COMMON INPUT PARAMETERS
 # Growth Modes:
