@@ -56,206 +56,52 @@ jobs:
       - name: 📊 Analyze Repository Health
         id: health_check
         run: |
-          echo "🔍 Analyzing repository health and detecting improvement opportunities..."
+          ./scripts/analyze-repository-health.sh \
+            "$EVOLUTION_TYPE" \
+            "$INTENSITY" \
+            "$FORCE_RUN"
           
-          # Check for common issues
-          ISSUES_FOUND=0
-          SUGGESTIONS=()
-          
-          # Check for inconsistent formatting
-          if find . -name "*.md" -exec grep -l "	" {} \; | head -1 > /dev/null; then
-            ISSUES_FOUND=$((ISSUES_FOUND + 1))
-            SUGGESTIONS+=("Fix tab/space inconsistencies in Markdown files")
-          fi
-          
-          # Check for TODO comments
-          if grep -r "TODO\|FIXME\|XXX" --include="*.md" --include="*.sh" --include="*.yml" . | head -1 > /dev/null; then
-            ISSUES_FOUND=$((ISSUES_FOUND + 1))
-            SUGGESTIONS+=("Address pending TODO/FIXME items")
-          fi
-          
-          # Check for outdated documentation
-          LAST_COMMIT=$(git log -1 --format="%ct")
-          README_MODIFIED=$(stat -c %Y README.md 2>/dev/null || stat -f %m README.md 2>/dev/null || echo 0)
-          if [ $((LAST_COMMIT - README_MODIFIED)) -gt 604800 ]; then # 7 days
-            ISSUES_FOUND=$((ISSUES_FOUND + 1))
-            SUGGESTIONS+=("Update documentation to reflect recent changes")
-          fi
-          
-          # Check for broken links (basic check)
-          if grep -r "http" --include="*.md" . | grep -v "https://" | head -1 > /dev/null; then
-            ISSUES_FOUND=$((ISSUES_FOUND + 1))
-            SUGGESTIONS+=("Update insecure HTTP links to HTTPS")
-          fi
-          
-          # Check evolution metrics for staleness
-          LAST_EVOLUTION=$(jq -r '.last_growth_spurt' evolution-metrics.json)
-          if [ "$LAST_EVOLUTION" != "null" ] && [ "$LAST_EVOLUTION" != "Never" ]; then
-            DAYS_SINCE=$(( ($(date +%s) - $(date -d "$LAST_EVOLUTION" +%s)) / 86400 ))
-            if [ $DAYS_SINCE -gt 7 ]; then
-              ISSUES_FOUND=$((ISSUES_FOUND + 1))
-              SUGGESTIONS+=("Repository hasn't evolved in $DAYS_SINCE days - time for growth")
-            fi
-          fi
-          
+          # Load results for GitHub Actions output
+          source /tmp/health_check_results.env
           echo "issues_found=$ISSUES_FOUND" >> $GITHUB_OUTPUT
-          printf 'suggestions<<EOF\n%s\nEOF\n' "$(IFS=$'\n'; echo "${SUGGESTIONS[*]}")" >> $GITHUB_OUTPUT
-          
-          # Decide if evolution should proceed
-          SHOULD_EVOLVE="false"
-          if [ "$FORCE_RUN" = "true" ] || [ $ISSUES_FOUND -gt 0 ]; then
-            SHOULD_EVOLVE="true"
-          fi
           echo "should_evolve=$SHOULD_EVOLVE" >> $GITHUB_OUTPUT
           
-          echo "🔍 Health Check Complete:"
-          echo "  - Issues Found: $ISSUES_FOUND"
-          echo "  - Should Evolve: $SHOULD_EVOLVE"
-          echo "  - Evolution Type: $EVOLUTION_TYPE"
-          echo "  - Intensity: $INTENSITY"
+          # Format suggestions for GitHub Actions
+          if [ -f "/tmp/health_check_suggestions.txt" ]; then
+            {
+              echo 'suggestions<<EOF'
+              cat /tmp/health_check_suggestions.txt
+              echo 'EOF'
+            } >> $GITHUB_OUTPUT
+          fi
 
       - name: 🧬 Generate Evolution Prompt
         id: generate_prompt
         if: steps.health_check.outputs.should_evolve == 'true'
         run: |
-          echo "🧬 Generating targeted evolution prompt..."
+          ./scripts/generate-evolution-prompt.sh \
+            "$EVOLUTION_TYPE" \
+            "$INTENSITY"
           
-          SUGGESTIONS="${{ steps.health_check.outputs.suggestions }}"
-          ISSUES_COUNT="${{ steps.health_check.outputs.issues_found }}"
-          
-          # Base prompts for different evolution types
-          case "$EVOLUTION_TYPE" in
-            "consistency")
-              BASE_PROMPT="Perform consistency improvements and minor fixes"
-              ;;
-            "error_fixing")
-              BASE_PROMPT="Fix minor errors and improve robustness"
-              ;;
-            "documentation")
-              BASE_PROMPT="Update and improve documentation quality"
-              ;;
-            "code_quality")
-              BASE_PROMPT="Enhance code quality and maintainability"
-              ;;
-            "security_updates")
-              BASE_PROMPT="Apply security improvements and updates"
-              ;;
-            *)
-              BASE_PROMPT="Perform general maintenance and improvements"
-              ;;
-          esac
-          
-          # Intensity modifiers
-          case "$INTENSITY" in
-            "minimal")
-              INTENSITY_MODIFIER="Focus on safe, minimal changes that improve consistency without altering functionality."
-              ;;
-            "moderate")
-              INTENSITY_MODIFIER="Apply moderate improvements including minor refactoring and optimization."
-              ;;
-            "comprehensive")
-              INTENSITY_MODIFIER="Perform comprehensive improvements including significant enhancements."
-              ;;
-          esac
-          
-          # Construct the full prompt
-          EVOLUTION_PROMPT="Daily Evolution Cycle - $BASE_PROMPT
-          
-          $INTENSITY_MODIFIER
-          
-          Detected improvement opportunities:
-          $SUGGESTIONS
-          
-          Guidelines for this evolution:
-          - Maintain backward compatibility
-          - Follow DFF (Design for Failure) principles
-          - Keep changes atomic and well-documented
-          - Update relevant documentation
-          - Preserve existing functionality
-          - Focus on incremental improvements
-          
-          Priority areas:
-          1. Fix any inconsistencies in formatting or structure
-          2. Address TODO/FIXME items where appropriate
-          3. Update outdated documentation or examples
-          4. Improve error handling and resilience
-          5. Enhance code readability and maintainability"
-          
-          # Save the prompt for the main evolution workflow
-          echo "evolution_prompt<<EOF" >> $GITHUB_OUTPUT
-          echo "$EVOLUTION_PROMPT" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-          
-          echo "🧬 Evolution prompt generated successfully"
+          # Load the generated prompt for GitHub Actions output
+          {
+            echo 'evolution_prompt<<EOF'
+            cat /tmp/evolution_prompt.txt
+            echo 'EOF'
+          } >> $GITHUB_OUTPUT
 
       - name: 🚀 Trigger Evolution Workflow
         if: steps.health_check.outputs.should_evolve == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "🚀 Triggering main evolution workflow..."
-          
-          EVOLUTION_PROMPT="${{ steps.generate_prompt.outputs.evolution_prompt }}"
-          
-          # Trigger the main ai_evolver.yml workflow
-          gh workflow run ai_evolver.yml \
-            -f prompt="$EVOLUTION_PROMPT" \
-            -f growth_mode="conservative" \
-            -f auto_plant_seeds=true
-          
-          echo "✅ Daily evolution cycle initiated successfully"
-          echo "📝 View the evolution progress in the Actions tab"
+          ./scripts/trigger-evolution-workflow.sh \
+            "$EVOLUTION_TYPE" \
+            "conservative"
 
       - name: 📊 Update Daily Evolution Metrics
         if: steps.health_check.outputs.should_evolve == 'true'
-        run: |
-          echo "📊 Recording daily evolution metrics..."
-          
-          # Create or update daily evolution tracking
-          DAILY_METRICS_FILE=".evolution_daily.json"
-          
-          if [ ! -f "$DAILY_METRICS_FILE" ]; then
-            echo '{
-              "daily_evolution_version": "1.0",
-              "first_run": "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'",
-              "total_daily_cycles": 0,
-              "last_daily_evolution": null,
-              "evolution_types": {
-                "consistency": 0,
-                "error_fixing": 0,
-                "documentation": 0,
-                "code_quality": 0,
-                "security_updates": 0
-              },
-              "daily_history": []
-            }' > "$DAILY_METRICS_FILE"
-          fi
-          
-          # Update metrics
-          UPDATED_METRICS=$(jq \
-            --arg timestamp "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-            --arg evolution_type "$EVOLUTION_TYPE" \
-            --arg intensity "$INTENSITY" \
-            --argjson issues_found "${{ steps.health_check.outputs.issues_found }}" \
-            '.total_daily_cycles += 1 |
-             .last_daily_evolution = $timestamp |
-             .evolution_types[$evolution_type] += 1 |
-             .daily_history += [{
-               "timestamp": $timestamp,
-               "evolution_type": $evolution_type,
-               "intensity": $intensity,
-               "issues_found": $issues_found,
-               "trigger": (if "${{ github.event_name }}" == "schedule" then "automated" else "manual" end)
-             }] |
-             .daily_history = (.daily_history | sort_by(.timestamp) | .[-30:])' \
-            "$DAILY_METRICS_FILE")
-          
-          echo "$UPDATED_METRICS" > "$DAILY_METRICS_FILE"
-          
-          echo "📊 Daily evolution metrics updated"
-          echo "  - Total Daily Cycles: $(jq -r '.total_daily_cycles' "$DAILY_METRICS_FILE")"
-          echo "  - Evolution Type: $EVOLUTION_TYPE"
-          echo "  - Intensity: $INTENSITY"
+        run: ./scripts/update-evolution-metrics.sh
 
       - name: 🌱 No Evolution Needed
         if: steps.health_check.outputs.should_evolve == 'false'

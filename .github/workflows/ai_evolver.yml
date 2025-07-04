@@ -38,258 +38,34 @@ jobs:
         with:
           fetch-depth: 0 # Need full history for some context, potentially
           
+      - name: 🛠️ Setup Environment
+        run: ./scripts/setup-environment.sh
+          
       - name: 🧬 Collect Repository DNA & Metrics
         id: collect_context
         run: |
-          echo "🧬 Analyzing repository genome and current metrics..."
-          CONTEXT_FILE="/tmp/repo_context.json"
-          
-          # Initialize context with metadata and metrics
-          METRICS_CONTENT=$(cat evolution-metrics.json || echo '{}')
-          # Ensure METRICS_CONTENT is valid JSON
-          if ! echo "$METRICS_CONTENT" | jq empty > /dev/null 2>&1; then
-              echo "Warning: evolution-metrics.json contains invalid JSON, using default structure"
-              METRICS_CONTENT='{"seed_version": "0.2.0-seed", "growth_cycles": 0, "current_generation": 0, "adaptations_logged": 0, "last_growth_spurt": "Never", "last_prompt": null, "evolution_history": []}'
-          fi
-          # Collect repository structure using tree command
-          REPO_STRUCTURE=$(tree -J -L 3 -I ".git|node_modules|venv|dist|build" || echo "[]")
-          jq -n \
-            --argjson metrics "$METRICS_CONTENT" \
-            --arg prompt "${{ inputs.prompt }}" \
-            --arg growth_mode "${{ inputs.growth_mode }}" \
-            --argjson repository_structure "$REPO_STRUCTURE" \
-            '{
-              "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-              "user_prompt": $prompt,
-              "growth_mode": $growth_mode,
-              "current_metrics": $metrics,
-              "repository_structure": $repository_structure,
-              "files": {}
-            }' > "$CONTEXT_FILE"
-
-          # Add file contents (respecting .gptignore if present, else common ignores)
-          IGNORE_PATTERNS='\.git|\.DS_Store|node_modules|venv|env|dist|build|\*.pyc|__pycache__|\*.log|\*.tmp|\*.swp'
-          if [ -f .gptignore ]; then
-            GPTIGNORE_PATTERNS=$(cat .gptignore | grep -v '^#' | grep -v '^[[:space:]]*$' | sed 's|/$|/.*|' | paste -sd '|')
-            if [ -n "$GPTIGNORE_PATTERNS" ]; then
-              IGNORE_PATTERNS="$IGNORE_PATTERNS|$GPTIGNORE_PATTERNS"
-            fi
-          fi
-          
-          find . -type f | grep -Ev "$IGNORE_PATTERNS" | head -n $(jq -r '.evolution.max_context_files // 50' .evolution.yml 2>/dev/null || echo 50) | \
-          while IFS= read -r file; do
-            echo "Adding $file to context..."
-            # Ensure file path is a valid JSON string key
-            file_key=$(echo "$file" | sed 's|^\./||')
-            jq --arg path "$file_key" \
-               --arg content "$(cat "$file" | head -n $(jq -r '.evolution.max_context_line_per_file // 1000' .evolution.yml 2>/dev/null || echo 1000))" \
-              '.files[$path] = $content' "$CONTEXT_FILE" > "${CONTEXT_FILE}.tmp" && mv "${CONTEXT_FILE}.tmp" "$CONTEXT_FILE"
-          done
-          echo "Context collected in $CONTEXT_FILE"
-          cat $CONTEXT_FILE # For debugging
+          ./scripts/collect-context.sh \
+            "${{ inputs.prompt }}" \
+            "${{ inputs.growth_mode }}" \
+            "/tmp/repo_context.json"
           
       - name: 🧠 Invoke Simulated AI Growth Engine
         id: ai_growth_simulation
         run: |
-          echo "🧠 Simulating AI growth cycle based on prompt: ${{ inputs.prompt }}"
-          CONTEXT_FILE="/tmp/repo_context.json"
-          RESPONSE_FILE="/tmp/evolution_response.json"
-          
-          # Safely extract current metrics with proper JSON handling
-          CURRENT_METRICS_JSON=$(jq -r '.current_metrics // {}' "$CONTEXT_FILE")
-          # Ensure we have a valid JSON object, not a string
-          if ! echo "$CURRENT_METRICS_JSON" | jq empty > /dev/null 2>&1; then
-              echo "Warning: Invalid metrics JSON detected, using defaults"
-              CURRENT_METRICS_JSON='{"growth_cycles": 0, "current_generation": 0, "adaptations_logged": 0}'
-          fi
-          
-          CURRENT_CYCLE=$(echo "$CURRENT_METRICS_JSON" | jq -r '.growth_cycles // 0')
-          CURRENT_GENERATION=$(echo "$CURRENT_METRICS_JSON" | jq -r '.current_generation // 0')
-          NEW_CYCLE=$((CURRENT_CYCLE + 1))
-          NEW_GENERATION=$((CURRENT_GENERATION + 1)) # Simple increment for simulation
-
-          # Simulate updating evolution-metrics.json with safer jq operations
-          NEW_METRICS_CONTENT=$(echo "$CURRENT_METRICS_JSON" | jq \
-            --arg new_cycle "$NEW_CYCLE" \
-            --arg new_gen "$NEW_GENERATION" \
-            --arg last_prompt "${{ inputs.prompt }}" \
-            --arg last_growth "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-            '{
-              "seed_version": (.seed_version // "0.2.0-seed"),
-              "planted_at": (.planted_at // $last_growth),
-              "growth_cycles": ($new_cycle | tonumber),
-              "current_generation": ($new_gen | tonumber),
-              "adaptations_logged": ((.adaptations_logged // 0) | tonumber + 1),
-              "last_growth_spurt": $last_growth,
-              "last_prompt": $last_prompt,
-              "evolution_history": ((.evolution_history // []) + [{"cycle": ($new_cycle | tonumber), "prompt": $last_prompt, "timestamp": $last_growth}])
-            }')
-          
-          # Simulate updating README.md
-          # This will replace the content between the markers
-          README_MARKER_START="<!-- AI-EVOLUTION-MARKER:START -->"
-          README_MARKER_END="<!-- AI-EVOLUTION-MARKER:END -->"
-          # Extract values safely for README content
-          ADAPTATIONS_COUNT=$(echo "$NEW_METRICS_CONTENT" | jq -r '.adaptations_logged // 0')
-          LAST_GROWTH=$(echo "$NEW_METRICS_CONTENT" | jq -r '.last_growth_spurt // "Never"')
-          NEW_README_DYNAMIC_CONTENT="**Evolutionary State:**\n- Generation: $NEW_GENERATION\n- Adaptations Logged: $ADAPTATIONS_COUNT\n- Last Growth Spurt: $LAST_GROWTH\n- Last Prompt: ${{ inputs.prompt }}"
-          
-          # Read existing README, replace marker section (crude sed for multiline)
-          # A more robust solution would use a proper templating engine or smarter AI replacement
-          # For this simulation, we'll generate the whole README content
-          CURRENT_README_CONTENT=$(cat README.md)
-          # This is a simplified way to replace a block. A real AI might regenerate more.
-          # Escaping for sed is tricky with arbitrary content.
-          # So, for simplicity, the AI will provide the *full new README content*.
-          # Let's build the new README content by replacing the dynamic block.
-          # This is still complex for pure shell. Let's assume the AI generates the full README content.
-          # For simulation, we'll crudely replace the block.
-          # This is still tricky. The AI response will just provide the NEW full README.
-
-          # Construct the new README content (simplified)
-          # This is a placeholder for a more sophisticated README update.
-          # In a real scenario, the AI would craft this. Here, we just update the marker section.
-          # For the simulation, we'll provide the *entire* new README content.
-          # This is a bit of a cheat for the simulation, but easier to implement.
-          # A real AI would be smarter.
-          # The 'changes' array will carry this full content.
-          # This part assumes the AI can reconstruct the README with the new stats.
-          # For this simulation, we'll crudely replace the block.
-          # This is still tricky. The AI response will just provide the NEW full README.
-
-          # Let's make the AI generate the *entire* content for README.md and evolution-metrics.json
-          # This simplifies the "Apply Growth Changes" step.
-          
-          # For README.md: Read existing, then try to replace the section.
-          # This is a complex task for shell scripting if new_content has many special chars.
-          # Alternative: AI generates full new README.
-          # Let's stick to the "AI generates full file content" for changed files.
-
-          # Generate new README.md content (Simulated AI creates this)
-          # For now, we'll just focus on the metrics part and assume the rest is handled.
-          # The AI would ideally get the README template and fill it.
-          # For simulation, let's create a "new" README content string here.
-          # This is a simplified example. A real AI would be much more sophisticated.
-          # We will replace the content between markers in the existing README.
-          # This is still hard. Let's assume the AI generates the full README content.
-          # This is a placeholder for the AI's README generation.
-          # It should take the existing README structure and update the dynamic part.
-          
-          # Read the original README content
-          ORIGINAL_README_CONTENT=$(cat README.md)
-          # Prepare the new dynamic content block with safe jq extraction
-          ADAPTATIONS_COUNT=$(echo "$NEW_METRICS_CONTENT" | jq -r '.adaptations_logged // 0')
-          LAST_GROWTH=$(echo "$NEW_METRICS_CONTENT" | jq -r '.last_growth_spurt // "Never"')
-          DYNAMIC_BLOCK_CONTENT="    **Evolutionary State:**\n    - Generation: $NEW_GENERATION\n    - Adaptations Logged: $ADAPTATIONS_COUNT\n    - Last Growth Spurt: $LAST_GROWTH\n    - Last Prompt: ${{ inputs.prompt }}"
-          # Use awk to replace content between markers. Relies on markers being on their own lines.
-          # This is still fragile. If AI provides full content, it's more robust.
-          # Let's go with: AI provides the *full* new README.md content.
-          # For simulation, we'll just generate a new README string based on the old one + new stats.
-          # This is too complex to do robustly in bash for the simulation.
-          # The "evolution_response.json" will contain the *full text* for modified files.
-          
-          # Placeholder for full new README content generation by AI
-          # This is where a real LLM would be prompted with the old README and new stats.
-          # For simulation, we'll just indicate it changed.
-          # For a better simulation, one could use sed to replace the block, but it's tricky.
-          # For now, the "change" will be to evolution-metrics.json and a new .seed.md.
-          # README update will be a simplified "touch" or small modification.
-          # Let's make the AI output the *new content for the dynamic block only*.
-          # And the apply step will use sed. This is more realistic for an AI.
-
-          # Simulated AI generates new content for the dynamic block in README.md
-          ADAPTATIONS_COUNT=$(echo "$NEW_METRICS_CONTENT" | jq -r '.adaptations_logged // 0')
-          LAST_GROWTH=$(echo "$NEW_METRICS_CONTENT" | jq -r '.last_growth_spurt // "Never"')
-          README_DYNAMIC_CONTENT_FOR_AI_RESPONSE="    **Evolutionary State:**\\n    - Generation: $NEW_GENERATION\\n    - Adaptations Logged: $ADAPTATIONS_COUNT\\n    - Last Growth Spurt: $LAST_GROWTH\\n    - Last Prompt: ${{ inputs.prompt }}"
-
-          # Content for the next .seed.md is now generated by an external script to avoid YAML/heredoc issues
-          NEXT_SEED_CONTENT=$(scripts/generate_seed.sh "$NEW_CYCLE" "$NEW_GENERATION" "${{ inputs.prompt }}" "${{ inputs.growth_mode }}")
-
-          # Generate the AI response JSON using an external script
-          scripts/generate_ai_response.sh \
-            "$NEW_CYCLE" \
-            "$NEW_GENERATION" \
+          ./scripts/simulate-ai-growth.sh \
             "${{ inputs.prompt }}" \
             "${{ inputs.growth_mode }}" \
-            "$NEW_METRICS_CONTENT" \
-            "$README_MARKER_START" \
-            "$README_MARKER_END" \
-            "$README_DYNAMIC_CONTENT_FOR_AI_RESPONSE" \
-            "$NEXT_SEED_CONTENT" \
-            "$RESPONSE_FILE"
-
-          echo "AI simulation response generated: $RESPONSE_FILE"
-          cat $RESPONSE_FILE # For debugging
+            "/tmp/repo_context.json" \
+            "/tmp/evolution_response.json"
 
       - name: 🌾 Apply Growth Changes
-        run: |
-          echo "🌾 Applying evolutionary changes..."
-          RESPONSE_FILE="/tmp/evolution_response.json"
-          BRANCH_NAME=$(jq -r .new_branch "$RESPONSE_FILE")
-          
-          echo "Creating and switching to new branch: $BRANCH_NAME"
-          git checkout -b "$BRANCH_NAME"
-          
-          # Apply file changes from AI response
-          jq -c '.changes[]' "$RESPONSE_FILE" | while read -r change_json; do
-            path=$(echo "$change_json" | jq -r '.path')
-            action=$(echo "$change_json" | jq -r '.action')
-            
-            mkdir -p "$(dirname "$path")"
-            echo "Processing change for $path (Action: $action)"
-
-            if [ "$action" == "replace_content" ]; then
-              content=$(echo "$change_json" | jq -r '.content')
-              echo -e "$content" > "$path"
-              echo "✓ Content replaced for $path"
-            elif [ "$action" == "create" ]; then
-              content=$(echo "$change_json" | jq -r '.content')
-              echo -e "$content" > "$path"
-              echo "✓ File created: $path"
-            elif [ "$action" == "update_readme_block" ]; then
-              # More robust way to handle multiline content for sed
-              # The new_block_content is already escaped (\\n) from jq -Rsa
-              # marker_start=$(echo "$change_json" | jq -r '.marker_start') # Not needed if fixed
-              # marker_end=$(echo "$change_json" | jq -r '.marker_end') # Not needed if fixed
-              new_block_content_escaped_for_sed=$(echo "$change_json" | jq -r '.new_block_content')
-              
-              # Use awk for safer multiline replacement between markers
-              awk -v start="<!-- AI-EVOLUTION-MARKER:START -->" \
-                  -v end="<!-- AI-EVOLUTION-MARKER:END -->" \
-                  -v new_content="$new_block_content_escaped_for_sed" '
-              BEGIN { p = 1 }
-              $0 == start { print; print new_content; p = 0; next }
-              $0 == end { p = 1 }
-              p { print }
-              ' "$path" > "${path}.tmp" && mv "${path}.tmp" "$path"
-              echo "✓ README.md block updated for $path"
-            else
-              echo "Unknown action: $action for $path"
-            fi
-          done
-          
-          # Commit growth (evolution-metrics.json is updated via replace_content)
-          git add -A
-          COMMIT_MSG=$(jq -r .commit_message "$RESPONSE_FILE")
-          git commit -m "$COMMIT_MSG" || echo "No changes to commit, or commit failed."
-          git push origin "$BRANCH_NAME"
+        run: ./scripts/apply-growth-changes.sh "/tmp/evolution_response.json"
           
       - name: 🌰 Plant New Seeds (Generate .seed.md for next evolution)
         if: ${{ inputs.auto_plant_seeds == true }}
-        run: |
-          echo "🌰 Generating next generation .seed.md..."
-          RESPONSE_FILE="/tmp/evolution_response.json"
-          NEXT_SEED_CONTENT=$(jq -r .next_seed_content "$RESPONSE_FILE")
-          
-          echo -e "$NEXT_SEED_CONTENT" > .seed.md
-          echo "✓ New .seed.md generated for the next evolutionary cycle."
-          
-          git add .seed.md
-          git commit -m "🌰 Planted new seed for next evolution (post cycle $(jq -r '.changes[] | select(.path=="evolution-metrics.json") | .content' "$RESPONSE_FILE" | jq -r .growth_cycles))" || echo "No changes to .seed.md or commit failed."
-          git push origin "$BRANCH_NAME" || true # Allow if branch already up-to-date
+        run: ./scripts/plant-new-seeds.sh "/tmp/evolution_response.json" "${{ inputs.auto_plant_seeds }}"
           
       - name: 🌳 Create Growth Pull Request
         env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          scripts/create_pr.sh /tmp/evolution_response.json "${{ inputs.prompt }}" "${{ inputs.growth_mode }}"
+        run: ./scripts/create_pr.sh "/tmp/evolution_response.json" "${{ inputs.prompt }}" "${{ inputs.growth_mode }}"
