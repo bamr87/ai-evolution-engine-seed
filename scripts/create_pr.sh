@@ -20,12 +20,12 @@ PR_BODY=$(cat <<EOF_PR_BODY
 
 ### 🌿 Summary of Changes in this Cycle:
 This cycle focused on evolving the codebase based on the prompt. Key changes include:
-- Updates to `evolution-metrics.json`.
-- Modifications to `README.md` dynamic block.
-- Other changes as per the AI's plan (see commit details).
+- Updates to evolution-metrics.json.
+- Modifications to README.md dynamic block.
+- Other changes as per the AI plan (see commit details).
 
 ### 🌰 Next Generation Seed (.seed.md) Highlights:
-The following `.seed.md` has been generated to guide the next evolution:
+The following .seed.md has been generated to guide the next evolution:
 
 ```markdown
 $NEXT_SEED_PREVIEW

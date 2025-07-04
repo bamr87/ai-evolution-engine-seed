@@ -23,6 +23,22 @@ We believe in software that grows organically, much like a plant from a seed. Th
 - **Adaptability**: The system learns and refines its growth patterns.
 - **Acceleration**: AI handles boilerplate and complex transformations, letting humans focus on vision.
 
+## 📁 Repository Structure
+
+The repository is now organized following software engineering best practices:
+
+```text
+📁 Root Files               # Core seed components
+├── 📁 docs/               # Comprehensive documentation 
+├── 📁 tests/              # Testing framework (unit & integration)
+├── 📁 scripts/            # Automation utilities
+├── 📁 templates/          # Reusable project templates
+├── 📁 src/                # Source code
+└── 📁 prompts/            # AI prompts and instructions
+```
+
+For detailed structure information, see [`docs/ORGANIZATION.md`](docs/ORGANIZATION.md).
+
 ## 🧬 Seed Anatomy (v0.2.1)
 
 1. **`README.md` (This file)**: A dynamic chronicle of the repository's evolution. The section below is updated by the AI.
