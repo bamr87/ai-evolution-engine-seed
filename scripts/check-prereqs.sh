@@ -160,7 +160,7 @@ if command -v gh >/dev/null 2>&1; then
     else
         # Local development - check auth status
         if gh auth status >/dev/null 2>&1; then
-            local gh_user=$(gh api user --jq '.login' 2>/dev/null || echo "Unknown")
+            gh_user=$(gh api user --jq '.login' 2>/dev/null || echo "Unknown")
             print_status "pass" "GitHub CLI is authenticated" "Logged in as: $gh_user"
         else
             print_status "fail" "GitHub CLI is not authenticated" "Run: gh auth login"
@@ -181,7 +181,7 @@ if git rev-parse --git-dir >/dev/null 2>&1; then
     
     # Check for remote origin
     if git remote get-url origin >/dev/null 2>&1; then
-        local origin_url=$(git remote get-url origin)
+        origin_url=$(git remote get-url origin)
         print_status "pass" "Git remote 'origin' is configured" "$origin_url"
     else
         print_status "warn" "Git remote 'origin' is not configured" "You may need to set up a GitHub repository"
