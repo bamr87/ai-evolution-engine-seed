@@ -4,11 +4,19 @@
 
 set -euo pipefail
 
+# Get project root directory
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+# Source modular libraries
+source "$PROJECT_ROOT/src/lib/core/logger.sh"
+source "$PROJECT_ROOT/src/lib/core/environment.sh"
+source "$PROJECT_ROOT/src/lib/evolution/metrics.sh"
+
 EVOLUTION_TYPE="${1:-consistency}"
 INTENSITY="${2:-minimal}"
 FORCE_RUN="${3:-false}"
 
-echo "🔍 Analyzing repository health and detecting improvement opportunities..."
+log_info "Analyzing repository health and detecting improvement opportunities..."
 
 # Check for common issues
 ISSUES_FOUND=0
@@ -87,3 +95,5 @@ if [ ${#SUGGESTIONS[@]} -gt 0 ]; then
   echo "📋 Suggestions:"
   printf '  - %s\n' "${SUGGESTIONS[@]}"
 fi
+
+log_success "Health check completed - Issues found: $ISSUES_FOUND, Should evolve: $SHOULD_EVOLVE"

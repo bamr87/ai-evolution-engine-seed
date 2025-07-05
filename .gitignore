@@ -20,6 +20,14 @@ yarn-error.log
 build/
 dist/
 
+# Test artifacts (temporary, debug only)
+tests/test-reports/
+tests/test-logs/
+tests/test-results/
+test-reports/
+test-logs/
+debug-output/
+
 # IDE specific
 .vscode/
 .idea/

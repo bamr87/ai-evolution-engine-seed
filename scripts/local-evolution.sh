@@ -8,13 +8,15 @@
 
 set -euo pipefail
 
-# Colors for output
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-CYAN='\033[0;36m'
-RED='\033[0;31m'
-NC='\033[0m' # No Color
+# Get project root directory
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+# Source modular libraries
+source "$PROJECT_ROOT/src/lib/core/logger.sh"
+source "$PROJECT_ROOT/src/lib/core/environment.sh"
+source "$PROJECT_ROOT/src/lib/core/testing.sh"
+source "$PROJECT_ROOT/src/lib/evolution/git.sh"
+source "$PROJECT_ROOT/src/lib/evolution/metrics.sh"
 
 # Default values
 USE_CONTAINER="false"

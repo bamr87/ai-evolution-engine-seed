@@ -145,6 +145,60 @@ gh workflow run ai_evolver.yml -f prompt="Evolve the project to include a basic 
 ```
 *(Requires GitHub CLI `gh` to be installed and authenticated)*
 
+## 🏗️ Modular Architecture (New in v0.3.1!)
+
+The AI Evolution Engine features a completely refactored modular architecture for improved maintainability, testing, and extensibility:
+
+### 📦 Core Libraries
+
+**`src/lib/core/`** - Foundation libraries used across all scripts:
+
+- **`logger.sh`** - Unified logging with color support and CI/local awareness
+- **`environment.sh`** - Environment detection, OS handling, and command checking
+- **`testing.sh`** - Comprehensive test framework with assertions and reporting
+
+**`src/lib/evolution/`** - Evolution-specific functionality:
+
+- **`git.sh`** - Git operations (branching, committing, pushing)
+- **`metrics.sh`** - Evolution metrics tracking and analysis
+
+### 🔧 Refactored Scripts
+
+Scripts now use modular imports instead of inline duplicated code:
+
+```bash
+# Before: Inline logging and environment detection
+echo "Starting process..."
+
+# After: Modular approach
+source "$PROJECT_ROOT/src/lib/core/logger.sh"
+source "$PROJECT_ROOT/src/lib/core/environment.sh"
+log_info "Starting process..."
+```
+
+**Currently Refactored:**
+
+- ✅ `evolve.sh` - Main evolution orchestrator
+- ✅ `ai-debug-helper.sh` - Debug information collector
+- ✅ `analyze-repository-health.sh` - Health analysis
+- ✅ `apply-growth-changes.sh` - Change application
+- ✅ `check-prereqs.sh` - Prerequisite validation
+- ✅ `collect-context.sh` - Context gathering
+- ✅ `generate-evolution-prompt.sh` - Prompt generation
+- ✅ `local-evolution.sh` - Local development runner
+- ✅ `setup-environment.sh` - Environment setup
+- ✅ `test-workflow.sh` - Workflow testing
+- ✅ `update-evolution-metrics.sh` - Metrics updates
+
+### 🧪 Enhanced Testing Framework
+
+- **Modular test suites** for each library component
+- **Integration testing** between libraries
+- **Backward compatibility validation**
+- **Comprehensive test reporting** with JSON and Markdown outputs
+
+➡️ **[Complete Modular Architecture Guide](MODULAR_ARCHITECTURE.md)**
+
 ## 🌳 The Growth Cycle Explained
 
 ```mermaid

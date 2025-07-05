@@ -4,37 +4,45 @@
 
 set -euo pipefail
 
+# Get project root directory
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+# Source modular libraries
+source "$PROJECT_ROOT/src/lib/core/logger.sh"
+source "$PROJECT_ROOT/src/lib/core/environment.sh"
+source "$PROJECT_ROOT/src/lib/evolution/git.sh"
+
 RESPONSE_FILE="${1:-/tmp/evolution_response.json}"
 
-echo "🌾 Applying evolutionary changes..."
+log_info "Applying evolutionary changes..."
 
 if [ ! -f "$RESPONSE_FILE" ]; then
-    echo "❌ Error: Response file not found: $RESPONSE_FILE"
+    log_error "Response file not found: $RESPONSE_FILE"
     exit 1
 fi
 
 BRANCH_NAME=$(jq -r .new_branch "$RESPONSE_FILE")
 
-echo "🌿 Creating and switching to new branch: $BRANCH_NAME"
-git checkout -b "$BRANCH_NAME"
+log_info "Creating and switching to new branch: $BRANCH_NAME"
+create_branch "$BRANCH_NAME"
 
 # Apply file changes from AI response
-echo "📝 Applying file changes..."
+log_info "Applying file changes..."
 jq -c '.changes[]' "$RESPONSE_FILE" | while read -r change_json; do
   path=$(echo "$change_json" | jq -r '.path')
   action=$(echo "$change_json" | jq -r '.action')
   
   mkdir -p "$(dirname "$path")"
-  echo "Processing change for $path (Action: $action)"
+  log_info "Processing change for $path (Action: $action)"
 
   if [ "$action" == "replace_content" ]; then
     content=$(echo "$change_json" | jq -r '.content')
     echo -e "$content" > "$path"
-    echo "✓ Content replaced for $path"
+    log_success "Content replaced for $path"
   elif [ "$action" == "create" ]; then
     content=$(echo "$change_json" | jq -r '.content')
     echo -e "$content" > "$path"
-    echo "✓ File created: $path"
+    log_success "File created: $path"
   elif [ "$action" == "update_readme_block" ]; then
     # More robust way to handle multiline content for sed
     new_block_content_escaped_for_sed=$(echo "$change_json" | jq -r '.new_block_content')
@@ -48,21 +56,21 @@ jq -c '.changes[]' "$RESPONSE_FILE" | while read -r change_json; do
     $0 == end { p = 1 }
     p { print }
     ' "$path" > "${path}.tmp" && mv "${path}.tmp" "$path"
-    echo "✓ README.md block updated for $path"
+    log_success "README.md block updated for $path"
   else
-    echo "⚠️  Unknown action: $action for $path"
+    log_warn "Unknown action: $action for $path"
   fi
 done
 
 # Commit growth
-echo "💾 Committing changes..."
+log_info "Committing changes..."
 git add -A
 
 COMMIT_MSG=$(jq -r .commit_message "$RESPONSE_FILE")
-if git commit -m "$COMMIT_MSG"; then
-    echo "✅ Changes committed successfully"
-    git push origin "$BRANCH_NAME"
-    echo "🚀 Changes pushed to branch: $BRANCH_NAME"
+if commit_changes "$COMMIT_MSG"; then
+    log_success "Changes committed successfully"
+    push_branch "$BRANCH_NAME"
+    log_success "Changes pushed to branch: $BRANCH_NAME"
 else
-    echo "⚠️  No changes to commit, or commit failed"
+    log_warn "No changes to commit, or commit failed"
 fi

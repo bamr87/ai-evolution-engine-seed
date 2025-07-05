@@ -5,28 +5,17 @@
 
 set -euo pipefail
 
+# Get project root directory
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+# Source modular libraries
+source "$PROJECT_ROOT/src/lib/core/logger.sh"
+source "$PROJECT_ROOT/src/lib/core/environment.sh"
+
 # Configuration
 OUTPUT_DIR="./debug-output"
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 DEBUG_FILE="$OUTPUT_DIR/ai-debug-report-$TIMESTAMP.md"
-
-# Colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m'
-
-log() {
-    local level=$1
-    shift
-    case $level in
-        "INFO") echo -e "${BLUE}[INFO]${NC} $*" ;;
-        "WARN") echo -e "${YELLOW}[WARN]${NC} $*" ;;
-        "ERROR") echo -e "${RED}[ERROR]${NC} $*" ;;
-        "SUCCESS") echo -e "${GREEN}[SUCCESS]${NC} $*" ;;
-    esac
-}
 
 # Create debug output directory
 mkdir -p "$OUTPUT_DIR"
@@ -317,8 +306,8 @@ EOF
 
 # Main function to generate debug report
 generate_debug_report() {
-    log "INFO" "Generating comprehensive debug report..."
-    log "INFO" "Output file: $DEBUG_FILE"
+    log_info "Generating comprehensive debug report..."
+    log_info "Output file: $DEBUG_FILE"
     
     cat > "$DEBUG_FILE" << EOF
 # GitHub Actions Debug Report
@@ -337,7 +326,7 @@ EOF
     collect_error_analysis >> "$DEBUG_FILE"
     create_troubleshooting_guide >> "$DEBUG_FILE"
     
-    log "SUCCESS" "Debug report generated: $DEBUG_FILE"
+    log_success "Debug report generated: $DEBUG_FILE"
     
     # Create a summary for quick reference
     local summary_file="$OUTPUT_DIR/debug-summary-$TIMESTAMP.txt"
@@ -362,7 +351,7 @@ To share with AI:
 
 EOF
 
-    log "INFO" "Summary created: $summary_file"
+    log_info "Summary created: $summary_file"
     
     # Display key information
     echo ""
@@ -371,7 +360,7 @@ EOF
     echo "========================================"
     echo ""
     
-    log "INFO" "You can now share $DEBUG_FILE with an AI assistant for debugging help"
+    log_info "You can now share $DEBUG_FILE with an AI assistant for debugging help"
 }
 
 # Script options
@@ -391,7 +380,7 @@ The debug report will be created in: $OUTPUT_DIR/
 EOF
         ;;
     *)
-        log "ERROR" "Unknown command: $1"
+        log_error "Unknown command: $1"
         exit 1
         ;;
 esac

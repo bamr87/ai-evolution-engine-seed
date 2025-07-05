@@ -5,32 +5,26 @@
 
 set -euo pipefail
 
+# Get project root directory
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+# Source modular libraries
+source "$PROJECT_ROOT/src/lib/core/logger.sh"
+source "$PROJECT_ROOT/src/lib/core/environment.sh"
+
 # Detect environment
 CI_ENVIRONMENT="${CI_ENVIRONMENT:-false}"
 USE_CONTAINER="${USE_CONTAINER:-false}"
 
-echo "🌱 Setting up evolution environment..."
-echo "  - CI Environment: $CI_ENVIRONMENT"
-echo "  - Container Mode: $USE_CONTAINER"
-
-# Function to detect OS
-detect_os() {
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-        echo "macos"
-    elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-        echo "linux"
-    elif [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
-        echo "windows"
-    else
-        echo "unknown"
-    fi
-}
+log_info "Setting up evolution environment..."
+log_info "CI Environment: $CI_ENVIRONMENT"
+log_info "Container Mode: $USE_CONTAINER"
 
 # Function to install dependencies based on environment
 install_dependencies() {
     local os=$(detect_os)
     
-    echo "📦 Installing dependencies for $os..."
+    log_info "Installing dependencies for $os..."
     
     if [ "$CI_ENVIRONMENT" = "true" ]; then
         # CI environment - use package manager available

@@ -1,23 +1,30 @@
 #!/bin/bash
 # scripts/collect-context.sh
 # Collects repository context and metrics for AI evolution
+# Version: 2.0.0 - Modular Architecture
 
 set -euo pipefail
+
+# Get script directory for relative imports
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+# Import modular libraries
+source "$PROJECT_ROOT/src/lib/core/logger.sh"
+source "$PROJECT_ROOT/src/lib/core/environment.sh"
+source "$PROJECT_ROOT/src/lib/evolution/metrics.sh"
+
+# Initialize logging
+init_logger "logs" "collect-context"
 
 PROMPT="${1:-}"
 GROWTH_MODE="${2:-adaptive}"
 CONTEXT_FILE="${3:-/tmp/repo_context.json}"
 
-echo "🧬 Analyzing repository genome and current metrics..."
+log_info "🧬 Analyzing repository genome and current metrics..."
 
-# Initialize context with metadata and metrics
-METRICS_CONTENT=$(cat evolution-metrics.json || echo '{}')
-
-# Ensure METRICS_CONTENT is valid JSON
-if ! echo "$METRICS_CONTENT" | jq empty > /dev/null 2>&1; then
-    echo "Warning: evolution-metrics.json contains invalid JSON, using default structure"
-    METRICS_CONTENT='{"seed_version": "0.2.0-seed", "growth_cycles": 0, "current_generation": 0, "adaptations_logged": 0, "last_growth_spurt": "Never", "last_prompt": null, "evolution_history": []}'
-fi
+# Initialize context with metadata and metrics using modular function
+METRICS_CONTENT=$(load_metrics_data)
 
 # Collect repository structure using tree command
 REPO_STRUCTURE=$(tree -J -L 3 -I ".git|node_modules|venv|dist|build" || echo "[]")

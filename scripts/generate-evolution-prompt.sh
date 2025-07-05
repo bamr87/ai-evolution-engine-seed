@@ -4,16 +4,23 @@
 
 set -euo pipefail
 
+# Get project root directory
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+# Source modular libraries
+source "$PROJECT_ROOT/src/lib/core/logger.sh"
+source "$PROJECT_ROOT/src/lib/core/environment.sh"
+
 EVOLUTION_TYPE="${1:-consistency}"
 INTENSITY="${2:-minimal}"
 
-echo "🧬 Generating targeted evolution prompt..."
+log_info "Generating targeted evolution prompt..."
 
 # Load health check results
 if [ -f "/tmp/health_check_results.env" ]; then
     source /tmp/health_check_results.env
 else
-    echo "❌ Error: Health check results not found"
+    log_error "Health check results not found"
     exit 1
 fi
 
@@ -87,6 +94,6 @@ Priority areas:
 # Output the prompt to a file for the workflow to use
 echo "$EVOLUTION_PROMPT" > /tmp/evolution_prompt.txt
 
-echo "✅ Evolution prompt generated successfully"
-echo "📝 Prompt type: $EVOLUTION_TYPE (intensity: $INTENSITY)"
-echo "🎯 Found $ISSUES_FOUND issues to address"
+log_success "Evolution prompt generated successfully"
+log_info "Prompt type: $EVOLUTION_TYPE (intensity: $INTENSITY)"
+log_info "Found $ISSUES_FOUND issues to address"

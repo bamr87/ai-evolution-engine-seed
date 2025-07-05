@@ -2,19 +2,24 @@
 
 #############################################################################
 # 🌱 AI Evolution Engine - On-Demand Evolution Runner 🌱
-# Version: 1.0.0
+# Version: 2.0.0 - Modular Architecture
 # Purpose: Command-line interface for triggering evolution cycles
 #############################################################################
 
 set -euo pipefail
 
-# Colors for output
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-CYAN='\033[0;36m'
-RED='\033[0;31m'
-NC='\033[0m' # No Color
+# Get script directory for relative imports
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+# Import modular libraries
+source "$PROJECT_ROOT/src/lib/core/logger.sh"
+source "$PROJECT_ROOT/src/lib/core/environment.sh"
+source "$PROJECT_ROOT/src/lib/evolution/git.sh"
+source "$PROJECT_ROOT/src/lib/evolution/metrics.sh"
+
+# Initialize logging
+init_logger "logs" "evolve"
 
 # Default values
 EVOLUTION_TYPE="consistency"
@@ -80,26 +85,26 @@ REQUIREMENTS:
 EOF
 }
 
-# Logging functions
+# Logging functions (using modular logger)
 log() {
-    echo -e "${BLUE}[INFO]${NC} $1"
+    log_info "$1"
 }
 
 warn() {
-    echo -e "${YELLOW}[WARN]${NC} $1"
+    log_warn "$1"
 }
 
 error() {
-    echo -e "${RED}[ERROR]${NC} $1" >&2
+    log_error "$1"
 }
 
 success() {
-    echo -e "${GREEN}[SUCCESS]${NC} $1"
+    log_success "$1"
 }
 
 verbose_log() {
     if [[ "$VERBOSE" == "true" ]]; then
-        echo -e "${CYAN}[VERBOSE]${NC} $1"
+        log_debug "$1"
     fi
 }
 

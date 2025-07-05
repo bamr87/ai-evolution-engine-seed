@@ -2,32 +2,27 @@
 # scripts/test-workflow.sh
 # Comprehensive GitHub Actions testing and debugging script
 # Supports both local testing with 'act' and remote workflow analysis
+# Version: 2.0.0 - Modular Architecture
 
 set -euo pipefail
+
+# Get script directory for relative imports
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+# Import modular libraries
+source "$PROJECT_ROOT/src/lib/core/logger.sh"
+source "$PROJECT_ROOT/src/lib/core/environment.sh"
+source "$PROJECT_ROOT/src/lib/core/testing.sh"
+
+# Initialize environment and logging
+init_environment_config
+init_logger "logs" "test-workflow"
 
 # Configuration
 WORKFLOW_FILE=".github/workflows/ai_evolver.yml"
 LOG_DIR="./logs"
 SECRETS_FILE=".secrets" # For local testing only - never commit this file
-
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
-
-# Logging function
-log() {
-    local level=$1
-    shift
-    case $level in
-        "INFO") echo -e "${BLUE}[INFO]${NC} $*" ;;
-        "WARN") echo -e "${YELLOW}[WARN]${NC} $*" ;;
-        "ERROR") echo -e "${RED}[ERROR]${NC} $*" ;;
-        "SUCCESS") echo -e "${GREEN}[SUCCESS]${NC} $*" ;;
-    esac
-}
 
 # Function to show usage
 show_usage() {
@@ -60,62 +55,62 @@ EOF
 
 # Function to setup local testing environment
 setup_testing() {
-    log "INFO" "Setting up local testing environment..."
+    log_info "Setting up local testing environment..."
     
     # Create logs directory
     mkdir -p "$LOG_DIR"
     
     # Check if act is installed
     if ! command -v act >/dev/null 2>&1; then
-        log "ERROR" "act is not installed. Install with: brew install act"
+        log_error "act is not installed. Install with: brew install act"
         exit 1
     fi
     
     # Check if Docker is running (required for act)
     if ! docker info >/dev/null 2>&1; then
-        log "ERROR" "Docker is not running. Please start Docker Desktop."
+        log_error "Docker is not running. Please start Docker Desktop."
         exit 1
     fi
     
     # Create sample secrets file if it doesn't exist
     if [ ! -f "$SECRETS_FILE" ]; then
-        log "INFO" "Creating sample secrets file: $SECRETS_FILE"
+        log_info "Creating sample secrets file: $SECRETS_FILE"
         cat > "$SECRETS_FILE" << 'EOF'
 # Local testing secrets - NEVER commit this file
 # Add your GitHub token for testing
 GITHUB_TOKEN=your_github_token_here
 PAT_TOKEN=your_pat_token_here
 EOF
-        log "WARN" "Please edit $SECRETS_FILE and add your GitHub tokens"
+        log_warn "Please edit $SECRETS_FILE and add your GitHub tokens"
     fi
     
     # Add to .gitignore if not already there
     if [ -f ".gitignore" ] && ! grep -q "^\.secrets$" .gitignore; then
         echo ".secrets" >> .gitignore
-        log "INFO" "Added .secrets to .gitignore"
+        log_info "Added .secrets to .gitignore"
     fi
     
-    log "SUCCESS" "Testing environment setup complete"
+    log_success "Testing environment setup complete"
 }
 
 # Function to validate workflow syntax
 validate_workflow() {
-    log "INFO" "Validating workflow syntax..."
+    log_info "Validating workflow syntax..."
     
     if [ ! -f "$WORKFLOW_FILE" ]; then
-        log "ERROR" "Workflow file not found: $WORKFLOW_FILE"
+        log_error "Workflow file not found: $WORKFLOW_FILE"
         exit 1
     fi
     
     # Use act to validate workflow
     if act --list >/dev/null 2>&1; then
-        log "SUCCESS" "Workflow syntax is valid"
+        log_success "Workflow syntax is valid"
         
         # Show available jobs
-        log "INFO" "Available jobs:"
+        log_info "Available jobs:"
         act --list
     else
-        log "ERROR" "Workflow syntax validation failed"
+        log_error "Workflow syntax validation failed"
         exit 1
     fi
 }
@@ -127,9 +122,9 @@ run_local() {
     local job="${3:-}"
     local debug_mode="${4:-false}"
     
-    log "INFO" "Running workflow locally..."
-    log "INFO" "Prompt: $prompt"
-    log "INFO" "Mode: $mode"
+    log_info "Running workflow locally..."
+    log_info "Prompt: $prompt"
+    log_info "Mode: $mode"
     
     # Prepare act command
     local act_cmd="act workflow_dispatch"
@@ -155,43 +150,43 @@ run_local() {
     # Create log file
     local log_file="$LOG_DIR/local-run-$(date +%Y%m%d-%H%M%S).log"
     
-    log "INFO" "Running: $act_cmd"
-    log "INFO" "Log file: $log_file"
+    log_info "Running: $act_cmd"
+    log_info "Log file: $log_file"
     
     # Run act and capture output
     if eval "$act_cmd" 2>&1 | tee "$log_file"; then
-        log "SUCCESS" "Local workflow run completed"
-        log "INFO" "Check log file for details: $log_file"
+        log_success "Local workflow run completed"
+        log_info "Check log file for details: $log_file"
     else
-        log "ERROR" "Local workflow run failed"
-        log "INFO" "Check log file for errors: $log_file"
+        log_error "Local workflow run failed"
+        log_info "Check log file for errors: $log_file"
         exit 1
     fi
 }
 
 # Function to fetch and analyze GitHub Action logs
 fetch_github_logs() {
-    log "INFO" "Fetching recent GitHub Action logs..."
+    log_info "Fetching recent GitHub Action logs..."
     
     # Check if gh CLI is installed and authenticated
     if ! command -v gh >/dev/null 2>&1; then
-        log "ERROR" "GitHub CLI (gh) is not installed. Install with: brew install gh"
+        log_error "GitHub CLI (gh) is not installed. Install with: brew install gh"
         exit 1
     fi
     
     if ! gh auth status >/dev/null 2>&1; then
-        log "ERROR" "GitHub CLI not authenticated. Run: gh auth login"
+        log_error "GitHub CLI not authenticated. Run: gh auth login"
         exit 1
     fi
     
     # Fetch recent workflow runs
     local runs_file="$LOG_DIR/recent-runs-$(date +%Y%m%d-%H%M%S).json"
     
-    log "INFO" "Fetching workflow runs..."
+    log_info "Fetching workflow runs..."
     gh run list --workflow="$WORKFLOW_FILE" --limit=10 --json=status,conclusion,createdAt,headBranch,databaseId > "$runs_file"
     
     # Display recent runs
-    log "INFO" "Recent workflow runs:"
+    log_info "Recent workflow runs:"
     gh run list --workflow="$WORKFLOW_FILE" --limit=5
     
     # Get the most recent run ID
@@ -199,28 +194,28 @@ fetch_github_logs() {
     latest_run_id=$(jq -r '.[0].databaseId' "$runs_file" 2>/dev/null || echo "")
     
     if [ -n "$latest_run_id" ] && [ "$latest_run_id" != "null" ]; then
-        log "INFO" "Fetching logs for latest run: $latest_run_id"
+        log_info "Fetching logs for latest run: $latest_run_id"
         
         local log_file="$LOG_DIR/github-logs-$latest_run_id-$(date +%Y%m%d-%H%M%S).log"
         
         # Download logs
         if gh run download "$latest_run_id" --dir "$LOG_DIR/run-$latest_run_id" 2>/dev/null; then
-            log "SUCCESS" "Logs downloaded to: $LOG_DIR/run-$latest_run_id"
+            log_success "Logs downloaded to: $LOG_DIR/run-$latest_run_id"
         else
             # If download fails, try to view logs directly
-            log "INFO" "Attempting to view logs directly..."
+            log_info "Attempting to view logs directly..."
             gh run view "$latest_run_id" --log > "$log_file" || true
         fi
         
         # Display log summary
         if [ -f "$log_file" ]; then
-            log "INFO" "Log summary:"
+            log_info "Log summary:"
             echo "=========================================="
             tail -50 "$log_file"
             echo "=========================================="
         fi
     else
-        log "WARN" "No recent workflow runs found"
+        log_warn "No recent workflow runs found"
     fi
 }
 
@@ -229,7 +224,7 @@ create_debug_output() {
     local log_file="$1"
     local debug_file="$LOG_DIR/debug-analysis-$(date +%Y%m%d-%H%M%S).md"
     
-    log "INFO" "Creating debug analysis file: $debug_file"
+    log_info "Creating debug analysis file: $debug_file"
     
     cat > "$debug_file" << EOF
 # GitHub Actions Debug Analysis
@@ -275,8 +270,8 @@ $(cat "$log_file" 2>/dev/null || echo "Log file not available")
 - [ ] Repository permissions are correct
 EOF
 
-    log "SUCCESS" "Debug analysis created: $debug_file"
-    log "INFO" "You can share this file with AI assistants for debugging help"
+    log_success "Debug analysis created: $debug_file"
+    log_info "You can share this file with AI assistants for debugging help"
 }
 
 # Main script logic
@@ -312,7 +307,7 @@ main() {
                 exit 0
                 ;;
             *)
-                log "ERROR" "Unknown option: $1"
+                log_error "Unknown option: $1"
                 show_usage
                 exit 1
                 ;;
@@ -339,7 +334,7 @@ main() {
             fetch_github_logs
             ;;
         "dry-run")
-            log "INFO" "Running dry-run simulation..."
+            log_info "Running dry-run simulation..."
             validate_workflow
             run_local "$prompt" "$mode" "$job" "false"
             ;;
