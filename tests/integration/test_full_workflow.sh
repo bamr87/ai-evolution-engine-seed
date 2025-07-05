@@ -1,4 +1,31 @@
 #!/bin/bash
+#
+# @file tests/integration/test_full_workflow.sh
+# @description Integration tests for complete AI Evolution Engine workflow validation
+# @author IT-Journey Team <team@it-journey.org>
+# @created 2025-07-05
+# @lastModified 2025-07-05
+# @version 1.0.0
+#
+# @relatedIssues 
+#   - #integration-testing: Complete workflow integration validation
+#   - #test-framework-reorganization: Category-specific artifact management
+#
+# @relatedEvolutions
+#   - v1.0.0: Initial implementation with comprehensive integration testing
+#
+# @dependencies
+#   - bash: >=4.0
+#   - find: for repository structure validation
+#   - make: for Makefile testing
+#
+# @changelog
+#   - 2025-07-05: Added proper file header and artifact management - ITJ
+#   - 2025-07-05: Refactored to use integration-specific artifact directories - ITJ
+#
+# @usage ./test_full_workflow.sh
+# @notes Tests the AI Evolution Engine repository organization and structure
+#
 
 # Integration Test: Repository Structure Validation
 # Tests the AI Evolution Engine repository organization and structure
@@ -15,6 +42,27 @@ YELLOW='\033[1;33m'
 NC='\033[0m'
 
 echo "Running AI Evolution Engine integration tests..."
+
+# Setup artifact directories for integration tests
+INTEGRATION_LOGS_DIR="$SCRIPT_DIR/logs"
+INTEGRATION_RESULTS_DIR="$SCRIPT_DIR/results"
+INTEGRATION_REPORTS_DIR="$SCRIPT_DIR/reports"
+
+# Create artifact directories if they don't exist
+mkdir -p "$INTEGRATION_LOGS_DIR" "$INTEGRATION_RESULTS_DIR" "$INTEGRATION_REPORTS_DIR"
+
+# Initialize test run timestamp for artifacts
+TEST_RUN_TIMESTAMP=$(date "+%Y%m%d-%H%M%S")
+TEST_LOG_FILE="$INTEGRATION_LOGS_DIR/full_workflow_test_${TEST_RUN_TIMESTAMP}.log"
+TEST_RESULTS_FILE="$INTEGRATION_RESULTS_DIR/full_workflow_results_${TEST_RUN_TIMESTAMP}.json"
+TEST_REPORT_FILE="$INTEGRATION_REPORTS_DIR/full_workflow_report_${TEST_RUN_TIMESTAMP}.md"
+
+# Redirect all output to log file as well as console
+exec > >(tee -a "$TEST_LOG_FILE")
+exec 2>&1
+
+# Initialize results JSON
+echo "{\"test_run_id\": \"full_workflow_test_${TEST_RUN_TIMESTAMP}\", \"start_time\": \"$(date -Iseconds)\", \"tests\": []}" > "$TEST_RESULTS_FILE"
 
 # Test 1: Verify main test runner works
 echo -e "${YELLOW}Testing main test runner...${NC}"

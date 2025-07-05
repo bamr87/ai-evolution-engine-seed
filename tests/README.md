@@ -1,197 +1,317 @@
+<!--
+@file tests/README.md
+@description Comprehensive testing framework documentation for AI Evolution Engine
+@author IT-Journey Team <team@it-journey.org>
+@created 2025-07-05
+@lastModified 2025-07-05
+@version 2.0.0
+
+@relatedIssues 
+  - Testing framework reorganization and standardization
+  - Implementation of modular test artifact management
+
+@relatedEvolutions
+  - v2.0.0: Major restructure with category-specific artifact directories
+  - v1.0.0: Initial testing framework implementation
+
+@dependencies
+  - bash: >=4.0
+  - jq: for JSON processing in tests
+
+@changelog
+  - 2025-07-05: Reorganized directory structure with category-specific artifacts - ITJ
+  - 2025-07-05: Updated documentation with new standards - ITJ
+
+@usage Reference documentation for test framework organization and usage
+@notes Each test category maintains its own logs, results, and reports
+-->
+
 # Testing Framework Documentation
 
-This directory contains the comprehensive testing framework for the AI Evolution Engine, featuring organized test artifacts and management tools.
+This directory contains the comprehensive testing framework for the AI Evolution Engine, featuring organized test artifacts and management tools with category-specific storage.
 
 ## Directory Structure
 
-```
+```text
 tests/
 ├── README.md                           # This documentation
 ├── manage-test-artifacts.sh            # Test artifact management script
 ├── modular-architecture-test.sh        # Core architecture validation
 ├── comprehensive-refactoring-test.sh   # Refactoring validation
 ├── test_runner.sh                      # Legacy test runner
-├── test-results/                       # JSON test results (temporary)
-├── test-reports/                       # Markdown/HTML reports (temporary)
-├── test-logs/                          # Execution logs (temporary)
-└── archives/                           # Long-term test archives (optional)
+├── workflow_test_runner.sh             # Workflow-specific test runner
+├── fixtures/                           # Test data and fixtures
+├── unit/                               # Unit tests
+│   ├── logs/                          # Unit test execution logs
+│   ├── results/                       # Unit test results (JSON)
+│   ├── reports/                       # Unit test reports (Markdown/HTML)
+│   ├── test_project_structure.sh     # Project structure validation
+│   └── workflows/                     # Workflow unit tests
+│       ├── logs/                      # Workflow test logs
+│       ├── results/                   # Workflow test results
+│       ├── reports/                   # Workflow test reports
+│       ├── test_ai_evolver.sh         # AI evolver workflow tests
+│       ├── test_daily_evolution.sh    # Daily evolution tests
+│       └── test_daily_evolution_backup.sh
+├── integration/                        # Integration tests
+│   ├── logs/                          # Integration test logs
+│   ├── results/                       # Integration test results
+│   ├── reports/                       # Integration test reports
+│   ├── test_full_workflow.sh          # Full workflow integration
+│   └── test_workflow_integration.sh   # Workflow integration tests
+└── archives/                          # Long-term test archives (optional)
 ```
 
 ## Test Artifact Organization
 
-### Temporary Directories (Git Ignored)
+### Category-Specific Artifact Storage
 
-**`test-results/`** - JSON test result files
-- Individual test execution results
-- Test suite summaries
-- Performance metrics
-- Created during test runs, cleaned up automatically
+Each test category (`unit/`, `integration/`, `unit/workflows/`) maintains its own artifact directories:
 
-**`test-reports/`** - Human-readable test reports
-- Markdown formatted reports
-- HTML dashboards (if generated)
-- Summary reports for stakeholders
-- Can be preserved during cleanup for reference
+#### `logs/` Directories
 
-**`test-logs/`** - Detailed execution logs
-- Debug information
-- Error traces
-- Performance data
-- Automatically rotated and cleaned
+- Detailed execution logs for debugging
+- Error traces and diagnostic information
+- Performance metrics and timing data
+- Automatically timestamped and rotated
 
-### Permanent Storage
+#### `results/` Directories
 
-**`archives/`** - Long-term test artifact storage
-- Compressed archives of important test runs
-- Historical data for trend analysis
-- Manually created via management script
+- JSON-formatted test results
+- Individual test execution outcomes
+- Test suite summaries and statistics
+- Machine-readable data for automation
 
-## Test Management Commands
+#### `reports/` Directories
+
+- Human-readable test reports (Markdown/HTML)
+- Summary dashboards and visualizations
+- Stakeholder-friendly documentation
+- Historical trend analysis
+
+### Artifact Management Principles
+
+#### Design for Failure (DFF)
+
+- All artifacts are retained until explicitly cleaned
+- Failed test runs preserve full diagnostic information
+- Redundant storage prevents data loss during cleanup
+
+#### Don't Repeat Yourself (DRY)
+
+- Common artifact management functions are centralized
+- Template-based report generation eliminates duplication
+- Shared utilities handle logging and result formatting
+
+#### Keep It Simple (KIS)
+
+- Clear directory structure with intuitive naming
+- Standardized artifact formats across all test categories
+- Simple cleanup and archival processes
+
+## Test Artifact Management Commands
 
 ### Status and Information
+
 ```bash
-# Show current test artifacts status
+# Show current test artifacts status across all categories
 ./manage-test-artifacts.sh status
 
-# Show help and available commands
-./manage-test-artifacts.sh --help
+# Show artifacts for specific test category
+./manage-test-artifacts.sh status --category unit
+./manage-test-artifacts.sh status --category integration
 ```
 
 ### Cleanup Operations
+
 ```bash
-# Clean up all temporary test artifacts
-./manage-test-artifacts.sh cleanup
+# Clean up artifacts but keep reports for reference
+./manage-test-artifacts.sh cleanup --keep-reports
 
-# Clean up but preserve test reports
-./manage-test-artifacts.sh cleanup keep-reports
+# Clean specific category artifacts
+./manage-test-artifacts.sh cleanup --category unit
+./manage-test-artifacts.sh cleanup --category integration
 
-# Auto-cleanup artifacts older than 7 days
-./manage-test-artifacts.sh auto-cleanup
+# Clean all artifacts (destructive)
+./manage-test-artifacts.sh cleanup --all
 
-# Auto-cleanup artifacts older than 3 days
-./manage-test-artifacts.sh auto-cleanup 3
+# Auto-cleanup old artifacts (older than 7 days)
+./manage-test-artifacts.sh auto-cleanup --days 7
 ```
 
 ### Archiving
+
 ```bash
-# Archive current test artifacts with auto-generated name
-./manage-test-artifacts.sh archive
+# Archive current artifacts before cleanup
+./manage-test-artifacts.sh archive --name "release-v1.0"
 
-# Archive with custom name
-./manage-test-artifacts.sh archive "release-v1.0-tests"
+# Archive specific test category
+./manage-test-artifacts.sh archive --category unit --name "unit-tests-milestone"
 
-# Archive and cleanup original files
-./manage-test-artifacts.sh archive "milestone-tests"
-./manage-test-artifacts.sh cleanup
+# List archived artifacts
+./manage-test-artifacts.sh list-archives
 ```
 
 ### Nuclear Options
-```bash
-# Remove ALL test artifacts including archives (requires confirmation)
-PURGE_CONFIRM=true ./manage-test-artifacts.sh purge
-```
-
-## Test Framework Integration
-
-### For Test Scripts
-
-When creating new test scripts, use the organized structure:
 
 ```bash
-#!/bin/bash
-set -euo pipefail
+# Purge everything including archives (use with extreme caution)
+./manage-test-artifacts.sh purge-all --confirm
 
-# Source the testing framework
-source "../src/lib/core/testing.sh"
-
-# Initialize with proper directory structure
-init_testing "my-test-session" "tests"
-
-# Your tests here...
-start_test_suite "example_tests"
-run_test "Example test" "echo 'Hello, World!'"
-end_test_suite
-
-# Generate reports and finalize
-generate_test_report
-finalize_testing
+# Reset test environment completely
+./manage-test-artifacts.sh reset --confirm
 ```
 
-### For CI/CD Integration
+## Test Execution Workflow
 
-The testing framework supports automated cleanup and archiving:
+### Running Tests
 
-```yaml
-# Example GitHub Actions integration
-- name: Run Tests
-  run: ./tests/comprehensive-refactoring-test.sh
+```bash
+# Run all tests
+./test_runner.sh
 
-- name: Archive Test Results
-  if: always()
-  run: ./tests/manage-test-artifacts.sh archive "ci-build-${{ github.run_number }}"
+# Run specific test category
+./test_runner.sh --type unit
+./test_runner.sh --type integration
 
-- name: Cleanup Temporary Artifacts
-  if: always()
-  run: ./tests/manage-test-artifacts.sh cleanup keep-reports
+# Run workflow-specific tests
+./workflow_test_runner.sh
+
+# Run with verbose output
+./test_runner.sh --verbose
 ```
+
+### Test Results Processing
+
+1. **Execution**: Test runs generate artifacts in category-specific directories
+2. **Logging**: Detailed logs are saved to `logs/` subdirectories
+3. **Results**: JSON results are saved to `results/` subdirectories
+4. **Reports**: Human-readable reports are generated in `reports/` subdirectories
+
+### Artifact Lifecycle
+
+1. **Creation**: During test execution
+2. **Retention**: Until manual cleanup or auto-cleanup threshold
+3. **Archiving**: Optional long-term storage
+4. **Cleanup**: Automated or manual removal
+
+## Integration with CI/CD
+
+### GitHub Actions Integration
+
+Test artifacts are automatically managed in CI/CD pipelines:
+
+- Test execution generates artifacts in appropriate category directories
+- Failed tests preserve full diagnostic information
+- Artifacts are conditionally uploaded as workflow artifacts
+- Historical data is maintained for trend analysis
+
+### Artifact Retention Policies
+
+- **Logs**: Kept for 30 days by default
+- **Results**: Kept for 90 days by default
+- **Reports**: Kept indefinitely until manual cleanup
+- **Archives**: Manually managed, no automatic expiration
+
+## Configuration
+
+### Environment Variables
+
+```bash
+# Test artifact retention (days)
+TEST_ARTIFACT_RETENTION_DAYS=30
+
+# Enable verbose logging
+TEST_VERBOSE_LOGGING=true
+
+# Automatic cleanup threshold
+TEST_AUTO_CLEANUP_THRESHOLD=7
+```
+
+### Test Categories
+
+- **Unit Tests**: Fast, isolated tests for individual components
+- **Integration Tests**: Tests for component interactions
+- **Workflow Tests**: Tests for GitHub Actions workflows
+- **End-to-End Tests**: Full system validation tests
 
 ## Best Practices
 
-### Development Workflow
+### Test Organization
 
-1. **During Development**: Let temporary artifacts accumulate for debugging
-2. **After Debugging**: Use `cleanup keep-reports` to preserve summaries
-3. **Before Releases**: Archive important test runs for historical reference
-4. **Regular Maintenance**: Use `auto-cleanup` to prevent disk bloat
+- Use descriptive test names that explain what is being tested
+- Group related tests in the same directory
+- Follow the DRY principle for test utilities
+- Implement proper error handling in all tests
 
-### Debugging Failed Tests
+### Artifact Management
 
-1. Check `test-logs/` for detailed execution logs
-2. Review `test-results/` for specific failure data
-3. Examine `test-reports/` for high-level summaries
-4. Archive the session before cleanup for future reference
+- Regularly review and clean up old artifacts
+- Archive important test runs before cleanup
+- Use descriptive names for archived artifacts
+- Monitor disk usage and implement cleanup policies
 
-### Performance Considerations
+### Debugging
 
-- Test artifacts are automatically cleaned to prevent disk usage issues
-- Archives are compressed to minimize storage requirements
-- Old artifacts are auto-cleaned based on age policies
-- Large test outputs are truncated in reports
-
-## Integration with Modular Architecture
-
-The testing framework leverages the modular architecture:
-
-- **`src/lib/core/testing.sh`**: Core testing functionality
-- **`src/lib/core/logger.sh`**: Unified logging across tests
-- **`src/lib/core/environment.sh`**: Environment detection and validation
-
-This ensures consistent behavior across all test scenarios and easy maintenance of the testing infrastructure.
+- Always check the appropriate `logs/` directory for detailed error information
+- Use the `results/` directory for programmatic analysis
+- Consult the `reports/` directory for human-readable summaries
+- Enable verbose logging for troubleshooting
 
 ## Troubleshooting
 
 ### Common Issues
 
-**Test artifacts not being created:**
-- Ensure `init_testing` is called with proper base directory
-- Check permissions on the tests directory
+#### Missing Dependencies
 
-**Cleanup not working:**
+- Install `jq` for JSON processing: `brew install jq` (macOS)
+- Ensure `bash` version 4.0 or higher
 - Verify script permissions: `chmod +x manage-test-artifacts.sh`
-- Check for running test processes that may lock files
 
-**Archives not being created:**
-- Ensure `tar` and `gzip` are available
-- Check disk space availability
-- Verify test artifacts exist before archiving
+#### Artifact Storage Issues
 
-### Debug Mode
+- Check disk space: `df -h`
+- Verify directory permissions
+- Ensure `tar` and `gzip` are available for archiving
 
-Enable verbose logging for troubleshooting:
+#### Test Execution Problems
 
-```bash
-export LOG_LEVEL=DEBUG
-./tests/comprehensive-refactoring-test.sh
-```
+- Review logs in the appropriate `logs/` directory
+- Check for missing test dependencies
+- Verify test environment setup
+- Ensure `init_testing` is called with proper base directory
 
-This will provide detailed information about test execution and artifact management operations.
+### Getting Help
+
+1. Check the logs in the appropriate category's `logs/` directory
+2. Review the test results in the `results/` directory
+3. Consult the generated reports in the `reports/` directory
+4. Run tests with verbose output for additional debugging information
+5. Use the artifact management script to inspect current state
+
+## Contributing
+
+### Adding New Tests
+
+1. Create test files in the appropriate category directory
+2. Follow the standard file header format
+3. Use the modular testing framework
+4. Implement proper error handling
+5. Update documentation as needed
+
+### Modifying Existing Tests
+
+1. Preserve backward compatibility when possible
+2. Update version numbers and changelog entries
+3. Test changes thoroughly before committing
+4. Update related documentation
+
+### Test Framework Development
+
+1. Follow the established patterns and conventions
+2. Maintain category-specific artifact storage
+3. Implement proper logging and error handling
+4. Document all changes and additions
+5. Consider impact on CI/CD integration
+
+For detailed contribution guidelines, see the main project CONTRIBUTING.md file.

@@ -1,26 +1,57 @@
 #!/bin/bash
-# tests/manage-test-artifacts.sh
+#
+# @file tests/manage-test-artifacts.sh
+# @description Test artifact management script for AI Evolution Engine with category-specific storage
+# @author IT-Journey Team <team@it-journey.org>
+# @created 2025-07-05
+# @lastModified 2025-07-05
+# @version 2.0.0
+#
+# @relatedIssues 
+#   - #test-artifact-management: Comprehensive artifact lifecycle management
+#   - #test-framework-reorganization: Category-specific artifact directories
+#
+# @relatedEvolutions
+#   - v2.0.0: Major restructure for category-specific artifact management
+#   - v1.0.0: Initial implementation with basic artifact management
+#
+# @dependencies
+#   - bash: >=4.0
+#   - find: for file system operations
+#   - tar: for archiving operations
+#   - jq: for JSON processing
+#
+# @changelog
+#   - 2025-07-05: Restructured for category-specific artifact directories - ITJ
+#   - 2025-07-05: Added proper file header and enhanced functionality - ITJ
+#
+# @usage ./manage-test-artifacts.sh <command> [options]
+# @notes Provides commands for archiving, cleaning up, and managing test artifacts across categories
+#
+
 # Test artifact management script for AI Evolution Engine
 # Provides commands for archiving, cleaning up, and managing test outputs
 
 set -euo pipefail
 
 # Save script location before sourcing other scripts
-TESTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "${TESTS_DIR}/.." && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
 # Configuration  
-TEST_BASE_DIR="$TESTS_DIR"
+TEST_BASE_DIR="$SCRIPT_DIR"
 
-# Source modular libraries  
-source "$PROJECT_ROOT/src/lib/core/logger.sh"
-source "$PROJECT_ROOT/src/lib/core/testing.sh"
+# Test categories with artifact directories
+TEST_CATEGORIES=("unit" "integration" "unit/workflows")
+ARTIFACT_TYPES=("logs" "results" "reports")
 
-# Initialize logger in tests directory (use relative path)
-init_logger "test-logs" "test-management"
+# Simple logging functions
+log_info() { echo "[INFO] $*"; }
+log_error() { echo "[ERROR] $*" >&2; }
+log_success() { echo "[SUCCESS] $*"; }
 
 # Debug information
-log_info "Tests directory: $TESTS_DIR"
+log_info "Script directory: $SCRIPT_DIR"
 log_info "Project root: $PROJECT_ROOT"
 log_info "Test base directory: $TEST_BASE_DIR"
 
@@ -61,71 +92,101 @@ EOF
 
 # Show current status of test artifacts
 show_status() {
-    log_info "Test Artifacts Status for: $TEST_BASE_DIR"
-    echo ""
+    local target_category="${1:-}"
     
-    # Check each test artifact directory
-    for dir in test-results test-reports test-logs; do
-        local full_path="$TEST_BASE_DIR/$dir"
-        if [[ -d "$full_path" ]]; then
-            local file_count=$(find "$full_path" -type f | wc -l)
-            local dir_size=$(du -sh "$full_path" 2>/dev/null | cut -f1 || echo "unknown")
-            local latest_file=$(find "$full_path" -type f -name "*.json" -o -name "*.log" -o -name "*.md" | head -1)
+    log_info "Test Artifacts Status for: $TEST_BASE_DIR"
+    
+    if [[ -n "$target_category" ]]; then
+        log_info "Filtering by category: $target_category"
+        show_category_status "$target_category"
+    else
+        log_info "Showing all categories"
+        for category in "${TEST_CATEGORIES[@]}"; do
+            show_category_status "$category"
+        done
+    fi
+    
+    # Check archives
+    show_archives_status
+}
+
+# Show status for a specific test category
+show_category_status() {
+    local category="$1"
+    local category_path="$TEST_BASE_DIR/$category"
+    
+    echo ""
+    log_info "📂 Category: $category"
+    
+    if [[ ! -d "$category_path" ]]; then
+        log_info "  ❌ Category directory not found: $category_path"
+        return
+    fi
+    
+    # Check each artifact type in this category
+    for artifact_type in "${ARTIFACT_TYPES[@]}"; do
+        local artifact_path="$category_path/$artifact_type"
+        
+        if [[ -d "$artifact_path" ]]; then
+            local file_count=$(find "$artifact_path" -type f | wc -l)
+            local dir_size=$(du -sh "$artifact_path" 2>/dev/null | cut -f1 || echo "unknown")
+            local latest_file=$(find "$artifact_path" -type f -exec stat -f "%m %N" {} \; 2>/dev/null | sort -nr | head -1 | cut -d' ' -f2-)
             local age="unknown"
             
             if [[ -n "$latest_file" ]]; then
                 age=$(stat -f "%Sm" -t "%Y-%m-%d %H:%M" "$latest_file" 2>/dev/null || echo "unknown")
             fi
             
-            log_info "  📁 $dir: $file_count files, $dir_size (latest: $age)"
+            log_info "    📁 $artifact_type: $file_count files, $dir_size (latest: $age)"
             
             # Show sample files if verbose
             if [[ "$file_count" -gt 0 ]]; then
-                echo "    Recent files:"
-                find "$full_path" -type f | head -3 | while read -r file; do
-                    echo "      - $(basename "$file")"
+                echo "      Recent files:"
+                find "$artifact_path" -type f | head -3 | while read -r file; do
+                    echo "        - $(basename "$file")"
                 done
                 if [[ "$file_count" -gt 3 ]]; then
-                    echo "      ... and $((file_count - 3)) more"
+                    echo "        ... and $((file_count - 3)) more"
                 fi
             fi
         else
-            log_info "  📁 $dir: not found"
+            log_info "    📁 $artifact_type: not found"
         fi
-        echo ""
     done
-    
-    # Check archives
+}
+
+# Show archives status
+show_archives_status() {
     local archive_dir="$TEST_BASE_DIR/archives"
+    
+    echo ""
+    log_info "📦 Archives"
+    
     if [[ -d "$archive_dir" ]]; then
         local archive_count=$(find "$archive_dir" -name "*.tar.gz" | wc -l)
         if [[ "$archive_count" -gt 0 ]]; then
             local archive_size=$(du -sh "$archive_dir" 2>/dev/null | cut -f1 || echo "unknown")
-            log_info "  📦 archives: $archive_count files, $archive_size"
+            log_info "  $archive_count files, $archive_size total"
             
-            echo "    Available archives:"
+            echo "  Available archives:"
             find "$archive_dir" -name "*.tar.gz" | sort | while read -r archive; do
                 local name=$(basename "$archive" .tar.gz)
                 local size=$(du -sh "$archive" 2>/dev/null | cut -f1 || echo "unknown")
-                echo "      - $name ($size)"
+                local date=$(stat -f "%Sm" -t "%Y-%m-%d" "$archive" 2>/dev/null || echo "unknown")
+                echo "    - $name ($size, created: $date)"
             done
         else
-            log_info "  📦 archives: directory exists but empty"
+            log_info "  Directory exists but empty"
         fi
     else
-        log_info "  📦 archives: not found"
+        log_info "  Directory not found"
     fi
-    
-    echo ""
-    
-    # Disk usage summary
-    local total_size=$(du -sh "$TEST_BASE_DIR" 2>/dev/null | cut -f1 || echo "unknown")
-    log_info "Total test directory size: $total_size"
 }
 
 # Clean up test artifacts
 cleanup_artifacts() {
     local keep_reports="${1:-false}"
+    local target_category="${2:-}"
     
     log_info "Cleaning up test artifacts..."
     
@@ -210,10 +271,41 @@ main() {
     
     case "$command" in
         "status")
-            show_status
+            # Parse category argument
+            local category=""
+            while [[ $# -gt 0 ]]; do
+                case $1 in
+                    --category)
+                        category="$2"
+                        shift 2
+                        ;;
+                    *)
+                        shift
+                        ;;
+                esac
+            done
+            show_status "$category"
             ;;
         "cleanup")
-            cleanup_artifacts "$@"
+            # Parse cleanup arguments
+            local keep_reports="false"
+            local category=""
+            while [[ $# -gt 0 ]]; do
+                case $1 in
+                    --keep-reports)
+                        keep_reports="true"
+                        shift
+                        ;;
+                    --category)
+                        category="$2"
+                        shift 2
+                        ;;
+                    *)
+                        shift
+                        ;;
+                esac
+            done
+            cleanup_artifacts "$keep_reports" "$category"
             ;;
         "archive")
             archive_artifacts "$@"
@@ -221,8 +313,30 @@ main() {
         "auto-cleanup")
             auto_cleanup_artifacts "$@"
             ;;
-        "purge")
-            purge_all_artifacts
+        "purge-all")
+            # Check for confirmation
+            local confirmed="false"
+            while [[ $# -gt 0 ]]; do
+                case $1 in
+                    --confirm)
+                        confirmed="true"
+                        shift
+                        ;;
+                    *)
+                        shift
+                        ;;
+                esac
+            done
+            
+            if [[ "$confirmed" == "true" ]]; then
+                purge_all_artifacts
+            else
+                log_error "Purge command requires --confirm flag for safety"
+                exit 1
+            fi
+            ;;
+        "list-archives")
+            show_archives_status
             ;;
         "-h"|"--help"|"help")
             show_usage

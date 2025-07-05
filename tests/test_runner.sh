@@ -1,8 +1,36 @@
 #!/bin/bash
+#
+# @file tests/test_runner.sh
+# @description Comprehensive testing framework for AI Evolution Engine with category-specific artifacts
+# @author IT-Journey Team <team@it-journey.org>
+# @created 2025-07-05
+# @lastModified 2025-07-05
+# @version 2.0.0
+#
+# @relatedIssues 
+#   - #test-framework-reorganization: Category-specific artifact management
+#   - #comprehensive-testing: Multi-category test execution
+#
+# @relatedEvolutions
+#   - v2.0.0: Major restructure for category-specific artifact storage
+#   - v1.0.0: Initial implementation with basic test runner
+#
+# @dependencies
+#   - bash: >=4.0
+#   - find: for test discovery
+#   - jq: for JSON processing (optional)
+#
+# @changelog
+#   - 2025-07-05: Restructured for category-specific artifacts - ITJ
+#   - 2025-07-05: Enhanced with proper DFF error handling - ITJ
+#
+# @usage ./test_runner.sh [OPTIONS]
+# @notes Comprehensive testing framework following DFF principles
+#
 
 # AI Evolution Engine - Test Runner
 # Comprehensive testing framework following DFF principles
-# Version: 1.0.0
+# Version: 2.0.0
 
 set -euo pipefail
 

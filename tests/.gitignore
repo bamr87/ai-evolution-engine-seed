@@ -1,0 +1,26 @@
+# Test artifacts - generated during test execution
+# Keep directory structure but ignore contents
+
+# Unit test artifacts
+unit/logs/*.log
+unit/results/*.json
+unit/reports/*.md
+unit/workflows/logs/*.log
+unit/workflows/results/*.json
+unit/workflows/reports/*.md
+
+# Integration test artifacts
+integration/logs/*.log
+integration/results/*.json
+integration/reports/*.md
+
+# Preserve README files in artifact directories
+!*/README.md
+
+# Legacy artifact directories (can be removed after migration)
+test-logs/
+test-results/
+test-reports/
+
+# Archives are intentionally preserved
+# archives/ - commented out to keep archives
