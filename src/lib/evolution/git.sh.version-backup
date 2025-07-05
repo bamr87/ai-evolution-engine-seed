@@ -1,7 +1,7 @@
 #!/bin/bash
 # Git operations library for AI Evolution Engine
 # Provides consistent git operations across all scripts
-# Version: 0.3.3-seed
+# Version: 1.0.0
 
 # Source dependencies
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

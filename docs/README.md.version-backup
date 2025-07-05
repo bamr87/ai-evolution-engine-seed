@@ -11,7 +11,7 @@
   - Repository structure standardization
 
 @relatedEvolutions
-  - v0.3.3: Implemented documentation organization rule
+  - v0.3.2: Implemented documentation organization rule
 
 @dependencies
   - Repository structure following documentation organization rule

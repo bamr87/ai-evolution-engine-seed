@@ -1,0 +1,147 @@
+{
+  "current_version": "0.3.3",
+  "version_format": "semantic",
+  "seed_suffix": "-seed",
+  "auto_increment": {
+    "patch": true,
+    "minor": false,
+    "major": false
+  },
+  "tracked_files": {
+    "core_files": [
+      {
+        "path": "README.md",
+        "patterns": [
+          {
+            "type": "ascii_art",
+            "pattern": "v[0-9]+\\.[0-9]+\\.[0-9]+(-seed)?",
+            "line_context": "AI EVOLUTION ENGINE"
+          },
+          {
+            "type": "badge",
+            "pattern": "version-[0-9]+\\.[0-9]+\\.[0-9]+(--seed)?",
+            "line_context": "[![Version]"
+          },
+          {
+            "type": "marker_section",
+            "pattern": "Generation: [0-9]+\\.[0-9]+",
+            "line_context": "AI-EVOLUTION-MARKER"
+          }
+        ],
+        "last_modified_version": "0.3.3"
+      },
+      {
+        "path": "init_setup.sh",
+        "patterns": [
+          {
+            "type": "header_version",
+            "pattern": "Version: [0-9]+\\.[0-9]+\\.[0-9]+(-seed)?",
+            "line_context": "# Version:"
+          },
+          {
+            "type": "variable",
+            "pattern": "SEED_VERSION=\"[0-9]+\\.[0-9]+\\.[0-9]+(-seed)?\"",
+            "line_context": "SEED_VERSION="
+          },
+          {
+            "type": "ascii_display",
+            "pattern": "v[0-9]+\\.[0-9]+\\.[0-9]+",
+            "line_context": "AI EVOLUTION ENGINE - SEED PLANTER"
+          }
+        ],
+        "last_modified_version": "0.3.3"
+      },
+      {
+        "path": ".github/workflows/ai_evolver.yml",
+        "patterns": [
+          {
+            "type": "workflow_name",
+            "pattern": "\\(v[0-9]+\\.[0-9]+\\.[0-9]+\\)",
+            "line_context": "name: 🌱 AI Evolution Growth Engine"
+          }
+        ],
+        "last_modified_version": "0.3.3"
+      },
+      {
+        "path": ".seed.md",
+        "patterns": [
+          {
+            "type": "header",
+            "pattern": "\\(v[0-9]+\\.[0-9]+\\.[0-9]+\\)",
+            "line_context": "# 🌱 AI Evolution Engine"
+          },
+          {
+            "type": "summary_header",
+            "pattern": "\\(v[0-9]+\\.[0-9]+\\.[0-9]+\\)",
+            "line_context": "## 🌿"
+          }
+        ],
+        "last_modified_version": "0.3.3"
+      },
+      {
+        "path": "seed_prompt.md",
+        "patterns": [
+          {
+            "type": "header",
+            "pattern": "v[0-9]+\\.[0-9]+\\.[0-9]+",
+            "line_context": "# 🌱 AI Evolution Engine"
+          }
+        ],
+        "last_modified_version": "0.3.3"
+      }
+    ],
+    "documentation_files": [
+      {
+        "path": "docs/README.md",
+        "patterns": [
+          {
+            "type": "changelog_entry",
+            "pattern": "v[0-9]+\\.[0-9]+\\.[0-9]+:",
+            "line_context": "- v"
+          }
+        ],
+        "last_modified_version": "0.3.3"
+      }
+    ],
+    "script_files": [
+      {
+        "path": "scripts/*.sh",
+        "patterns": [
+          {
+            "type": "header_version",
+            "pattern": "# Version: [0-9]+\\.[0-9]+\\.[0-9]+",
+            "line_context": "# Version:"
+          }
+        ],
+        "scan_directory": true,
+        "last_modified_version": "0.3.3"
+      }
+    ]
+  },
+  "version_history": [
+    {
+      "version": "0.3.2",
+      "date": "2025-07-05",
+      "type": "patch",
+      "description": "Documentation organization implementation"
+    },
+    {
+      "version": "0.3.3",
+      "date": "2025-07-05",
+      "type": "patch",
+      "description": "Automatic version increment"
+    }
+  ],
+  "file_tracking": {
+    "track_by_git_hash": true,
+    "track_by_modification_time": true,
+    "auto_detect_new_files": true,
+    "ignore_patterns": [
+      "*.log",
+      "*.tmp",
+      "*/.git/*",
+      "*/node_modules/*",
+      "*/_site/*"
+    ]
+  }
+}

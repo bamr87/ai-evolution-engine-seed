@@ -1,7 +1,7 @@
 #!/bin/bash
 # scripts/collect-context.sh
 # Collects repository context and metrics for AI evolution
-# Version: 0.3.3-seed - Modular Architecture
+# Version: 2.0.0 - Modular Architecture
 
 set -euo pipefail
 

@@ -83,6 +83,12 @@ When generating code for Azure, running terminal commands for Azure, or performi
   - Lists and describes key files and subdirectories within that directory
   - Provides examples of how to use or interact with directory contents
   - Maintains current and accurate information as directory contents evolve
+- **Documentation Organization Rule**: All documentation files MUST reside in the `docs/` directory, with only two exceptions:
+  - `README.md` - Main project documentation at repository root
+  - `CHANGELOG.md` - Version change log at repository root
+  - All other documentation (guides, references, specifications, etc.) must be organized within `docs/` subdirectories
+  - Use clear subdirectory structure within `docs/` (e.g., `docs/guides/`, `docs/api/`, `docs/architecture/`)
+  - Maintain consistent naming conventions and cross-references between documentation files
 - Include installation, usage, and contribution guidelines
 - Add inline code documentation for complex logic
 - Create user guides and API documentation when relevant

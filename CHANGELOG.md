@@ -5,6 +5,48 @@ All notable changes to the AI Evolution Engine project will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+## [0.3.3] - 2025-07-05
+
+### 🔄 Version Management
+- **Version Update**: patch increment (Automatic version increment)
+- **Automatic File Updates**: Updated version references across tracked files
+
+# Changelog
+
+All notable changes to the AI Evolution Engine project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [0.3.2] - 2025-07-05
+
+### 🔧 Changed
+- **Repository Structure**: Implemented Documentation Organization Rule
+- **Documentation Location**: Moved all documentation to `docs/` directory (except README.md and CHANGELOG.md)
+- **Directory Structure**: Created organized subdirectories: `docs/guides/`, `docs/architecture/`, `docs/evolution/`, `docs/workflows/`
+
+### ✨ Added
+- **Documentation Organization Rule**: Added comprehensive rule to copilot-instructions.md
+- **Structured Documentation**: Created logical organization for scalable documentation management
+- **Enhanced README**: Added documentation structure section explaining new organization
+- **Clean Root Directory**: Maintained minimal root directory with only essential files
+
+### 📁 Moved Files
+- `EVOLUTION_SUMMARY.md` → `docs/evolution/`
+- `CROSS_PLATFORM_UPDATE.md` → `docs/evolution/`
+- `v0.3.0_IMPLEMENTATION_SUMMARY.md` → `docs/evolution/`
+- `TEST_RESULTS.md` → `docs/evolution/`
+- `FULL_TEST_VALIDATION_COMPLETE.md` → `docs/evolution/`
+- `MODULAR_ARCHITECTURE.md` → `docs/architecture/`
+- `REFACTORING_SUMMARY.md` → `docs/architecture/`
+- `WORKFLOW_QUICK_REFERENCE.md` → `docs/workflows/`
+
+### 🐛 Fixed
+- **Documentation Discoverability**: Clear organization improves finding relevant documentation
+- **Maintainability**: Structured hierarchy supports growing documentation needs
+- **Team Collaboration**: Standardized location for all documentation reduces confusion
+
 ## [0.3.0] - 2025-07-04
 
 ### 🔧 Changed
