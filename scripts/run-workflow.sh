@@ -6,67 +6,47 @@
 
 set -euo pipefail
 
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-PURPLE='\033[0;35m'
-CYAN='\033[0;36m'
-NC='\033[0m' # No Color
+# Source modular libraries
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
-# Function to print colored output
-print_status() {
-    echo -e "${BLUE}[INFO]${NC} $1"
-}
+# Source logger
+source "$PROJECT_ROOT/src/lib/core/logger.sh"
 
-print_success() {
-    echo -e "${GREEN}[SUCCESS]${NC} $1"
-}
-
-print_warning() {
-    echo -e "${YELLOW}[WARNING]${NC} $1"
-}
-
-print_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
-}
-
-print_header() {
-    echo -e "${PURPLE}=== $1 ===${NC}"
-}
+# Source environment detection
+source "$PROJECT_ROOT/src/lib/utils/env_detect.sh"
 
 # Check if GitHub CLI is installed
 check_gh_cli() {
     if ! command -v gh &> /dev/null; then
-        print_error "GitHub CLI (gh) is not installed."
+        log_error "GitHub CLI (gh) is not installed."
         echo "Install it from: https://cli.github.com/"
         exit 1
     fi
     
     # Check if authenticated
     if ! gh auth status &> /dev/null; then
-        print_error "GitHub CLI is not authenticated."
+        log_error "GitHub CLI is not authenticated."
         echo "Run: gh auth login"
         exit 1
     fi
     
-    print_success "GitHub CLI is installed and authenticated"
+    log_success "GitHub CLI is installed and authenticated"
 }
 
 # Show available workflows
 show_workflows() {
-    print_header "Available AI Evolution Workflows"
+    log_header "Available AI Evolution Workflows"
     echo
-    echo -e "${CYAN}1. ai_evolver.yml${NC} - Manual AI Evolution Engine"
+    echo "1. ai_evolver.yml - Manual AI Evolution Engine"
     echo "   Purpose: Custom AI-driven evolution with human prompts"
     echo "   Use cases: Feature development, custom improvements"
     echo
-    echo -e "${CYAN}2. daily_evolution.yml${NC} - Automated Maintenance"
+    echo "2. daily_evolution.yml - Automated Maintenance"
     echo "   Purpose: Repository health checks and maintenance"
     echo "   Use cases: Consistency fixes, error resolution, documentation"
     echo
-    echo -e "${CYAN}3. testing_automation_evolver.yml${NC} - Testing & Build Optimization"
+    echo "3. testing_automation_evolver.yml - Testing & Build Optimization"
     echo "   Purpose: Testing and CI/CD improvements"
     echo "   Use cases: Test automation, build optimization, error resilience"
     echo
@@ -80,10 +60,10 @@ run_ai_evolver() {
     local auto_plant_seeds="${4:-true}"
     local use_container="${5:-true}"
     
-    print_header "Running AI Evolution Workflow"
-    print_status "Prompt: $prompt"
-    print_status "Growth Mode: $growth_mode"
-    print_status "Dry Run: $dry_run"
+    log_header "Running AI Evolution Workflow"
+    log_info "Prompt: $prompt"
+    log_info "Growth Mode: $growth_mode"
+    log_info "Dry Run: $dry_run"
     
     gh workflow run ai_evolver.yml \
         -f prompt="$prompt" \
@@ -92,7 +72,7 @@ run_ai_evolver() {
         -f auto_plant_seeds="$auto_plant_seeds" \
         -f use_container="$use_container"
     
-    print_success "Workflow triggered successfully!"
+    log_success "Workflow triggered successfully!"
 }
 
 # Function to run Daily Evolution workflow
@@ -102,11 +82,11 @@ run_daily_evolution() {
     local force_run="${3:-false}"
     local dry_run="${4:-false}"
     
-    print_header "Running Daily Evolution Workflow"
-    print_status "Evolution Type: $evolution_type"
-    print_status "Intensity: $intensity"
-    print_status "Force Run: $force_run"
-    print_status "Dry Run: $dry_run"
+    log_header "Running Daily Evolution Workflow"
+    log_info "Evolution Type: $evolution_type"
+    log_info "Intensity: $intensity"
+    log_info "Force Run: $force_run"
+    log_info "Dry Run: $dry_run"
     
     gh workflow run daily_evolution.yml \
         -f evolution_type="$evolution_type" \
@@ -114,7 +94,7 @@ run_daily_evolution() {
         -f force_run="$force_run" \
         -f dry_run="$dry_run"
     
-    print_success "Workflow triggered successfully!"
+    log_success "Workflow triggered successfully!"
 }
 
 # Function to run Testing Automation workflow
@@ -124,11 +104,11 @@ run_testing_automation() {
     local generation="${3:-1}"
     local dry_run="${4:-false}"
     
-    print_header "Running Testing Automation Workflow"
-    print_status "Growth Mode: $growth_mode"
-    print_status "Cycle: $cycle"
-    print_status "Generation: $generation"
-    print_status "Dry Run: $dry_run"
+    log_header "Running Testing Automation Workflow"
+    log_info "Growth Mode: $growth_mode"
+    log_info "Cycle: $cycle"
+    log_info "Generation: $generation"
+    log_info "Dry Run: $dry_run"
     
     gh workflow run testing_automation_evolver.yml \
         -f growth_mode="$growth_mode" \
@@ -136,33 +116,33 @@ run_testing_automation() {
         -f generation="$generation" \
         -f dry_run="$dry_run"
     
-    print_success "Workflow triggered successfully!"
+    log_success "Workflow triggered successfully!"
 }
 
 # Function to monitor workflow runs
 monitor_workflows() {
-    print_header "Recent Workflow Runs"
+    log_header "Recent Workflow Runs"
     gh run list --limit 10
     echo
     
-    print_status "To view logs for a specific run, use:"
+    log_info "To view logs for a specific run, use:"
     echo "gh run view <run-id> --log"
     echo
-    print_status "To watch a running workflow:"
+    log_info "To watch a running workflow:"
     echo "gh run watch <run-id>"
 }
 
 # Function to view workflow logs
 view_logs() {
     local run_id="$1"
-    print_header "Viewing Logs for Run: $run_id"
+    log_header "Viewing Logs for Run: $run_id"
     gh run view "$run_id" --log
 }
 
 # Function to watch workflow
 watch_workflow() {
     local run_id="$1"
-    print_header "Watching Workflow Run: $run_id"
+    log_header "Watching Workflow Run: $run_id"
     gh run watch "$run_id"
 }
 
@@ -218,7 +198,7 @@ main() {
             ;;
         "logs")
             if [ $# -lt 2 ]; then
-                print_error "Run ID required for logs command"
+                log_error "Run ID required for logs command"
                 echo "Usage: $0 logs <run-id>"
                 exit 1
             fi
@@ -226,7 +206,7 @@ main() {
             ;;
         "watch")
             if [ $# -lt 2 ]; then
-                print_error "Run ID required for watch command"
+                log_error "Run ID required for watch command"
                 echo "Usage: $0 watch <run-id>"
                 exit 1
             fi
@@ -234,7 +214,7 @@ main() {
             ;;
         "ai")
             if [ $# -lt 2 ]; then
-                print_error "Prompt required for AI evolution"
+                log_error "Prompt required for AI evolution"
                 echo "Usage: $0 ai \"<prompt>\" [growth_mode] [dry_run]"
                 exit 1
             fi
@@ -250,7 +230,7 @@ main() {
             show_usage
             ;;
         *)
-            print_error "Unknown command: $1"
+            log_error "Unknown command: $1"
             echo
             show_usage
             exit 1

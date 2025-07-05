@@ -3,19 +3,40 @@
 # Usage: create_pr.sh RESPONSE_FILE PROMPT GROWTH_MODE
 # Creates a pull request with evolution changes
 
-set -e
+set -euo pipefail
+
+# Get script directory for relative imports
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+# Source modular libraries
+source "$PROJECT_ROOT/src/lib/core/logger.sh"
+source "$PROJECT_ROOT/src/lib/core/environment.sh"
+
+# Initialize logging
+init_logger "logs" "create-pr"
+
+# Validate input parameters
+if [[ $# -lt 3 ]]; then
+    log_error "Usage: $0 <response_file> <prompt> <growth_mode>"
+    exit 1
+fi
 
 RESPONSE_FILE="$1"
 PROMPT="$2"
 GROWTH_MODE="$3"
 
+log_info "Creating pull request for evolution changes"
+log_info "Response file: $RESPONSE_FILE"
+log_info "Growth mode: $GROWTH_MODE"
+
 # Validate inputs
 if [ ! -f "$RESPONSE_FILE" ]; then
-    echo "❌ Error: Response file not found: $RESPONSE_FILE"
+    log_error "Response file not found: $RESPONSE_FILE"
     exit 1
 fi
 
-echo "🌳 Creating growth pull request..."
+log_info "🌳 Creating growth pull request..."
 
 # Extract data from response file
 BRANCH_NAME=$(jq -r .new_branch "$RESPONSE_FILE" 2>/dev/null || echo "")

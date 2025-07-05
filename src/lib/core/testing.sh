@@ -147,18 +147,30 @@ record_test_result() {
     
     local result_file="$TEST_RESULTS_DIR/test-$test_id.json"
     
+    # Escape and sanitize the output for JSON
+    local escaped_output
+    if [[ -n "$output" ]]; then
+        escaped_output=$(echo "$output" | tr -d '\000-\031' | jq -R -s . 2>/dev/null || echo '""')
+    else
+        escaped_output='""'
+    fi
+    
+    # Escape other fields
+    local escaped_name=$(echo "$test_name" | tr -d '\000-\031')
+    local escaped_command=$(echo "$test_command" | tr -d '\000-\031')
+    
     cat > "$result_file" << EOF
 {
   "id": "$test_id",
-  "name": "$test_name",
-  "command": "$test_command",
+  "name": "$escaped_name",
+  "command": "$escaped_command",
   "status": "$status",
   "exit_code": $exit_code,
   "duration": $duration,
-  "timestamp": "$(date -Iseconds)",
+  "timestamp": "$(date -Iseconds 2>/dev/null || date)",
   "suite": "$CURRENT_TEST_SUITE",
   "session": "$TEST_SESSION_ID",
-  "output": $(echo "$output" | jq -R -s .)
+  "output": $escaped_output
 }
 EOF
 }
@@ -313,19 +325,21 @@ generate_json_report() {
     local end_time=$(date +%s)
     local total_duration=$((end_time - TEST_START_TIME))
     
-    # Collect all test results
+    # Collect all test results safely
     local test_results="[]"
     for result_file in "$TEST_RESULTS_DIR"/test-*.json; do
-        if [[ -f "$result_file" ]]; then
-            test_results=$(echo "$test_results" | jq ". + [$(cat "$result_file")]")
+        if [[ -f "$result_file" ]] && jq empty "$result_file" 2>/dev/null; then
+            local result_content
+            result_content=$(cat "$result_file" 2>/dev/null || echo '{}')
+            test_results=$(echo "$test_results" | jq ". + [$result_content]" 2>/dev/null || echo "$test_results")
         fi
     done
     
     cat > "$output_file" << EOF
 {
   "session_id": "$TEST_SESSION_ID",
-  "start_time": "$(date -d @$TEST_START_TIME -Iseconds)",
-  "end_time": "$(date -Iseconds)",
+  "start_time": "$(date -r $TEST_START_TIME -Iseconds 2>/dev/null || date -d @$TEST_START_TIME -Iseconds 2>/dev/null || date)",
+  "end_time": "$(date -Iseconds 2>/dev/null || date)",
   "duration": $total_duration,
   "summary": {
     "total": $TESTS_RUN,

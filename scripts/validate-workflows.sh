@@ -5,8 +5,17 @@
 
 set -euo pipefail
 
-echo "🔍 AI Evolution Workflow Validation Script"
-echo "========================================="
+# Source modular libraries
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+# Source logger
+source "$PROJECT_ROOT/src/lib/core/logger.sh"
+
+# Source environment detection
+source "$PROJECT_ROOT/src/lib/utils/env_detect.sh"
+
+log_header "AI Evolution Workflow Validation Script"
 
 WORKFLOWS_DIR=".github/workflows"
 ERRORS=0
@@ -15,11 +24,11 @@ ERRORS=0
 check_file_exists() {
     local file="$1"
     if [ ! -f "$file" ]; then
-        echo "❌ ERROR: File not found: $file"
+        log_error "File not found: $file"
         ((ERRORS++))
         return 1
     fi
-    echo "✅ Found: $file"
+    log_success "Found: $file"
     return 0
 }
 
@@ -30,11 +39,11 @@ check_string_in_file() {
     local description="$3"
     
     if ! grep -q "$string" "$file"; then
-        echo "❌ ERROR: $description not found in $file"
+        log_error "$description not found in $file"
         ((ERRORS++))
         return 1
     fi
-    echo "✅ $description found in $file"
+    log_success "$description found in $file"
     return 0
 }
 
@@ -43,9 +52,7 @@ validate_workflow() {
     local workflow_file="$1"
     local workflow_name="$2"
     
-    echo ""
-    echo "🔎 Validating $workflow_name..."
-    echo "----------------------------------------"
+    log_info "Validating $workflow_name..."
     
     check_file_exists "$workflow_file" || return 1
     
@@ -74,9 +81,7 @@ validate_workflow() {
 
 # Function to validate documentation
 validate_documentation() {
-    echo ""
-    echo "📚 Validating Documentation..."
-    echo "----------------------------------------"
+    log_info "Validating Documentation..."
     
     check_file_exists "$WORKFLOWS_DIR/README.md"
     check_file_exists "$WORKFLOWS_DIR/WORKFLOW_STANDARDS.md"
@@ -91,9 +96,7 @@ validate_documentation() {
 }
 
 # Main validation
-echo ""
-echo "🚀 Starting Workflow Validation..."
-echo ""
+log_info "Starting Workflow Validation..."
 
 # Validate each workflow
 validate_workflow "$WORKFLOWS_DIR/ai_evolver.yml" "AI Evolution Growth Engine"
@@ -104,24 +107,22 @@ validate_workflow "$WORKFLOWS_DIR/testing_automation_evolver.yml" "Testing & Bui
 validate_documentation
 
 # Summary
-echo ""
-echo "📊 Validation Summary"
-echo "===================="
+log_header "Validation Summary"
 
 if [ $ERRORS -eq 0 ]; then
-    echo "🎉 All validations passed! Workflows are properly configured."
+    log_success "All validations passed! Workflows are properly configured."
     echo ""
-    echo "✅ Consistency: All workflows follow standard patterns"
-    echo "✅ Security: Using GitHub tokens appropriately"
-    echo "✅ Error Handling: Proper validation and error handling"
-    echo "✅ Documentation: Complete documentation suite"
-    echo "✅ DRY Principle: Standardized patterns and reusable components"
-    echo "✅ Simplicity: Clear, readable workflow structure"
+    log_success "Consistency: All workflows follow standard patterns"
+    log_success "Security: Using GitHub tokens appropriately"
+    log_success "Error Handling: Proper validation and error handling"
+    log_success "Documentation: Complete documentation suite"
+    log_success "DRY Principle: Standardized patterns and reusable components"
+    log_success "Simplicity: Clear, readable workflow structure"
     echo ""
-    echo "🚀 Ready for deployment!"
+    log_success "Ready for deployment!"
     exit 0
 else
-    echo "❌ Validation failed with $ERRORS errors."
+    log_error "Validation failed with $ERRORS errors."
     echo ""
     echo "Please review the errors above and fix them before proceeding."
     echo "Refer to WORKFLOW_STANDARDS.md for guidance."

@@ -4,14 +4,24 @@
 
 set -euo pipefail
 
+# Source modular libraries
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+# Source logger
+source "$PROJECT_ROOT/src/lib/core/logger.sh"
+
+# Source environment detection
+source "$PROJECT_ROOT/src/lib/utils/env_detect.sh"
+
 EVOLUTION_TYPE="${1:-consistency}"
 GROWTH_MODE="${2:-adaptive}"
 
-echo "🚀 Triggering main evolution workflow..."
+log_info "Triggering main evolution workflow..."
 
 # Read the generated evolution prompt
 if [ ! -f "/tmp/evolution_prompt.txt" ]; then
-    echo "❌ Error: Evolution prompt not found"
+    log_error "Evolution prompt not found"
     exit 1
 fi
 
@@ -23,7 +33,7 @@ gh workflow run ai_evolver.yml \
   --field growth_mode="$GROWTH_MODE" \
   --field auto_plant_seeds="true"
 
-echo "✅ Daily evolution cycle initiated successfully"
-echo "📝 View the evolution progress in the Actions tab"
-echo "🔧 Evolution type: $EVOLUTION_TYPE"
-echo "🌱 Growth mode: $GROWTH_MODE"
+log_success "Daily evolution cycle initiated successfully"
+log_info "View the evolution progress in the Actions tab"
+log_info "Evolution type: $EVOLUTION_TYPE"
+log_info "Growth mode: $GROWTH_MODE"

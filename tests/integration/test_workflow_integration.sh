@@ -276,78 +276,28 @@ EOF
 test_prompt_generation() {
     info "Testing evolution prompt generation..."
     
-    # Create test script for prompt generation
-    local prompt_script="$PROJECT_ROOT/tests/fixtures/test_prompt_generation.sh"
-    cat > "$prompt_script" << 'EOF'
-#!/bin/bash
-set -euo pipefail
-
-# Simulate prompt generation from daily_evolution.yml
-EVOLUTION_TYPE="consistency"
-INTENSITY="minimal"
-SUGGESTIONS="Fix tab/space inconsistencies in Markdown files;Address pending TODO/FIXME items"
-
-# Base prompts for different evolution types
-case "$EVOLUTION_TYPE" in
-    "consistency")
-        BASE_PROMPT="Perform consistency improvements and minor fixes"
-        ;;
-    "error_fixing")
-        BASE_PROMPT="Fix minor errors and improve robustness"
-        ;;
-    "documentation")
-        BASE_PROMPT="Update and improve documentation quality"
-        ;;
-    "code_quality")
-        BASE_PROMPT="Enhance code quality and maintainability"
-        ;;
-    "security_updates")
-        BASE_PROMPT="Apply security improvements and updates"
-        ;;
-    *)
-        BASE_PROMPT="Perform general maintenance and improvements"
-        ;;
-esac
-
-# Intensity modifiers
-case "$INTENSITY" in
-    "minimal")
-        INTENSITY_MODIFIER="Focus on quick wins and low-risk changes"
-        ;;
-    "moderate")
-        INTENSITY_MODIFIER="Balance improvement with stability"
-        ;;
-    "comprehensive")
-        INTENSITY_MODIFIER="Perform thorough review and substantial improvements"
-        ;;
-    *)
-        INTENSITY_MODIFIER="Use balanced approach"
-        ;;
-esac
-
-# Combine into final prompt
-EVOLUTION_PROMPT="$BASE_PROMPT. $INTENSITY_MODIFIER. Evolution type: $EVOLUTION_TYPE, Intensity: $INTENSITY. Address these specific issues: $SUGGESTIONS"
-
-echo "Generated prompt: $EVOLUTION_PROMPT"
-
-# Validate prompt is not empty and contains expected elements
-if [[ -n "$EVOLUTION_PROMPT" ]] && [[ "$EVOLUTION_PROMPT" == *"consistency"* ]] && [[ "$EVOLUTION_PROMPT" == *"minimal"* ]]; then
-    echo "Prompt generation successful"
-    exit 0
-else
-    echo "Prompt generation failed"
-    exit 1
-fi
+    # Create test health check results that the actual script needs
+    cat > "/tmp/health_check_results.env" << 'EOF'
+ISSUES_FOUND=3
+SHOULD_EVOLVE=true
 EOF
-
-    chmod +x "$prompt_script"
     
-    run_test "Prompt generation script execution" "bash '$prompt_script'"
-    run_test "Generated prompt contains evolution type" "bash '$prompt_script' | grep -q 'Evolution type:'"
-    run_test "Generated prompt contains intensity" "bash '$prompt_script' | grep -q 'Intensity:'"
+    # Create test suggestions that the actual script needs
+    cat > "/tmp/health_check_suggestions.txt" << 'EOF'
+Fix tab/space inconsistencies in Markdown files
+Address pending TODO/FIXME items
+Repository hasn't evolved in 8 days - time for growth
+EOF
+    
+    # Test the actual prompt generation script
+    run_test "Prompt generation script execution" "./scripts/generate-evolution-prompt.sh consistency minimal"
+    
+    # Check if the prompt file was created and contains expected content
+    run_test "Generated prompt contains evolution type" "test -f '/tmp/evolution_prompt.txt' && grep -q 'consistency' '/tmp/evolution_prompt.txt'"
+    run_test "Generated prompt contains intensity" "test -f '/tmp/evolution_prompt.txt' && grep -q 'minimal' '/tmp/evolution_prompt.txt'"
     
     # Cleanup
-    rm -f "$prompt_script"
+    rm -f "/tmp/health_check_results.env" "/tmp/health_check_suggestions.txt" "/tmp/evolution_prompt.txt"
 }
 
 # Test script integration

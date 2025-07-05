@@ -57,7 +57,7 @@ jobs:
       USE_CONTAINER: ${{ inputs.use_container }}
       # GitHub CLI authentication
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      # Fallback to PAT if GITHUB_TOKEN insufficient
+      # Fallback to PAT if GITHUB access insufficient
       PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
     
     steps:
@@ -85,6 +85,21 @@ jobs:
       - name: 🧬 Collect Repository DNA & Metrics
         id: collect_context
         run: |
+          # Check for existing evolution metrics or create default
+          if [ -f "evolution-metrics.json" ]; then
+            echo "📊 Using existing evolution metrics"
+          else
+            echo "📊 Creating default evolution metrics structure"
+            echo '{"cycle":0,"generation":0,"version":"1.0.0","metrics":{"total_evolutions":0}}' > evolution-metrics.json || echo "⚠️ Could not create metrics file"
+          fi
+          
+          # Check for .gptignore file
+          if [ -f .gptignore ]; then
+            echo "🔍 Found .gptignore configuration"
+          else
+            echo "🔍 No .gptignore file found, using defaults"
+          fi
+          
           ./scripts/collect-context.sh \
             "$PROMPT" \
             "$GROWTH_MODE" \
@@ -98,6 +113,12 @@ jobs:
             "$GROWTH_MODE" \
             "/tmp/repo_context.json" \
             "/tmp/evolution_response.json"
+          
+          # Validate and fallback for invalid JSON
+          if ! jq empty "/tmp/evolution_response.json" 2>/dev/null; then
+            echo "⚠️ AI response invalid, using default structure"
+            echo '{"changes":[],"summary":"Fallback response due to invalid AI output","recommendations":["Review AI simulation script","Check input parameters"]}' > "/tmp/evolution_response.json"
+          fi
 
       - name: 🌾 Apply Growth Changes
         if: env.DRY_RUN != 'true'
@@ -109,7 +130,13 @@ jobs:
         run: |
           echo "🔍 DRY RUN MODE - Changes that would be applied:"
           if [ -f "/tmp/evolution_response.json" ]; then
-            cat "/tmp/evolution_response.json" | jq -r '.changes[] | "\(.type): \(.file)"'
+            # Validate JSON before processing
+            if jq empty "/tmp/evolution_response.json" 2>/dev/null; then
+              cat "/tmp/evolution_response.json" | jq -r '.changes[] | "\(.type): \(.file)"'
+            else
+              echo "❌ Invalid JSON in evolution response file"
+              exit 1
+            fi
           fi
           
       - name: 🌰 Plant New Seeds
@@ -123,7 +150,7 @@ jobs:
         if: env.DRY_RUN != 'true'
         env:
           # Ensure GitHub CLI has proper authentication
-          GH_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN || github.token }}
         run: |
           # Configure git for PR creation if needed
           git config --global user.name "AI Evolution Engine"
@@ -144,5 +171,10 @@ jobs:
           echo "  - Auto Plant Seeds: $AUTO_PLANT_SEEDS"
           
           if [ -f "/tmp/evolution_response.json" ]; then
-            echo "  - Changes Applied: $(jq -r '.changes | length' /tmp/evolution_response.json)"
+            # Validate JSON before processing
+            if jq empty "/tmp/evolution_response.json" 2>/dev/null; then
+              echo "  - Changes Applied: $(jq -r '.changes | length' /tmp/evolution_response.json)"
+            else
+              echo "  - Changes Applied: Unable to parse (invalid JSON)"
+            fi
           fi

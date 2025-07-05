@@ -192,8 +192,8 @@ end_test_suite
 log_info "🎯 Generating comprehensive test reports..."
 
 # Generate multiple report formats
-generate_test_report "json" "$PROJECT_ROOT/test-reports/modular-architecture-report.json"
-generate_test_report "markdown" "$PROJECT_ROOT/test-reports/modular-architecture-report.md"
+generate_test_report "json" "$TEST_REPORTS_DIR/modular-architecture-report.json"
+generate_test_report "markdown" "$TEST_REPORTS_DIR/modular-architecture-report.md"
 
 # Finalize testing and return appropriate exit code
 finalize_testing

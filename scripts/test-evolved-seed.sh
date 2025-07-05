@@ -4,62 +4,72 @@
 
 set -euo pipefail
 
+# Source modular libraries
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+# Source logger
+source "$PROJECT_ROOT/src/lib/core/logger.sh"
+
+# Source environment detection
+source "$PROJECT_ROOT/src/lib/utils/env_detect.sh"
+
 GROWTH_MODE="${1:-test-automation}"
 
-echo "🧪 Testing evolved seed functionality..."
+log_info "Testing evolved seed functionality..."
 
 # Check if testing automation init script exists
 if [ -f "testing_automation_init.sh" ]; then
-    echo "📋 Found testing automation init script"
+    log_info "Found testing automation init script"
     chmod +x testing_automation_init.sh
     
     # Create a test directory and run the seed
-    echo "🏗️  Setting up test environment..."
+    log_info "Setting up test environment..."
     mkdir -p test-evolution
     cd test-evolution
     
-    echo "🌱 Running seed initialization..."
+    log_info "Running seed initialization..."
     if ../testing_automation_init.sh; then
-        echo "✅ Seed initialization successful"
+        log_success "Seed initialization successful"
     else
-        echo "❌ Seed initialization failed"
+        log_error "Seed initialization failed"
         exit 1
     fi
     
     # Run the generated tests
     if [ -x "scripts/test.sh" ]; then
-        echo "🧪 Running generated tests..."
+        log_info "Running generated tests..."
         if ./scripts/test.sh --verbose; then
-            echo "✅ Tests passed"
+            log_success "Tests passed"
         else
-            echo "❌ Tests failed"
+            log_error "Tests failed"
             exit 1
         fi
     else
-        echo "⚠️  No test script found, skipping tests"
+        log_warn "No test script found, skipping tests"
     fi
     
     # Test the build process
     if [ -x "scripts/build.sh" ]; then
-        echo "🏗️  Testing build process..."
+        log_info "Testing build process..."
         if ./scripts/build.sh --dry-run; then
-            echo "✅ Build test successful"
+            log_success "Build test successful"
         else
-            echo "❌ Build test failed"
+            log_error "Build test failed"
             exit 1
         fi
     else
-        echo "⚠️  No build script found, skipping build test"
+        log_warn "No build script found, skipping build test"
     fi
     
     cd ..
-    echo "🧹 Cleaning up test environment..."
+    log_info "Cleaning up test environment..."
     rm -rf test-evolution
     
 else
-    echo "⚠️  No testing automation init script found"
-    echo "🔍 Available scripts:"
+    log_warn "No testing automation init script found"
+    log_info "Available scripts:"
     ls -la scripts/ 2>/dev/null || echo "No scripts directory found"
 fi
 
-echo "✅ Seed testing completed for growth mode: $GROWTH_MODE"
+log_success "Seed testing completed for growth mode: $GROWTH_MODE"

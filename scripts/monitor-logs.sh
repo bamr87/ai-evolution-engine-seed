@@ -5,30 +5,20 @@
 
 set -euo pipefail
 
+# Source modular libraries
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+# Source logger
+source "$PROJECT_ROOT/src/lib/core/logger.sh"
+
+# Source environment detection
+source "$PROJECT_ROOT/src/lib/utils/env_detect.sh"
+
 # Configuration
 LOG_DIR="./logs"
 MONITOR_INTERVAL=5
 MAX_TAIL_LINES=50
-
-# Colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-CYAN='\033[0;36m'
-NC='\033[0m'
-
-log() {
-    local level=$1
-    shift
-    case $level in
-        "INFO") echo -e "${BLUE}[INFO]${NC} $*" ;;
-        "WARN") echo -e "${YELLOW}[WARN]${NC} $*" ;;
-        "ERROR") echo -e "${RED}[ERROR]${NC} $*" ;;
-        "SUCCESS") echo -e "${GREEN}[SUCCESS]${NC} $*" ;;
-        "MONITOR") echo -e "${CYAN}[MONITOR]${NC} $*" ;;
-    esac
-}
 
 show_usage() {
     cat << EOF
@@ -59,12 +49,12 @@ EOF
 monitor_local_logs() {
     local filter_text="${1:-}"
     
-    log "MONITOR" "Starting local log monitoring..."
-    log "INFO" "Log directory: $LOG_DIR"
-    log "INFO" "Filter: ${filter_text:-none}"
+    log_info "Starting local log monitoring..."
+    log_info "Log directory: $LOG_DIR"
+    log_info "Filter: ${filter_text:-none}"
     
     if [ ! -d "$LOG_DIR" ]; then
-        log "WARN" "Log directory not found. Creating: $LOG_DIR"
+        log_warn "Log directory not found. Creating: $LOG_DIR"
         mkdir -p "$LOG_DIR"
     fi
     
@@ -85,7 +75,11 @@ monitor_local_logs() {
             if [ -n "$recent_log" ]; then
                 echo "🔍 Monitoring: $recent_log"
                 echo "📊 File size: $(du -h "$recent_log" | cut -f1)"
-                echo "🕐 Last modified: $(stat -f "%Sm" -t "%Y-%m-%d %H:%M:%S" "$recent_log" 2>/dev/null || date -r "$recent_log" 2>/dev/null || echo "Unknown")"
+                if is_macos; then
+                    echo "🕐 Last modified: $(stat -f "%Sm" -t "%Y-%m-%d %H:%M:%S" "$recent_log" 2>/dev/null || echo "Unknown")"
+                else
+                    echo "🕐 Last modified: $(date -r "$recent_log" 2>/dev/null || echo "Unknown")"
+                fi
                 echo ""
                 echo "--- Latest $MAX_TAIL_LINES lines ---"
                 
@@ -111,16 +105,16 @@ monitor_local_logs() {
 monitor_github_actions() {
     local filter_text="${1:-}"
     
-    log "MONITOR" "Starting GitHub Actions monitoring..."
+    log_info "Starting GitHub Actions monitoring..."
     
     # Check GitHub CLI authentication
     if ! command -v gh >/dev/null 2>&1; then
-        log "ERROR" "GitHub CLI not installed. Install with: brew install gh"
+        log_error "GitHub CLI not installed. Install with: brew install gh"
         exit 1
     fi
     
     if ! gh auth status >/dev/null 2>&1; then
-        log "ERROR" "GitHub CLI not authenticated. Run: gh auth login"
+        log_error "GitHub CLI not authenticated. Run: gh auth login"
         exit 1
     fi
     
@@ -168,7 +162,7 @@ monitor_github_actions() {
 monitor_both() {
     local filter_text="${1:-}"
     
-    log "MONITOR" "Starting combined monitoring..."
+    log_info "Starting combined monitoring..."
     
     while true; do
         clear
@@ -232,11 +226,11 @@ tail_specific_file() {
     local filter_text="${2:-}"
     
     if [ ! -f "$file_path" ]; then
-        log "ERROR" "File not found: $file_path"
+        log_error "File not found: $file_path"
         exit 1
     fi
     
-    log "MONITOR" "Following file: $file_path"
+    log_info "Following file: $file_path"
     
     if [ -n "$filter_text" ]; then
         tail -f "$file_path" | grep -i "$filter_text" --color=always --line-buffered
@@ -276,7 +270,7 @@ main() {
                 exit 0
                 ;;
             *)
-                log "ERROR" "Unknown option: $1"
+                log_error "Unknown option: $1"
                 show_usage
                 exit 1
                 ;;
@@ -299,13 +293,13 @@ main() {
             ;;
         "tail")
             if [ -z "$file_path" ]; then
-                log "ERROR" "File path required for tail command. Use --file option."
+                log_error "File path required for tail command. Use --file option."
                 exit 1
             fi
             tail_specific_file "$file_path" "$filter_text"
             ;;
         *)
-            log "ERROR" "Unknown command: $command"
+            log_error "Unknown command: $command"
             show_usage
             exit 1
             ;;
@@ -313,7 +307,7 @@ main() {
 }
 
 # Handle Ctrl+C gracefully
-trap 'echo -e "\n\n${YELLOW}[MONITOR]${NC} Monitoring stopped by user"; exit 0' INT
+trap 'echo -e "\n\n$(log_warn "Monitoring stopped by user")"; exit 0' INT
 
 # Run main function
 main "$@"

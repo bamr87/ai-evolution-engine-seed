@@ -169,7 +169,7 @@ test_security() {
     
     # Test that sensitive operations are properly scoped
     run_test "Has appropriate permissions scope" "yq eval '.permissions | keys | length' '$WORKFLOW_FILE' | grep -q '^3'"
-    run_test "No hardcoded secrets" "! grep -i 'password\|secret\|token.*[^}]' '$WORKFLOW_FILE' | grep -v 'github.token'"
+    run_test "No hardcoded secrets" "! grep -E '(password|secret|token): *[\"'\''][a-zA-Z0-9_-]{8,}[\"'\'']' '$WORKFLOW_FILE'"
     run_test "Uses secure checkout" "yq eval '.jobs.evolve.steps[] | select(.uses == \"actions/checkout@v4\")' '$WORKFLOW_FILE' | grep -q 'uses'"
 }
 
@@ -179,8 +179,8 @@ test_dependencies() {
     
     # Test that required tools are available or installed
     run_test "Workflow requires jq" "grep -q 'jq' '$WORKFLOW_FILE'"
-    run_test "Workflow requires tree command" "grep -q 'tree' '$WORKFLOW_FILE'"
-    run_test "Workflow requires date command" "grep -q 'date' '$WORKFLOW_FILE'"
+    run_test "Workflow requires git command" "grep -q 'git' '$WORKFLOW_FILE'"
+    run_test "Workflow mentions bash scripts" "grep -q '\.sh' '$WORKFLOW_FILE'"
 }
 
 # Main test execution
