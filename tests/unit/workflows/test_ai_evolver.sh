@@ -29,7 +29,7 @@
 
 # Unit Tests for AI Evolution Growth Engine Workflow
 # Tests all aspects of the ai_evolver.yml workflow
-# Version: 0.3.3-seed
+# Version: 0.3.6-seed
 
 set -euo pipefail
 

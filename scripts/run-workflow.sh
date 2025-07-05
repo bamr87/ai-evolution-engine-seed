@@ -2,7 +2,7 @@
 
 # AI Evolution Engine - Manual Workflow Runner
 # This script helps you manually invoke GitHub Actions workflows and monitor their execution
-# Version: 0.3.3-seed
+# Version: 0.3.6-seed
 
 set -euo pipefail
 

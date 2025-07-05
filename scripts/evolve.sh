@@ -2,7 +2,7 @@
 
 #############################################################################
 # 🌱 AI Evolution Engine - On-Demand Evolution Runner 🌱
-# Version: 0.3.3-seed - Modular Architecture
+# Version: 0.3.6-seed - Modular Architecture
 # Purpose: Command-line interface for triggering evolution cycles
 #############################################################################
 

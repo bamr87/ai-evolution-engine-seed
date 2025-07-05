@@ -2,7 +2,7 @@
 
 # GitHub Actions Workflow Test Runner
 # Comprehensive testing framework for all workflow files
-# Version: 0.3.3-seed
+# Version: 0.3.6-seed
 
 set -euo pipefail
 

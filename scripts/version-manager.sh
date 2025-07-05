@@ -190,8 +190,21 @@ update_file_version() {
     
     log_info "Updating version references in: $file_path"
     
-    # Create backup
-    cp "$file_path" "$file_path$backup_suffix"
+    # Check if backup files are enabled in configuration
+    local backup_enabled=$(jq -r '.change_tracking.backup_files' "$VERSION_CONFIG" 2>/dev/null)
+    [[ "$backup_enabled" == "null" || -z "$backup_enabled" ]] && backup_enabled="true"
+    local temp_file=""
+    
+    if [[ "$backup_enabled" == "true" ]]; then
+        # Create backup only if enabled
+        cp "$file_path" "$file_path$backup_suffix"
+        log_info "  Created backup: $file_path$backup_suffix"
+    else
+        # Use temporary file for change verification without keeping backup
+        temp_file=$(mktemp)
+        cp "$file_path" "$temp_file"
+        log_info "  Backup files disabled - using temporary verification"
+    fi
     
     # Process each pattern
     echo "$patterns_json" | jq -c '.[]' | while read -r pattern_obj; do
@@ -238,12 +251,22 @@ update_file_version() {
         [[ -f "$file_path.tmp" ]] && rm "$file_path.tmp"
     done
     
-    # Verify changes were made
-    if diff -q "$file_path" "$file_path$backup_suffix" >/dev/null 2>&1; then
-        log_warn "  No changes made to $file_path"
-        rm "$file_path$backup_suffix"
+    # Verify changes and handle backups based on configuration
+    if [[ "$backup_enabled" == "true" ]]; then
+        if diff -q "$file_path" "$file_path$backup_suffix" >/dev/null 2>&1; then
+            log_warn "  No changes made to $file_path"
+            rm "$file_path$backup_suffix"
+        else
+            log_success "  Updated $file_path (backup: $file_path$backup_suffix)"
+        fi
     else
-        log_success "  Updated $file_path (backup: $file_path$backup_suffix)"
+        if diff -q "$file_path" "$temp_file" >/dev/null 2>&1; then
+            log_warn "  No changes made to $file_path"
+        else
+            log_success "  Updated $file_path (backup files disabled)"
+        fi
+        # Clean up temporary file
+        [[ -n "$temp_file" && -f "$temp_file" ]] && rm "$temp_file"
     fi
 }
 
@@ -402,6 +425,12 @@ action_increment() {
         return 0
     fi
     
+    # Initialize change tracking if tracker script exists
+    if [[ -f "$PROJECT_ROOT/scripts/version-tracker.sh" ]]; then
+        log_info "Initializing change tracking for version increment"
+        "$PROJECT_ROOT/scripts/version-tracker.sh" track-change --action "pre-version-update" --version "$current_version"
+    fi
+    
     # Update all files
     update_all_files "$new_version"
     
@@ -411,6 +440,18 @@ action_increment() {
     
     # Mark files as updated
     mark_files_updated "$new_version"
+    
+    # Track the version change and correlate files if tracker script exists
+    if [[ -f "$PROJECT_ROOT/scripts/version-tracker.sh" ]]; then
+        log_info "Tracking version change and correlating files"
+        "$PROJECT_ROOT/scripts/version-tracker.sh" track-change --action "post-version-update" --version "$new_version"
+        "$PROJECT_ROOT/scripts/version-tracker.sh" correlate-files --old-version "$current_version" --new-version "$new_version"
+        
+        # Update changelog with file correlations
+        "$PROJECT_ROOT/scripts/version-tracker.sh" update-changelog --version "$new_version" --prompt "$description"
+        
+        log_info "Generated correlation report for version $new_version"
+    fi
     
     log_success "Version increment complete: $new_version"
 }

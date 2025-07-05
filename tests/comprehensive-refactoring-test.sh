@@ -1,7 +1,7 @@
 #!/bin/bash
 # tests/comprehensive-refactoring-test.sh
 # Comprehensive validation of modular script refactoring
-# Version: 0.3.3-seed
+# Version: 0.3.6-seed
 
 set -euo pipefail
 

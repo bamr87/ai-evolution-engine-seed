@@ -1,7 +1,7 @@
 #!/bin/bash
 # Comprehensive test suite for modular AI Evolution Engine
 # Tests all core libraries and integration points
-# Version: 0.3.3-seed
+# Version: 0.3.6-seed
 
 set -euo pipefail
 

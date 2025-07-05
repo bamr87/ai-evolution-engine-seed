@@ -1,7 +1,7 @@
 #!/bin/bash
 # Environment validation and setup library
 # Provides consistent environment checking across all scripts
-# Version: 0.3.3-seed
+# Version: 0.3.6-seed
 
 # Source the logger
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

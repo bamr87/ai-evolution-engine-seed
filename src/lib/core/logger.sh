@@ -1,7 +1,7 @@
 #!/bin/bash
 # Core logging library for AI Evolution Engine
 # Provides consistent logging across all scripts
-# Version: 0.3.3-seed
+# Version: 0.3.6-seed
 
 # Color codes for output (only set if not already defined)
 if [[ -z "${RED:-}" ]]; then

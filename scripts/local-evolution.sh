@@ -2,7 +2,7 @@
 
 #############################################################################
 # 🌱 AI Evolution Engine - Local Development Runner
-# Version: 0.3.3-seed
+# Version: 0.3.6-seed
 # Purpose: Cross-platform script to run evolution cycles locally
 #############################################################################
 

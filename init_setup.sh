@@ -2,8 +2,8 @@
 
 #############################################################################
 # 🌱 AI Evolution Engine - Seed Germination Script 🌱
-# Version: 0.3.3-seed
-# Purpose: Plant the seeds of self-evolving software, v0.3.3 with organized documentation structure
+# Version: 0.3.6-seed
+# Purpose: Plant the seeds of self-evolving software, v0.3.6 with organized documentation structure
 #############################################################################
 
 set -euo pipefail
@@ -15,7 +15,7 @@ BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
-SEED_VERSION="0.3.3-seed"
+SEED_VERSION="0.3.6-seed"
 REPO_NAME="${REPO_NAME:-ai-evolution-engine}"
 
 # Display seed banner
@@ -23,7 +23,7 @@ show_seed_banner() {
     echo -e "${GREEN}"
     cat << "EOF"
     🌱 ════════════════════════════════════════════ 🌱
-           AI EVOLUTION ENGINE - SEED PLANTER v0.3.3
+           AI EVOLUTION ENGINE - SEED PLANTER v0.3.6
          "Organized documentation structure implementation"
          "Clean docs/ hierarchy following best practices"
     🌱 ════════════════════════════════════════════ 🌱
@@ -121,9 +121,9 @@ EOF
 
 # Create README.md
 create_readme() {
-    echo -e "${CYAN}Planting README.md (v0.3.3)...${NC}"
+    echo -e "${CYAN}Planting README.md (v0.3.6)...${NC}"
     # Using a heredoc for the README content. Ensure no unintended expansions.
-    # The content is taken from the user's context for README.md v0.3.3
+    # The content is taken from the user's context for README.md v0.3.6
     cat > README.md << 'EOF'
 # 🌱 AI Evolution Engine: The Self-Growing Repository 🌱
 
@@ -131,7 +131,7 @@ create_readme() {
 ╔═══════════════════════════════════════════════════════════════╗
 ║                   AI EVOLUTION ENGINE                         ║
 ║         Where Seeds Grow Into Intelligent Software            ║
-║                      v0.3.3-seed                              ║
+║                      v0.3.6-seed                              ║
 ╚═══════════════════════════════════════════════════════════════╝
 ```
 
@@ -150,7 +150,7 @@ We believe in software that grows organically, much like a plant from a seed. Th
 - **Adaptability**: The system learns and refines its growth patterns.
 - **Acceleration**: AI handles boilerplate and complex transformations, letting humans focus on vision.
 
-## 🧬 Seed Anatomy (v0.3.3)
+## 🧬 Seed Anatomy (v0.3.6)
 
 1.  **`README.md` (This file)**: A dynamic chronicle of the repository's evolution. The section below is updated by the AI.
     <!-- AI-EVOLUTION-MARKER:START -->
@@ -159,19 +159,19 @@ We believe in software that grows organically, much like a plant from a seed. Th
     - Adaptations Logged: 0
     - Last Growth Spurt: Never
     <!-- AI-EVOLUTION-MARKER:END -->
-2.  **`init_setup.sh`**: The germination script. It now sets up a complete v0.3.3 environment, including this README, the AI workflow, and initial configurations.
-3.  **`.github/workflows/ai_evolver.yml`**: The heart of the growth engine. In v0.3.3, it simulates AI-driven changes more deeply, including README updates and dynamic generation of the next seed.
-4.  **`.seed.md`**: The blueprint for the *next* generation. The v0.3.3 workflow generates a `.seed.md` that outlines the path towards v0.3.3, based on the current cycle's "learnings."
+2.  **`init_setup.sh`**: The germination script. It now sets up a complete v0.3.6 environment, including this README, the AI workflow, and initial configurations.
+3.  **`.github/workflows/ai_evolver.yml`**: The heart of the growth engine. In v0.3.6, it simulates AI-driven changes more deeply, including README updates and dynamic generation of the next seed.
+4.  **`.seed.md`**: The blueprint for the *next* generation. The v0.3.6 workflow generates a `.seed.md` that outlines the path towards v0.3.6, based on the current cycle's "learnings."
 5.  **`evolution-metrics.json`**: Tracks the quantitative aspects of growth.
 6.  **`.gptignore`**: A new file to help guide the AI's focus by excluding irrelevant files from its context.
 
 ## 🚀 Quick Germination & Growth
 
 ```bash
-# 1. Plant the v0.3.3 seed (if you haven't already)
+# 1. Plant the v0.3.6 seed (if you haven't already)
 # Ensure you're in an empty directory for a new project
 # curl -fsSL https://raw.githubusercontent.com/bamr87/ai-evolution-engine/main/init_setup.sh -o init_setup.sh # Get latest
-# For this specific v0.3.3, ensure you're using the v0.3.3 version of this script.
+# For this specific v0.3.6, ensure you're using the v0.3.6 version of this script.
 bash init_setup.sh
 
 # 2. Set your AI API Key (if using a real AI in the future)
@@ -186,7 +186,7 @@ gh workflow run ai_evolver.yml -f prompt="Evolve the project to include a basic 
 
 ```mermaid
 graph TD
-    A[🌱 Seed v0.3.3] --> B[💡 User Prompt (e.g., 'Add feature X')]
+    A[🌱 Seed v0.3.6] --> B[💡 User Prompt (e.g., 'Add feature X')]
     B --> C[🤖 ai_evolver.yml Workflow Triggered]
     C --> D[🧬 Context Collection (incl. .gptignore)]
     D --> E[🧠 Simulated AI Processing]
@@ -195,12 +195,12 @@ graph TD
     G -- Apply Changes --> H[💻 Codebase Evolves]
     H --> I[📊 Metrics Updated]
     I --> J[📄 README Updated (see markers)]
-    J --> K[🌰 New .seed.md Generated (for v0.3.3)]
+    J --> K[🌰 New .seed.md Generated (for v0.3.6)]
     K --> L[✅ PR Created for Review]
     L -- Merge --> A_NEXT[🌱 Evolved Seed (ready for next cycle)]
 ```
 
-## 🧪 Seed Vitality Metrics (Aspirational for v0.3.3)
+## 🧪 Seed Vitality Metrics (Aspirational for v0.3.6)
 
 - **Germination Success**: Aiming for >98% clean setup.
 - **Simulated Adaptation Rate**: 100% (as it's currently simulated).
@@ -212,7 +212,7 @@ This is more than just a template; it's a call to explore a new way of building 
 
 ---
 
-*🌱 Generated by AI Evolution Engine Seed v0.3.3*
+*🌱 Generated by AI Evolution Engine Seed v0.3.6*
 *"The code that grows itself, knows itself."*
 EOF
     echo -e "${GREEN}✓ README.md created${NC}"
@@ -230,7 +230,7 @@ growth:
   auto_evolve: true # Corresponds to auto_plant_seeds in workflow?
 
 ai:
-  provider: ${AI_PROVIDER:-openai} # Placeholder, actual AI call not in v0.3.3 workflow
+  provider: ${AI_PROVIDER:-openai} # Placeholder, actual AI call not in v0.3.6 workflow
   model: ${AI_MODEL:-gpt-4-turbo}
   temperature: 0.6
 
@@ -266,59 +266,59 @@ EOF
     echo -e "${GREEN}✓ evolution-metrics.json created${NC}"
 }
 
-# Create initial .seed.md (describing this v0.3.3 seed)
+# Create initial .seed.md (describing this v0.3.6 seed)
 create_initial_seed_md() {
-    echo -e "${CYAN}Creating initial .seed.md (v0.3.3 descriptor)...${NC}"
+    echo -e "${CYAN}Creating initial .seed.md (v0.3.6 descriptor)...${NC}"
     cat > .seed.md << 'EOF'
-# 🌱 AI Evolution Engine - Seed v0.3.3 🌱
+# 🌱 AI Evolution Engine - Seed v0.3.6 🌱
 
 This is the bootstrap seed file for the AI Evolution Engine, version 0.2.0.
 It describes the capabilities and structure of this specific seed generation.
 
-## 🧬 Core Components of Seed v0.3.3
+## 🧬 Core Components of Seed v0.3.6
 
 - **`README.md`**: Now features dynamic markers (`<!-- AI-EVOLUTION-MARKER:START -->` and `<!-- AI-EVOLUTION-MARKER:END -->`) for AI-driven updates on evolution status.
-- **`init_setup.sh`**: A more robust germination script that initializes the full v0.3.3 environment, including this `.seed.md`, the primary `README.md`, the AI workflow, `.gitignore`, `.gptignore`, and essential configuration files.
+- **`init_setup.sh`**: A more robust germination script that initializes the full v0.3.6 environment, including this `.seed.md`, the primary `README.md`, the AI workflow, `.gitignore`, `.gptignore`, and essential configuration files.
 - **`.github/workflows/ai_evolver.yml`**: An enhanced GitHub Actions workflow.
     - Simulates AI-driven evolution more deeply.
     - (Simulated) AI generates complete new versions of `README.md` and `evolution-metrics.json`.
     - Utilizes `.gptignore` for more focused context collection.
-    - Dynamically generates a *new* `.seed.md` file after each growth cycle, outlining the next evolutionary step (e.g., towards v0.3.3).
+    - Dynamically generates a *new* `.seed.md` file after each growth cycle, outlining the next evolutionary step (e.g., towards v0.3.6).
 - **`evolution-metrics.json`**: Tracks key metrics about the repository's growth and evolution.
 - **`.gptignore`**: Allows fine-tuning of files included in the AI's context, improving focus and efficiency.
 - **`.evolution.yml`**: Configuration for the evolution process.
 
 ## 🚀 How to Use This Seed
 
-1.  **Plant**: Run `bash init_setup.sh` in a new project directory. This will lay down all the v0.3.3 files.
+1.  **Plant**: Run `bash init_setup.sh` in a new project directory. This will lay down all the v0.3.6 files.
 2.  **Nurture**: Trigger the `ai_evolver.yml` workflow with a prompt:
     ```bash
     gh workflow run ai_evolver.yml -f prompt="Your evolutionary goal here"
     ```
-3.  **Observe**: A new branch will be created with changes (simulated by the AI). `README.md` and `evolution-metrics.json` will be updated. A new `.seed.md` pointing towards the next evolution (v0.3.3) will be generated.
+3.  **Observe**: A new branch will be created with changes (simulated by the AI). `README.md` and `evolution-metrics.json` will be updated. A new `.seed.md` pointing towards the next evolution (v0.3.6) will be generated.
 4.  **Iterate**: Merge the changes and repeat the process.
 
 ## 🌱 What's Next? (The Role of the *Generated* `.seed.md`)
 
 After a growth cycle using `ai_evolver.yml`, a *new* `.seed.md` file will be created. That file will contain:
 - A summary of the "learnings" or changes from that cycle.
-- A blueprint for the *next* potential version (e.g., v0.3.3).
+- A blueprint for the *next* potential version (e.g., v0.3.6).
 - Suggestions for features and improvements for the core evolution engine itself.
 
-This current file (`.seed.md` created by `init_setup.sh`) serves as the stable description of the v0.3.3 seed. The one generated by the workflow is the forward-looking, evolving seed.
+This current file (`.seed.md` created by `init_setup.sh`) serves as the stable description of the v0.3.6 seed. The one generated by the workflow is the forward-looking, evolving seed.
 
 ---
-*🌱 AI Evolution Engine - Seed v0.3.3: Ready for Growth!*
+*🌱 AI Evolution Engine - Seed v0.3.6: Ready for Growth!*
 EOF
-    echo -e "${GREEN}✓ Initial .seed.md (v0.3.3) created${NC}"
+    echo -e "${GREEN}✓ Initial .seed.md (v0.3.6) created${NC}"
 }
 
 # Create ai_evolver.yml GitHub Workflow
 create_ai_evolver_workflow() {
-    echo -e "${CYAN}Creating .github/workflows/ai_evolver.yml (v0.3.3)...${NC}"
-    # Content is from user context for ai_evolver.yml v0.3.3
+    echo -e "${CYAN}Creating .github/workflows/ai_evolver.yml (v0.3.6)...${NC}"
+    # Content is from user context for ai_evolver.yml v0.3.6
     cat > .github/workflows/ai_evolver.yml << 'EOF'
-name: 🌱 AI Evolution Growth Engine (v0.3.3)
+name: 🌱 AI Evolution Growth Engine (v0.3.6)
 
 on:
   workflow_dispatch:
@@ -349,7 +349,7 @@ permissions:
 
 jobs:
   evolve:
-    name: 🌿 Growth Cycle v0.3.3
+    name: 🌿 Growth Cycle v0.3.6
     runs-on: ubuntu-latest
     
     steps:
@@ -499,7 +499,7 @@ jobs:
 
           # Content for the next .seed.md
           NEXT_SEED_CONTENT=$(cat <<EOF_NEXT_SEED
-# 🌱 AI Evolution Engine - Evolved Seed (Candidate for v0.3.3) 🌱
+# 🌱 AI Evolution Engine - Evolved Seed (Candidate for v0.3.6) 🌱
 
 This seed was generated after growth cycle **#$NEW_CYCLE**.
 **Prompt for this cycle:** "${{ inputs.prompt }}"
@@ -512,9 +512,9 @@ This cycle (simulated) focused on:
 - Updating \`evolution-metrics.json\` with the latest statistics.
 - Modifying \`README.md\` to reflect these new metrics within the \`AI-EVOLUTION-MARKER\` block.
 
-## 🧬 Proposed Enhancements for v0.3.3 (Next Evolution)
+## 🧬 Proposed Enhancements for v0.3.6 (Next Evolution)
 
-Based on the current trajectory, the next evolutionary step (v0.3.3) should focus on:
+Based on the current trajectory, the next evolutionary step (v0.3.6) should focus on:
 
 1.  **True AI Integration (Conceptual):**
     *   Abstract the AI call: Create a script/interface (e.g., \`src/ai_interface.sh\`) that this workflow calls. Initially, it can use this simulation logic, but can be swapped for a real LLM call.
@@ -529,13 +529,13 @@ Based on the current trajectory, the next evolutionary step (v0.3.3) should focu
 
 ## 🚀 Planting this Evolved Seed
 
-To continue evolution towards v0.3.3:
+To continue evolution towards v0.3.6:
 1.  Review and merge the Pull Request from this growth cycle.
 2.  This \`.seed.md\` file now contains the refined blueprint.
 3.  The next run of \`ai_evolver.yml\` will use the evolved codebase as its starting point.
 
 ---
-*🌱 Generated by AI Evolution Engine v0.3.3 Workflow*
+*🌱 Generated by AI Evolution Engine v0.3.6 Workflow*
 *"From sapling to forest, one cycle at a time."*
 EOF_NEXT_SEED
 )
@@ -666,7 +666,7 @@ ${NEXT_SEED_PREVIEW}
 \`\`\`
 
 ---
-*Generated by AI Evolution Engine v0.3.3 Workflow 🌱*
+*Generated by AI Evolution Engine v0.3.6 Workflow 🌱*
 *Commit: ${COMMIT_MSG}*
 EOF_PR_BODY
 )
@@ -684,7 +684,7 @@ EOF
 create_first_growth_prompt() {
     echo -e "${CYAN}Creating prompts/first_growth.md...${NC}"
     cat > prompts/first_growth.md << 'EOF'
-# 🌱 First Growth Prompt (v0.3.3 Seed)
+# 🌱 First Growth Prompt (v0.3.6 Seed)
 
 Your mission, should you choose to accept it, is to guide the evolution of this nascent AI-driven repository.
 
@@ -727,11 +727,11 @@ main() {
     
     create_gitignore
     create_gptignore
-    create_readme # Creates v0.3.3 README
+    create_readme # Creates v0.3.6 README
     create_evolution_config
-    create_evolution_metrics # Creates v0.3.3 metrics
-    create_initial_seed_md # Creates v0.3.3 .seed.md
-    create_ai_evolver_workflow # Creates v0.3.3 workflow
+    create_evolution_metrics # Creates v0.3.6 metrics
+    create_initial_seed_md # Creates v0.3.6 .seed.md
+    create_ai_evolver_workflow # Creates v0.3.6 workflow
     create_first_growth_prompt
 
     # Initial commit
@@ -744,11 +744,11 @@ main() {
     echo "    🌱 SEED V0.2.0 SUCCESSFULLY PLANTED! 🌱"
     echo "════════════════════════════════════════════════"
     echo -e "${NC}"
-    echo "This v0.3.3 seed has laid a more comprehensive foundation."
+    echo "This v0.3.6 seed has laid a more comprehensive foundation."
     echo "Key improvements include:"
     echo "- A README.md with AI-updatable markers."
     echo "- An enhanced 'ai_evolver.yml' workflow with better simulation."
-    echo "- An initial '.seed.md' that describes this v0.3.3 seed."
+    echo "- An initial '.seed.md' that describes this v0.3.6 seed."
     echo "- '.gitignore' and '.gptignore' for better project and AI context management."
     echo
     echo "Next steps to grow your code:"

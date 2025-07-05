@@ -2,7 +2,7 @@
 
 # Integration Tests for GitHub Actions Workflows
 # Tests workflow execution in a controlled environment
-# Version: 0.3.3-seed
+# Version: 0.3.6-seed
 
 set -euo pipefail
 

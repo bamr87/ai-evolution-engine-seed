@@ -1,7 +1,7 @@
 #!/bin/bash
 # Refactored AI Evolution Engine - Main Evolution Script
 # Uses modular architecture for better maintainability and testing
-# Version: 0.3.3-seed-modular
+# Version: 0.3.6-seed-modular
 
 set -euo pipefail
 

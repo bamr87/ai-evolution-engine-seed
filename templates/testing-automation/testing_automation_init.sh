@@ -2,7 +2,7 @@
 
 #############################################################################
 # 🌱 AI Evolution Engine - Seed Germination Script 🌱
-# Version: 0.3.3-seed
+# Version: 0.3.6-seed
 # Purpose: Plant the seeds of self-evolving software, v0.2.1
 #############################################################################
 

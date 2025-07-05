@@ -30,7 +30,7 @@
 
 # AI Evolution Engine - Test Runner
 # Comprehensive testing framework following DFF principles
-# Version: 0.3.3-seed
+# Version: 0.3.6-seed
 
 set -euo pipefail
 

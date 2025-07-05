@@ -1,7 +1,7 @@
 #!/bin/bash
 # Testing framework for AI Evolution Engine
 # Provides comprehensive testing utilities with AI-powered insights
-# Version: 0.3.3-seed
+# Version: 0.3.6-seed
 
 # Source dependencies
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

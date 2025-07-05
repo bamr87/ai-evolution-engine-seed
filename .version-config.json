@@ -1,11 +1,25 @@
 {
-  "current_version": "0.3.3",
+  "current_version": "0.3.6",
   "version_format": "semantic",
   "seed_suffix": "-seed",
   "auto_increment": {
     "patch": true,
     "minor": false,
     "major": false
+  },
+  "change_tracking": {
+    "enabled": true,
+    "log_file": "version-changes.json",
+    "include_git_info": true,
+    "track_file_hashes": true,
+    "backup_files": false
+  },
+  "changelog_integration": {
+    "enabled": true,
+    "changelog_file": "CHANGELOG.md",
+    "auto_generate_entries": true,
+    "link_to_files": true,
+    "include_git_refs": true
   },
   "tracked_files": {
     "core_files": [
@@ -28,7 +42,7 @@
             "line_context": "AI-EVOLUTION-MARKER"
           }
         ],
-        "last_modified_version": "0.3.3"
+        "last_modified_version": "0.3.6"
       },
       {
         "path": "init_setup.sh",
@@ -49,7 +63,7 @@
             "line_context": "AI EVOLUTION ENGINE - SEED PLANTER"
           }
         ],
-        "last_modified_version": "0.3.3"
+        "last_modified_version": "0.3.6"
       },
       {
         "path": ".github/workflows/ai_evolver.yml",
@@ -60,7 +74,7 @@
             "line_context": "name: 🌱 AI Evolution Growth Engine"
           }
         ],
-        "last_modified_version": "0.3.3"
+        "last_modified_version": "0.3.6"
       },
       {
         "path": ".seed.md",
@@ -76,7 +90,7 @@
             "line_context": "## 🌿"
           }
         ],
-        "last_modified_version": "0.3.3"
+        "last_modified_version": "0.3.6"
       },
       {
         "path": "seed_prompt.md",
@@ -87,7 +101,7 @@
             "line_context": "# 🌱 AI Evolution Engine"
           }
         ],
-        "last_modified_version": "0.3.3"
+        "last_modified_version": "0.3.6"
       }
     ],
     "documentation_files": [
@@ -100,7 +114,7 @@
             "line_context": "- v"
           }
         ],
-        "last_modified_version": "0.3.3"
+        "last_modified_version": "0.3.6"
       }
     ],
     "script_files": [
@@ -114,7 +128,7 @@
           }
         ],
         "scan_directory": true,
-        "last_modified_version": "0.3.3"
+        "last_modified_version": "0.3.6"
       }
     ]
   },
@@ -127,6 +141,24 @@
     },
     {
       "version": "0.3.3",
+      "date": "2025-07-05",
+      "type": "patch",
+      "description": "Automatic version increment"
+    },
+    {
+      "version": "0.3.4",
+      "date": "2025-07-05",
+      "type": "patch",
+      "description": "Automatic version increment"
+    },
+    {
+      "version": "0.3.5",
+      "date": "2025-07-05",
+      "type": "patch",
+      "description": "Automatic version increment"
+    },
+    {
+      "version": "0.3.6",
       "date": "2025-07-05",
       "type": "patch",
       "description": "Automatic version increment"

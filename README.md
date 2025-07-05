@@ -4,11 +4,11 @@
 ╔═══════════════════════════════════════════════════════════════╗
 ║                   AI EVOLUTION ENGINE                         ║
 ║         Where Seeds Grow Into Intelligent Software            ║
-║                      v0.3.3-seed                              ║
+║                      v0.3.6-seed                              ║
 ╚═══════════════════════════════════════════════════════════════╝
 ```
 
-[![Version](https://img.shields.io/badge/version-0.3.3--seed-blue.svg)](https://github.com/bamr87/ai-evolution-engine)
+[![Version](https://img.shields.io/badge/version-0.3.6--seed-blue.svg)](https://github.com/bamr87/ai-evolution-engine)
 ![Evolution Status](https://img.shields.io/badge/status-documentation--organized-green.svg)
 ![Growth Potential](https://img.shields.io/badge/potential-universal-purple.svg)
 
@@ -47,7 +47,7 @@ Following our **Documentation Organization Rule**, all documentation resides in 
 - **Scalability**: Clear structure supports growing documentation needs
 - **Collaboration**: Team members always know where to find docs
 
-## 🌍 Cross-Platform Evolution (New in v0.3.3-seed!)
+## 🌍 Cross-Platform Evolution (New in v0.3.6-seed!)
 
 The AI Evolution Engine now runs everywhere with full cross-platform support:
 
@@ -97,12 +97,12 @@ The repository is now organized following software engineering best practices:
 
 For detailed structure information, see [`docs/ORGANIZATION.md`](docs/ORGANIZATION.md).
 
-## 🧬 Seed Anatomy (v0.3.3-seed)
+## 🧬 Seed Anatomy (v0.3.6-seed)
 
 1. **`README.md` (This file)**: A dynamic chronicle of the repository's evolution. The section below is updated by the AI.
     <!-- AI-EVOLUTION-MARKER:START -->
     **Evolutionary State:**
-    - Generation: 0.3.3 (Cross-Platform Evolution)
+    - Generation: 0.3.6.5.4.3 (Cross-Platform Evolution)
     - Adaptations Logged: 12 major enhancement categories implemented
     - Last Growth Spurt: 2025-07-04 (comprehensive cross-platform compatibility)
     - Last Prompt: Enhanced cross-platform compatibility with containerization and local development support
@@ -113,14 +113,14 @@ For detailed structure information, see [`docs/ORGANIZATION.md`](docs/ORGANIZATI
     - CI/CD Integration: Robust GitHub Actions with fallback strategies
     <!-- AI-EVOLUTION-MARKER:END -->
 2. **`init_setup.sh`**: The germination script. Now supports cross-platform setup with OS detection and proper dependency management.
-3. **`.github/workflows/ai_evolver.yml`**: The heart of the growth engine. v0.3.3-seed includes container support, enhanced authentication, and cross-platform compatibility.
-4. **`.seed.md`**: The blueprint for the *next* generation. The v0.3.3-seed workflow generates advanced evolution strategies.
+3. **`.github/workflows/ai_evolver.yml`**: The heart of the growth engine. v0.3.6-seed includes container support, enhanced authentication, and cross-platform compatibility.
+4. **`.seed.md`**: The blueprint for the *next* generation. The v0.3.6-seed workflow generates advanced evolution strategies.
 5. **`evolution-metrics.json`**: Tracks quantitative and qualitative aspects of growth with environment awareness.
 6. **`docker/`**: Complete containerization support with Dockerfile, docker-compose, and documentation.
 7. **`scripts/local-evolution.sh`**: Cross-platform local development runner with comprehensive CLI interface.
 8. **Enhanced Scripts**: All scripts now support multiple platforms and execution environments.
 
-## 🤖 Automated Daily Evolution (New in v0.3.3-seed!)
+## 🤖 Automated Daily Evolution (New in v0.3.6-seed!)
 
 The repository now includes an intelligent daily evolution system that automatically maintains code quality and consistency:
 
@@ -155,10 +155,10 @@ The repository now includes an intelligent daily evolution system that automatic
 ## 🚀 Quick Germination & Growth
 
 ```bash
-# 1. Plant the v0.3.3-seed seed (if you haven't already)
+# 1. Plant the v0.3.6-seed seed (if you haven't already)
 # Ensure you're in an empty directory for a new project
 # curl -fsSL https://raw.githubusercontent.com/bamr87/ai-evolution-engine/main/init_setup.sh -o init_setup.sh # Get latest
-# For this specific v0.3.3-seed, ensure you're using the v0.3.3-seed version of this script.
+# For this specific v0.3.6-seed, ensure you're using the v0.3.6-seed version of this script.
 bash init_setup.sh
 
 # 2. Set your AI API Key (if using a real AI in the future)
@@ -169,7 +169,7 @@ gh workflow run ai_evolver.yml -f prompt="Evolve the project to include a basic 
 ```
 *(Requires GitHub CLI `gh` to be installed and authenticated)*
 
-## 🏗️ Modular Architecture (New in v0.3.3-seed!)
+## 🏗️ Modular Architecture (New in v0.3.6-seed!)
 
 The AI Evolution Engine features a completely refactored modular architecture for improved maintainability, testing, and extensibility:
 
@@ -223,48 +223,106 @@ log_info "Starting process..."
 
 ➡️ **[Complete Modular Architecture Guide](MODULAR_ARCHITECTURE.md)**
 
-## 🔢 Comprehensive Version Management (New in v0.3.3!)
+## 🔢 Advanced Version Management & Change Tracking (Complete in v0.3.6-seed!)
 
-The AI Evolution Engine now includes an intelligent version management system that automatically tracks and updates version references across all repository files:
+The AI Evolution Engine features a comprehensive, automated version management system with intelligent change tracking, correlation reporting, and no backup file creation - providing complete visibility into what changed when across all evolution cycles.
 
-### 🎯 Automatic Version Tracking
+### 🎯 Intelligent Change Correlation
 
-- **File-Level Intelligence**: Tracks individual files for changes since last version update
+- **File-Level Tracking**: Monitors individual files for changes since last version update
 - **Pattern-Based Updates**: Uses configurable patterns to find and update version references
 - **Evolution-Aware**: Special handling for AI evolution cycles with automatic incrementing
 - **Cross-File Consistency**: Ensures all version references stay synchronized
+- **Change History**: Maintains detailed logs of which files changed in each release
+- **No Backup Files**: Clean workflow without cluttering the repository with backup files
+- **Correlation Reports**: Generate detailed reports linking versions to file changes
+- **Query Interface**: Rich CLI for exploring version and file history
 
 ### 🚀 Version Management Commands
 
 ```bash
-# Check current version status
+# Check current version status and change tracking
 ./scripts/version-manager.sh check-status
 
-# Increment version for evolution cycles
+# Increment version for evolution cycles with automatic tracking
 ./scripts/version-integration.sh evolution "Added new features"
 
-# Manual version increment
+# Manual version increment with change correlation
 ./scripts/version-manager.sh increment patch "Bug fixes and improvements"
 
-# Update all files to current version
-./scripts/version-manager.sh update-all
+# Query version history and correlations
+./scripts/version-tracker.sh show-history          # Recent version changes
+./scripts/version-tracker.sh correlate-files 0.3.6  # Files changed in version
+./scripts/version-tracker.sh file-history README.md # Version history for file
+
+# Generate comprehensive reports
+./scripts/version-tracker.sh generate-report markdown report.md
+./scripts/version-tracker.sh generate-report json data.json
+
+# Query which files changed in a specific version
+./scripts/version-tracker.sh correlate-files --version "0.3.3"
+
+# Show version history for a specific file
+./scripts/version-tracker.sh file-history README.md
+
+# Generate comprehensive correlation report
+./scripts/version-tracker.sh generate-report --format markdown --output evolution-report.md
 ```
 
-### 🔄 Evolution Integration
+### 🔄 Enhanced Evolution Integration
 
-The version management system automatically integrates with AI evolution cycles:
+The version management system provides complete visibility into evolution cycles:
 
-- **Pre-Evolution**: Checks current version status
-- **During Evolution**: Tracks which files are being modified
-- **Post-Evolution**: Automatically increments version and updates all references
-- **Changelog Updates**: Maintains comprehensive change history
+- **Pre-Evolution**: Captures current state and initializes change tracking
+- **During Evolution**: Monitors which files are being modified in real-time
+- **Post-Evolution**: Automatically increments version, correlates changes, and updates changelog
+- **Change Correlation**: Links version increments to specific file modifications
+- **Report Generation**: Creates detailed reports showing file-to-version relationships
 
-### 📁 Tracked Files
+### � Change Tracking Features
 
-- **Core Files**: README.md, init_setup.sh, workflow files, seed files
-- **Documentation**: All docs with version references
-- **Scripts**: Automatic detection and updating of script headers
-- **Configurable**: Easy to add new file types and patterns
+- **Version-File Correlation**: Easily see which files were modified in any release
+- **File-Version History**: Track all versions that affected a specific file
+- **Automated Changelog**: Enhanced changelog entries with file-level links
+- **Git Integration**: Leverages git metadata for comprehensive change tracking
+- **Query Interface**: CLI tools for investigating change history
+- **Report Generation**: Markdown, JSON, and CSV export formats
+
+### 📁 Configuration-Driven Tracking
+
+```json
+{
+  "change_tracking": {
+    "enabled": true,
+    "log_file": "version-changes.json",
+    "include_git_info": true,
+    "track_file_hashes": true,
+    "backup_files": false
+  },
+  "changelog_integration": {
+    "enabled": true,
+    "auto_generate_entries": true,
+    "link_to_files": true,
+    "include_git_refs": true
+  }
+}
+```
+
+### 🔍 Quick Reference Commands
+
+```bash
+# Find all files changed in version 0.3.3
+./scripts/version-tracker.sh correlate-files "0.3.3"
+
+# See which versions affected README.md
+./scripts/version-tracker.sh file-history "README.md"
+
+# Show recent version changes with file counts
+./scripts/version-tracker.sh show-history --limit 5
+
+# Generate evolution report for latest version
+./scripts/version-tracker.sh generate-report --format markdown
+```
 
 ➡️ **[Complete Version Management Guide](docs/guides/version-management.md)**
 
@@ -272,7 +330,7 @@ The version management system automatically integrates with AI evolution cycles:
 
 ```mermaid
 graph TD
-    A[🌱 Seed v0.3.3-seed] --> B[💡 User Prompt (e.g., 'Add feature X')]
+    A[🌱 Seed v0.3.6-seed] --> B[💡 User Prompt (e.g., 'Add feature X')]
     B --> C[🤖 ai_evolver.yml Workflow Triggered]
     C --> D[🧬 Context Collection (incl. .gptignore)]
     D --> E[🧠 Simulated AI Processing]
@@ -281,7 +339,7 @@ graph TD
     G -- Apply Changes --> H[💻 Codebase Evolves]
     H --> I[📊 Metrics Updated]
     I --> J[📄 README Updated (see markers)]
-    J --> K[🌰 New .seed.md Generated (for v0.3.3-seed)]
+    J --> K[🌰 New .seed.md Generated (for v0.3.6-seed)]
     K --> L[✅ PR Created for Review]
     L -- Merge --> A_NEXT[🌱 Evolved Seed (ready for next cycle)]
 ```
@@ -365,5 +423,5 @@ This is more than just a template; it's a call to explore a new way of building 
 
 ---
 
-*🌱 Generated by AI Evolution Engine Seed v0.3.3-seed*
+*🌱 Generated by AI Evolution Engine Seed v0.3.6-seed*
 *"The code that grows itself, knows itself."*

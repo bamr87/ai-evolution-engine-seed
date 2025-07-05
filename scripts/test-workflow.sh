@@ -2,7 +2,7 @@
 # scripts/test-workflow.sh
 # Comprehensive GitHub Actions testing and debugging script
 # Supports both local testing with 'act' and remote workflow analysis
-# Version: 0.3.3-seed - Modular Architecture
+# Version: 0.3.6-seed - Modular Architecture
 
 set -euo pipefail
 

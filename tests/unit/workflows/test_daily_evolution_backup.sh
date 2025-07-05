@@ -2,7 +2,7 @@
 
 # Unit Tests for Daily Evolution & Maintenance Workflow
 # Tests all aspects of the daily_evolution.yml workflow
-# Version: 0.3.3-seed
+# Version: 0.3.6-seed
 
 set -euo pipefail
 
