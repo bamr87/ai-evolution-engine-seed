@@ -24,3 +24,4 @@ dist/
 .vscode/
 .idea/
 *.iml
+.secrets
