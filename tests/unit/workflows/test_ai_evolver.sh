@@ -108,7 +108,7 @@ success() {
 fail() { 
     echo -e "${RED}✗${NC} $1"
     TESTS_FAILED=$((TESTS_FAILED + 1))
-    log_test_result "$1" "FAILED" "$2"
+    log_test_result "$1" "FAILED" "${2:-}"
 }
 
 # Log test results to JSON file
@@ -149,23 +149,24 @@ test_workflow_metadata() {
 test_workflow_inputs() {
     info "Testing workflow inputs..."
     
-    run_test "Has cycle input" "yq eval '.on.workflow_dispatch.inputs.cycle' '$WORKFLOW_FILE' | grep -q 'description'"
-    run_test "Has generation input" "yq eval '.on.workflow_dispatch.inputs.generation' '$WORKFLOW_FILE' | grep -q 'description'"
-    run_test "Has prompt input" "yq eval '.on.workflow_dispatch.inputs.prompt' '$WORKFLOW_FILE' | grep -q 'description'"
-    run_test "Has growth_mode input" "yq eval '.on.workflow_dispatch.inputs.growth_mode' '$WORKFLOW_FILE' | grep -q 'description'"
+    run_test "Has prompt input" "yq eval '.on.workflow_dispatch.inputs.prompt' \"$WORKFLOW_FILE\" | grep -q 'description'"
+    run_test "Has growth_mode input" "yq eval '.on.workflow_dispatch.inputs.growth_mode' \"$WORKFLOW_FILE\" | grep -q 'description'"
+    run_test "Has auto_plant_seeds input" "yq eval '.on.workflow_dispatch.inputs.auto_plant_seeds' \"$WORKFLOW_FILE\" | grep -q 'description'"
+    run_test "Has dry_run input" "yq eval '.on.workflow_dispatch.inputs.dry_run' \"$WORKFLOW_FILE\" | grep -q 'description'"
+    run_test "Has use_container input" "yq eval '.on.workflow_dispatch.inputs.use_container' \"$WORKFLOW_FILE\" | grep -q 'description'"
     
     # Test input defaults and validation
-    run_test "Cycle has numeric default" "yq eval '.on.workflow_dispatch.inputs.cycle.default' '$WORKFLOW_FILE' | grep -E '^[0-9]+$'"
-    run_test "Generation has numeric default" "yq eval '.on.workflow_dispatch.inputs.generation.default' '$WORKFLOW_FILE' | grep -E '^[0-9]+$'"
+    run_test "Growth mode has valid default" "yq eval '.on.workflow_dispatch.inputs.growth_mode.default' \"$WORKFLOW_FILE\" | grep -E '^(conservative|adaptive|experimental)$'"
+    run_test "Auto plant seeds has boolean default" "yq eval '.on.workflow_dispatch.inputs.auto_plant_seeds.default' \"$WORKFLOW_FILE\" | grep -E '^(true|false)$'"
 }
 
 # Test job configuration
 test_job_configuration() {
     info "Testing job configuration..."
     
-    run_test "Has evolve job" "yq eval '.jobs.evolve' '$WORKFLOW_FILE' | grep -q 'runs-on'"
-    run_test "Job runs on ubuntu-latest" "yq eval '.jobs.evolve.runs-on' '$WORKFLOW_FILE' | grep -q 'ubuntu-latest'"
-    run_test "Job has environment variables" "yq eval '.jobs.evolve.env' '$WORKFLOW_FILE' | grep -q 'GITHUB_TOKEN'"
+    run_test "Has evolve job" "yq eval '.jobs.evolve' \"$WORKFLOW_FILE\" | grep -q 'runs-on'"
+    run_test "Job runs on ubuntu-latest" "yq eval '.jobs.evolve.runs-on' \"$WORKFLOW_FILE\" | grep -q 'ubuntu-latest'"
+    run_test "Job has environment variables" "yq eval '.jobs.evolve.env' \"$WORKFLOW_FILE\" | grep -q 'GH_TOKEN'"
 }
 
 # Test workflow steps
