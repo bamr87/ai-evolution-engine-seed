@@ -2,8 +2,8 @@
 
 #############################################################################
 # 🌱 AI Evolution Engine - Seed Germination Script 🌱
-# Version: 0.2.1-seed
-# Purpose: Plant the seeds of self-evolving software, v0.2.1
+# Version: 0.3.1-seed
+# Purpose: Plant the seeds of self-evolving software, v0.3.1 with enhanced CI/CD reliability
 #############################################################################
 
 set -euo pipefail
@@ -15,7 +15,7 @@ BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
-SEED_VERSION="0.2.1-seed"
+SEED_VERSION="0.3.1-seed"
 REPO_NAME="${REPO_NAME:-ai-evolution-engine}"
 
 # Display seed banner
@@ -23,9 +23,9 @@ show_seed_banner() {
     echo -e "${GREEN}"
     cat << "EOF"
     🌱 ════════════════════════════════════════════ 🌱
-           AI EVOLUTION ENGINE - SEED PLANTER v0.2.1
-         "Planting the foundations for intelligent growth"
-         "Enhanced with stability and robustness fixes"
+           AI EVOLUTION ENGINE - SEED PLANTER v0.3.1
+         "Enhanced reliability with fixed container dependencies"
+         "Simplified CI/CD execution with native GitHub CLI"
     🌱 ════════════════════════════════════════════ 🌱
 EOF
     echo -e "${NC}"

@@ -4,15 +4,15 @@
 ╔═══════════════════════════════════════════════════════════════╗
 ║                   AI EVOLUTION ENGINE                         ║
 ║         Where Seeds Grow Into Intelligent Software            ║
-║                      v0.3.0-seed                              ║
+║                      v0.3.1-seed                              ║
 ╚═══════════════════════════════════════════════════════════════╝
 ```
 
-[![Version](https://img.shields.io/badge/version-0.3.0--seed-blue.svg)](https://github.com/bamr87/ai-evolution-engine)
+[![Version](https://img.shields.io/badge/version-0.3.1--seed-blue.svg)](https://github.com/bamr87/ai-evolution-engine)
 ![Evolution Status](https://img.shields.io/badge/status-cross--platform-green.svg)
 ![Growth Potential](https://img.shields.io/badge/potential-universal-purple.svg)
 
-> 🌱 **Now cross-platform ready! This seed grows everywhere - locally, in containers, or in the cloud. Plant it anywhere and watch AI guide its evolution.**
+> 🌱 **Now with enhanced reliability! Fixed container dependencies for consistent CI/CD execution across all environments.**
 
 This repository is a living experiment in AI-driven software evolution. It's designed to adapt, learn, and improve itself with each "growth cycle," guided by your prompts and an AI engine.
 
