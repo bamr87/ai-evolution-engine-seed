@@ -2,7 +2,7 @@
 
 #############################################################################
 # 🌱 AI Evolution Engine - On-Demand Evolution Runner 🌱
-# Version: 0.3.6-seed - Modular Architecture
+# Version: 2.0.0 - Modular Architecture
 # Purpose: Command-line interface for triggering evolution cycles
 #############################################################################
 
@@ -12,11 +12,16 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
-# Import modular libraries
-source "$PROJECT_ROOT/src/lib/core/logger.sh"
-source "$PROJECT_ROOT/src/lib/core/environment.sh"
-source "$PROJECT_ROOT/src/lib/evolution/git.sh"
-source "$PROJECT_ROOT/src/lib/evolution/metrics.sh"
+# Bootstrap the modular library system
+source "$PROJECT_ROOT/src/lib/core/bootstrap.sh"
+bootstrap_library
+
+# Load required modules
+require_module "core/logger"
+require_module "core/environment" 
+require_module "evolution/engine"
+require_module "evolution/git"
+require_module "evolution/metrics"
 
 # Initialize logging
 init_logger "logs" "evolve"
@@ -155,52 +160,53 @@ parse_args() {
 
 # Validate arguments
 validate_args() {
+    verbose_log "Validating arguments..."
+    
+    # Load validation module
+    require_module "core/validation"
+    
     # Validate evolution type
-    case "$EVOLUTION_TYPE" in
-        consistency|error_fixing|documentation|code_quality|security_updates|custom)
-            ;;
-        *)
-            error "Invalid evolution type: $EVOLUTION_TYPE"
-            echo "Valid types: consistency, error_fixing, documentation, code_quality, security_updates, custom"
-            exit 1
-            ;;
-    esac
+    local valid_types=("consistency" "error_fixing" "documentation" "code_quality" "security_updates" "custom")
+    if ! validate_choice "$EVOLUTION_TYPE" "${valid_types[@]}"; then
+        error "Invalid evolution type: $EVOLUTION_TYPE"
+        echo "Valid types: ${valid_types[*]}"
+        exit 1
+    fi
     
     # Validate intensity
-    case "$INTENSITY" in
-        minimal|moderate|comprehensive)
-            ;;
-        *)
-            error "Invalid intensity: $INTENSITY"
-            echo "Valid intensities: minimal, moderate, comprehensive"
-            exit 1
-            ;;
-    esac
+    local valid_intensities=("minimal" "moderate" "comprehensive")
+    if ! validate_choice "$INTENSITY" "${valid_intensities[@]}"; then
+        error "Invalid intensity: $INTENSITY"
+        echo "Valid intensities: ${valid_intensities[*]}"
+        exit 1
+    fi
     
     # Validate growth mode
-    case "$GROWTH_MODE" in
-        conservative|adaptive|experimental)
-            ;;
-        *)
-            error "Invalid growth mode: $GROWTH_MODE"
-            echo "Valid modes: conservative, adaptive, experimental"
-            exit 1
-            ;;
-    esac
+    local valid_modes=("conservative" "adaptive" "experimental")
+    if ! validate_choice "$GROWTH_MODE" "${valid_modes[@]}"; then
+        error "Invalid growth mode: $GROWTH_MODE"
+        echo "Valid modes: ${valid_modes[*]}"
+        exit 1
+    fi
     
     # Check for custom prompt when type is custom
     if [[ "$EVOLUTION_TYPE" == "custom" && -z "$PROMPT" ]]; then
         error "Custom evolution type requires a prompt (-p/--prompt)"
         exit 1
     fi
+    
+    verbose_log "✅ All arguments validated successfully"
 }
 
-# Check prerequisites
+# Check prerequisites  
 check_prerequisites() {
     verbose_log "Checking prerequisites..."
     
-    # Check if gh CLI is installed
-    if ! command -v gh &> /dev/null; then
+    # Load environment module for enhanced checks
+    require_module "core/environment"
+    
+    # Check if gh CLI is installed and configured
+    if ! check_command "gh"; then
         error "GitHub CLI (gh) is not installed"
         echo "Install it from: https://cli.github.com/"
         exit 1
@@ -214,17 +220,21 @@ check_prerequisites() {
     fi
     
     # Check if we're in a git repository
-    if ! git rev-parse --git-dir &> /dev/null; then
+    if ! check_git_repository; then
         error "Not in a git repository"
         exit 1
     fi
     
-    # Check for evolution files
+    # Check for evolution infrastructure
     if [[ ! -f "evolution-metrics.json" ]]; then
         warn "evolution-metrics.json not found - this may not be an AI Evolution Engine repository"
     fi
     
-    verbose_log "Prerequisites check passed"
+    if [[ ! -f ".seed.md" ]]; then
+        warn ".seed.md not found - seed file missing"
+    fi
+    
+    verbose_log "✅ Prerequisites check passed"
 }
 
 # Generate evolution prompt
@@ -365,60 +375,70 @@ show_dry_run() {
 
 # Main execution function
 main() {
+    log_info "🌱 Starting AI Evolution Engine v2.0.0"
+    
     parse_args "$@"
     validate_args
-    check_prerequisites
+    
+    # Initialize evolution engine
+    evolution_init || {
+        log_error "Failed to initialize evolution engine"
+        exit 1
+    }
+    
+    # Configure evolution parameters
+    evolution_set_type "$EVOLUTION_TYPE"
+    evolution_set_intensity "$INTENSITY"
+    evolution_set_mode "$GROWTH_MODE"
+    
+    if [[ -n "$PROMPT" ]]; then
+        evolution_set_prompt "$PROMPT"
+    fi
     
     # Show banner
-    echo -e "${GREEN}"
+    echo -e "${GREEN:-}"
     cat << 'EOF'
 🌱 ═══════════════════════════════════════════════════════════════════ 🌱
-║                   AI EVOLUTION ENGINE                                ║
+║                   AI EVOLUTION ENGINE v2.0.0                        ║
 ║                  On-Demand Evolution Runner                          ║
 🌱 ═══════════════════════════════════════════════════════════════════ 🌱
 EOF
-    echo -e "${NC}"
+    echo -e "${NC:-}"
+    
+    verbose_log "Evolution configuration:"
+    verbose_log "  Type: $EVOLUTION_TYPE"
+    verbose_log "  Intensity: $INTENSITY" 
+    verbose_log "  Growth Mode: $GROWTH_MODE"
+    verbose_log "  Auto Plant: $AUTO_PLANT"
+    verbose_log "  Dry Run: $DRY_RUN"
     
     if [[ "$DRY_RUN" == "true" ]]; then
-        show_dry_run
+        log_info "🔍 Dry run mode - showing what would be executed"
+        evolution_preview_cycle
+        log_info "Dry run completed. Use without --dry-run to execute."
         exit 0
     fi
     
-    log "Starting evolution cycle..."
-    verbose_log "Configuration: type=$EVOLUTION_TYPE, intensity=$INTENSITY, mode=$GROWTH_MODE"
+    log_info "Starting evolution cycle..."
     
-    # Generate the evolution prompt
-    local evolution_prompt
-    evolution_prompt=$(generate_prompt)
-    
-    if [[ "$VERBOSE" == "true" ]]; then
-        echo ""
-        echo "Generated Evolution Prompt:"
-        echo "────────────────────────────────────────────────────────────────"
-        echo "$evolution_prompt"
-        echo "────────────────────────────────────────────────────────────────"
-        echo ""
-    fi
-    
-    # Trigger the evolution workflow
-    log "🚀 Triggering AI evolution workflow..."
-    
-    if gh workflow run ai_evolver.yml \
-        -f prompt="$evolution_prompt" \
-        -f growth_mode="$GROWTH_MODE" \
-        -f auto_plant_seeds="$AUTO_PLANT"; then
+    # Execute evolution cycle
+    if evolution_run_cycle; then
+        log_success "✅ Evolution cycle completed successfully"
         
-        success "Evolution cycle initiated successfully!"
-        echo ""
-        log "📊 View progress: gh run list --workflow=ai_evolver.yml"
-        log "📋 Watch logs: gh run watch"
-        log "🌐 Web interface: gh repo view --web"
-        echo ""
-        log "🌱 Your repository is now evolving..."
+        if [[ "$AUTO_PLANT" == "true" ]]; then
+            log_info "🌱 Auto-planting seeds for next evolution"
+            if evolution_plant_seeds; then
+                log_success "✅ Seeds planted successfully"
+            else
+                log_warn "⚠️ Failed to plant seeds"
+            fi
+        fi
+        
+        log_info "📊 Evolution metrics updated"
+        log_success "🌱 Evolution cycle complete!"
         
     else
-        error "Failed to trigger evolution workflow"
-        echo "Check your GitHub CLI authentication and repository permissions"
+        log_error "❌ Evolution cycle failed"
         exit 1
     fi
 }

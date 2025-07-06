@@ -29,19 +29,20 @@
 # @notes Handles automatic version increments and tracks file modifications
 #
 
-set -e
+set -euo pipefail
 
-# Source modular libraries if available
-if [[ -f "src/lib/core/logger.sh" ]]; then
-    source "src/lib/core/logger.sh"
-    source "src/lib/core/environment.sh"
-else
-    # Fallback logging functions
-    log_info() { echo "[INFO] $1"; }
-    log_warn() { echo "[WARN] $1"; }
-    log_error() { echo "[ERROR] $1"; exit 1; }
-    log_success() { echo "[SUCCESS] $1"; }
-fi
+# Get script directory and project root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+# Bootstrap the modular system
+source "$PROJECT_ROOT/src/lib/core/bootstrap.sh"
+
+# Load required modules
+require_module "core/logger"
+require_module "core/environment"
+require_module "core/validation"
+require_module "core/utils"
 
 # Configuration
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

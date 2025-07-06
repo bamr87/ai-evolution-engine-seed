@@ -1,99 +1,176 @@
 #!/bin/bash
-# scripts/analyze-repository-health.sh
-# Analyzes repository health and suggests improvements
+
+#
+# @file scripts/analyze-repository-health.sh
+# @description Analyzes repository health and suggests improvements using modular analysis
+# @author IT-Journey Team <team@it-journey.org>
+# @created 2025-07-05
+# @lastModified 2025-07-05
+# @version 2.0.0
+#
+# @relatedIssues 
+#   - #modular-refactor: Migrate to modular architecture
+#   - #health-analysis: Comprehensive repository health analysis
+#
+# @relatedEvolutions
+#   - v2.0.0: Migrated to modular architecture with enhanced analysis
+#   - v1.0.0: Original implementation with basic health checks
+#
+# @dependencies
+#   - ../src/lib/core/bootstrap.sh: Modular bootstrap system
+#   - ../src/lib/analysis/health.sh: Health analysis module
+#
+# @changelog
+#   - 2025-07-05: Migrated to modular architecture - ITJ
+#   - 2025-07-05: Enhanced health analysis capabilities - ITJ
+#
+# @usage ./scripts/analyze-repository-health.sh [evolution_type] [intensity] [force_run]
+# @notes Provides comprehensive repository health analysis and improvement recommendations
+#
 
 set -euo pipefail
 
-# Get project root directory
-PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# Get script directory and project root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
-# Source modular libraries
-source "$PROJECT_ROOT/src/lib/core/logger.sh"
-source "$PROJECT_ROOT/src/lib/core/environment.sh"
-source "$PROJECT_ROOT/src/lib/evolution/metrics.sh"
+# Bootstrap the modular system
+source "$PROJECT_ROOT/src/lib/core/bootstrap.sh"
 
+# Load required modules
+require_module "core/logger"
+require_module "core/environment"
+require_module "core/validation"
+require_module "evolution/metrics"
+require_module "analysis/health"
+
+# Parse and validate arguments
 EVOLUTION_TYPE="${1:-consistency}"
 INTENSITY="${2:-minimal}"
 FORCE_RUN="${3:-false}"
 
-log_info "Analyzing repository health and detecting improvement opportunities..."
+# Validate arguments using modular validation
+validate_argument "evolution_type" "$EVOLUTION_TYPE" "consistency|maintenance|enhancement|security"
+validate_argument "intensity" "$INTENSITY" "minimal|moderate|comprehensive"
+validate_boolean "force_run" "$FORCE_RUN"
 
-# Check for common issues
-ISSUES_FOUND=0
-SUGGESTIONS=()
+log_info "🔍 Analyzing repository health and detecting improvement opportunities..."
+log_info "Evolution Type: $EVOLUTION_TYPE | Intensity: $INTENSITY | Force Run: $FORCE_RUN"
 
-# Check for inconsistent formatting
-if find . -name "*.md" -exec grep -l "	" {} \; | head -1 > /dev/null; then
-  ISSUES_FOUND=$((ISSUES_FOUND + 1))
-  SUGGESTIONS+=("Fix tab/space inconsistencies in Markdown files")
+# Initialize health analysis
+if ! health_initialize; then
+    log_error "Failed to initialize health analysis module"
+    exit 1
 fi
 
-# Check for TODO comments
-if grep -r "TODO\|FIXME\|XXX" --include="*.md" --include="*.sh" --include="*.yml" . | head -1 > /dev/null; then
-  ISSUES_FOUND=$((ISSUES_FOUND + 1))
-  SUGGESTIONS+=("Address pending TODO/FIXME items")
+# Perform comprehensive repository health analysis
+log_info "Running comprehensive health analysis..."
+HEALTH_REPORT=$(health_analyze_repository "$EVOLUTION_TYPE" "$INTENSITY")
+
+if [[ -z "$HEALTH_REPORT" ]]; then
+    log_error "Health analysis failed to generate report"
+    exit 1
 fi
 
-# Check for outdated documentation
-LAST_COMMIT=$(git log -1 --format="%ct")
-README_MODIFIED=$(stat -c %Y README.md 2>/dev/null || stat -f %m README.md 2>/dev/null || echo 0)
-if [ $((LAST_COMMIT - README_MODIFIED)) -gt 604800 ]; then # 7 days
-  ISSUES_FOUND=$((ISSUES_FOUND + 1))
-  SUGGESTIONS+=("Update documentation to reflect recent changes")
+# Extract key metrics from health report
+HEALTH_SCORE=$(echo "$HEALTH_REPORT" | jq -r '.health_score // 0')
+ISSUES_FOUND=$(echo "$HEALTH_REPORT" | jq -r '.issues_found // 0')
+SUGGESTIONS=$(echo "$HEALTH_REPORT" | jq -r '.suggestions[]? // empty')
+
+log_info "Health Analysis Results:"
+log_info "  Health Score: $HEALTH_SCORE/100"
+log_info "  Issues Found: $ISSUES_FOUND"
+
+# Display suggestions if any
+if [[ -n "$SUGGESTIONS" ]]; then
+    log_info "📋 Improvement Recommendations:"
+    echo "$SUGGESTIONS" | while read -r suggestion; do
+        log_info "  • $suggestion"
+    done
+else
+    log_success "✅ No immediate issues detected!"
 fi
 
-# Check for broken links (basic check)
-if grep -r "http" --include="*.md" . | grep -v "https://" | head -1 > /dev/null; then
-  ISSUES_FOUND=$((ISSUES_FOUND + 1))
-  SUGGESTIONS+=("Update insecure HTTP links to HTTPS")
-fi
+# Check evolution metrics for staleness using modular metrics functions
+log_info "📊 Checking evolution metrics and staleness..."
+EVOLUTION_METRICS=$(metrics_get_current)
 
-# Check evolution metrics for staleness
-if [ -f "evolution-metrics.json" ]; then
-  LAST_EVOLUTION=$(jq -r '.last_growth_spurt' evolution-metrics.json 2>/dev/null || echo "Never")
-  if [ "$LAST_EVOLUTION" != "null" ] && [ "$LAST_EVOLUTION" != "Never" ]; then
-    # Check if the date parsing works on this system
-    if date -d "$LAST_EVOLUTION" +%s >/dev/null 2>&1; then
-      DAYS_SINCE=$(( ($(date +%s) - $(date -d "$LAST_EVOLUTION" +%s)) / 86400 ))
-    elif date -j -f "%Y-%m-%dT%H:%M:%SZ" "$LAST_EVOLUTION" +%s >/dev/null 2>&1; then
-      # macOS date format
-      DAYS_SINCE=$(( ($(date +%s) - $(date -j -f "%Y-%m-%dT%H:%M:%SZ" "$LAST_EVOLUTION" +%s)) / 86400 ))
-    else
-      DAYS_SINCE=0
-    fi
+if [[ -n "$EVOLUTION_METRICS" ]]; then
+    LAST_EVOLUTION=$(echo "$EVOLUTION_METRICS" | jq -r '.last_growth_spurt // "Never"')
     
-    if [ $DAYS_SINCE -gt 7 ]; then
-      ISSUES_FOUND=$((ISSUES_FOUND + 1))
-      SUGGESTIONS+=("Repository hasn't evolved in $DAYS_SINCE days - time for growth")
+    if [[ "$LAST_EVOLUTION" != "null" && "$LAST_EVOLUTION" != "Never" ]]; then
+        DAYS_SINCE=$(metrics_calculate_days_since "$LAST_EVOLUTION")
+        
+        if [[ $DAYS_SINCE -gt 7 ]]; then
+            log_warn "Repository hasn't evolved in $DAYS_SINCE days - recommending growth cycle"
+            # Add to health report suggestions
+            HEALTH_REPORT=$(echo "$HEALTH_REPORT" | jq --arg suggestion "Repository hasn't evolved in $DAYS_SINCE days - time for growth" '.suggestions += [$suggestion]')
+            ISSUES_FOUND=$((ISSUES_FOUND + 1))
+        fi
     fi
-  fi
 fi
 
-# Decide if evolution should proceed
-SHOULD_EVOLVE="false"
-if [ "$FORCE_RUN" = "true" ] || [ $ISSUES_FOUND -gt 0 ]; then
-  SHOULD_EVOLVE="true"
-fi
+# Determine evolution recommendation
+log_info "🤔 Determining evolution recommendation..."
+SHOULD_EVOLVE=$(health_should_evolve "$HEALTH_SCORE" "$ISSUES_FOUND" "$FORCE_RUN")
 
-# Output results in a format that can be sourced
+# Generate comprehensive recommendations
+log_info "💡 Generating actionable recommendations..."
+RECOMMENDATIONS=$(health_generate_recommendations "$EVOLUTION_TYPE" "$INTENSITY" "$HEALTH_REPORT")
+
+# Save results in standardized format
+RESULTS_FILE="/tmp/health_check_results.json"
+jq -n \
+    --arg timestamp "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+    --arg evolution_type "$EVOLUTION_TYPE" \
+    --arg intensity "$INTENSITY" \
+    --argjson health_score "$HEALTH_SCORE" \
+    --argjson issues_found "$ISSUES_FOUND" \
+    --arg should_evolve "$SHOULD_EVOLVE" \
+    --argjson recommendations "$RECOMMENDATIONS" \
+    --argjson full_report "$HEALTH_REPORT" \
+    '{
+        "timestamp": $timestamp,
+        "evolution_type": $evolution_type,
+        "intensity": $intensity,
+        "health_score": $health_score,
+        "issues_found": $issues_found,
+        "should_evolve": ($should_evolve == "true"),
+        "recommendations": $recommendations,
+        "full_report": $full_report
+    }' > "$RESULTS_FILE"
+
+# Also save legacy format for backward compatibility
 cat > /tmp/health_check_results.env << EOF
 ISSUES_FOUND=$ISSUES_FOUND
 SHOULD_EVOLVE=$SHOULD_EVOLVE
-SUGGESTIONS_COUNT=${#SUGGESTIONS[@]}
+HEALTH_SCORE=$HEALTH_SCORE
+EVOLUTION_TYPE=$EVOLUTION_TYPE
+INTENSITY=$INTENSITY
 EOF
 
-# Output suggestions to a separate file for easy reading
-printf '%s\n' "${SUGGESTIONS[@]}" > /tmp/health_check_suggestions.txt
+# Save recommendations to text file for easy reading
+echo "$RECOMMENDATIONS" | jq -r '.[] // empty' > /tmp/health_check_suggestions.txt
 
-echo "🔍 Health Check Complete:"
-echo "  - Issues Found: $ISSUES_FOUND"
-echo "  - Should Evolve: $SHOULD_EVOLVE"
-echo "  - Evolution Type: $EVOLUTION_TYPE"
-echo "  - Intensity: $INTENSITY"
+# Display final results
+log_header "🏥 Repository Health Analysis Complete"
+log_info "Health Score: $HEALTH_SCORE/100"
+log_info "Issues Found: $ISSUES_FOUND"
+log_info "Evolution Recommended: $SHOULD_EVOLVE"
+log_info "Analysis Type: $EVOLUTION_TYPE ($INTENSITY intensity)"
 
-if [ ${#SUGGESTIONS[@]} -gt 0 ]; then
-  echo "📋 Suggestions:"
-  printf '  - %s\n' "${SUGGESTIONS[@]}"
+if [[ "$SHOULD_EVOLVE" == "true" ]]; then
+    log_info "📈 Evolution is recommended based on analysis"
+    
+    if [[ -n "$RECOMMENDATIONS" ]] && [[ "$RECOMMENDATIONS" != "[]" ]]; then
+        log_info "� Key Recommendations:"
+        echo "$RECOMMENDATIONS" | jq -r '.[]' | while read -r recommendation; do
+            log_info "  • $recommendation"
+        done
+    fi
+else
+    log_success "✨ Repository is in excellent health - no immediate evolution needed"
 fi
 
-log_success "Health check completed - Issues found: $ISSUES_FOUND, Should evolve: $SHOULD_EVOLVE"
+log_info "📄 Detailed results saved to: $RESULTS_FILE"
+log_success "Health analysis completed successfully"

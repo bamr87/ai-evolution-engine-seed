@@ -1,10 +1,41 @@
 # 🌱 AI Evolution Engine: The Self-Growing Repository 🌱
 
+## 🌟 NEW: Modular Architecture (v0.4.0)
+
+**Major Update**: The AI Evolution Engine Seed has been completely refactored with a modular architecture!
+
+### ✨ Key Improvements
+- **🔧 Modular Library System**: Reusable, well-tested modules for all functionality
+- **📦 Cross-Repository Usage**: Modules can be installed and used in other projects
+- **🧪 Comprehensive Testing**: Full test coverage with automated test runner
+- **📚 Enhanced Documentation**: Standardized file headers and migration guides
+- **🔍 Advanced Health Analysis**: Repository health checking with actionable recommendations
+- **🚀 Improved Performance**: Optimized module loading and execution
+- **🛡️ Better Error Handling**: Robust validation and error management throughout
+
+### Quick Start with Modular System
+```bash
+# Run comprehensive health analysis
+./scripts/analyze-repository-health.sh
+
+# Test the modular system
+./tests/run_modular_tests.sh
+
+# Generate evolution using modular templates
+./scripts/generate_seed.sh "Improve documentation"
+
+# Run evolution with enhanced validation
+./scripts/evolve.sh "enhance" "moderate"
+```
+
+### Migration Guide
+See [docs/MODULAR_MIGRATION_GUIDE.md](docs/MODULAR_MIGRATION_GUIDE.md) for complete migration instructions and best practices.
+
 ```
 ╔═══════════════════════════════════════════════════════════════╗
 ║                   AI EVOLUTION ENGINE                         ║
 ║         Where Seeds Grow Into Intelligent Software            ║
-║                      v0.3.6-seed                              ║
+║                      v0.4.0-modular                           ║
 ╚═══════════════════════════════════════════════════════════════╝
 ```
 

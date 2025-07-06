@@ -1,7 +1,29 @@
 #!/usr/bin/env bash
-# scripts/create_pr.sh
-# Usage: create_pr.sh RESPONSE_FILE PROMPT GROWTH_MODE
-# Creates a pull request with evolution changes
+#
+# @file scripts/create_pr.sh
+# @description Creates a pull request with evolution changes using modular library
+# @author IT-Journey Team <team@it-journey.org>
+# @created 2025-07-05
+# @lastModified 2025-07-05
+# @version 2.0.0
+#
+# @relatedIssues 
+#   - Refactor scripts to be modular with well-structured library
+#
+# @relatedEvolutions
+#   - v2.0.0: Complete modular refactor using new library system
+#
+# @dependencies
+#   - bash: >=4.0
+#   - src/lib/core/bootstrap.sh: Library bootstrap
+#   - src/lib/integration/github.sh: GitHub integration
+#
+# @changelog
+#   - 2025-07-05: Refactored to use modular library system - ITJ
+#
+# @usage ./create_pr.sh <response_file> <prompt> <growth_mode>
+# @notes Creates evolution PR using GitHub integration module
+#
 
 set -euo pipefail
 
@@ -9,9 +31,15 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
-# Source modular libraries
-source "$PROJECT_ROOT/src/lib/core/logger.sh"
-source "$PROJECT_ROOT/src/lib/core/environment.sh"
+# Bootstrap the modular library system
+source "$PROJECT_ROOT/src/lib/core/bootstrap.sh"
+bootstrap_library
+
+# Load required modules
+require_module "core/logger"
+require_module "core/validation"
+require_module "integration/github"
+require_module "evolution/git"
 
 # Initialize logging
 init_logger "logs" "create-pr"
@@ -30,140 +58,52 @@ log_info "Creating pull request for evolution changes"
 log_info "Response file: $RESPONSE_FILE"
 log_info "Growth mode: $GROWTH_MODE"
 
-# Validate inputs
-if [ ! -f "$RESPONSE_FILE" ]; then
+# Validate inputs using modular validation
+if ! validate_file_exists "$RESPONSE_FILE"; then
     log_error "Response file not found: $RESPONSE_FILE"
     exit 1
 fi
 
+# Initialize GitHub integration
+github_init || {
+    log_error "Failed to initialize GitHub integration"
+    exit 1
+}
+
 log_info "🌳 Creating growth pull request..."
 
-# Extract data from response file
-BRANCH_NAME=$(jq -r .new_branch "$RESPONSE_FILE" 2>/dev/null || echo "")
-COMMIT_MSG=$(jq -r .commit_message "$RESPONSE_FILE" 2>/dev/null || echo "")
-NEXT_SEED_PREVIEW=$(jq -r .next_seed_content "$RESPONSE_FILE" 2>/dev/null | head -n 20 || echo "")
+# Extract data from response file using jq
+if ! command -v jq >/dev/null 2>&1; then
+    log_error "jq is required for JSON processing"
+    exit 1
+fi
+
+BRANCH_NAME=$(jq -r '.new_branch // empty' "$RESPONSE_FILE" 2>/dev/null)
+COMMIT_MSG=$(jq -r '.commit_message // empty' "$RESPONSE_FILE" 2>/dev/null)
+EVOLUTION_TYPE=$(jq -r '.evolution_type // "evolution"' "$RESPONSE_FILE" 2>/dev/null)
+INTENSITY=$(jq -r '.intensity // "minimal"' "$RESPONSE_FILE" 2>/dev/null)
 
 # Validate extracted data
-if [ -z "$BRANCH_NAME" ] || [ "$BRANCH_NAME" = "null" ]; then
-    echo "❌ Error: Could not extract branch name from response file"
+if [[ -z "$BRANCH_NAME" ]]; then
+    log_error "Could not extract branch name from response file"
     exit 1
 fi
 
-if [ -z "$COMMIT_MSG" ] || [ "$COMMIT_MSG" = "null" ]; then
-    COMMIT_MSG="🌿 AI Evolution Cycle: $PROMPT"
+if [[ -z "$COMMIT_MSG" ]]; then
+    COMMIT_MSG="🌱 AI Evolution: $EVOLUTION_TYPE ($INTENSITY)"
+    log_warn "No commit message found, using default: $COMMIT_MSG"
 fi
 
-echo "📋 PR Details:"
-echo "  - Branch: $BRANCH_NAME"
-echo "  - Commit: $COMMIT_MSG"
-echo "  - Growth Mode: $GROWTH_MODE"
+# Generate PR body using GitHub integration module
+PR_TITLE="🌱 AI Evolution Cycle: $EVOLUTION_TYPE"
+PR_BODY=$(github_generate_pr_body "$EVOLUTION_TYPE" "$INTENSITY" "$GROWTH_MODE" "$PROMPT")
 
-# Check GitHub CLI authentication
-if ! command -v gh >/dev/null 2>&1; then
-    echo "❌ Error: GitHub CLI (gh) not found"
-    exit 1
-fi
+log_info "Creating pull request with title: $PR_TITLE"
 
-# Verify authentication
-if [ -n "${GH_TOKEN:-}" ]; then
-    echo "✅ GitHub token configured"
-    export GH_TOKEN="${GH_TOKEN}"
-elif [ -n "${PAT_TOKEN:-}" ]; then
-    echo "✅ PAT token configured"
-    export GH_TOKEN="${PAT_TOKEN}"
+# Create the pull request
+if github_create_pr "$PR_TITLE" "$PR_BODY" "main" "$BRANCH_NAME"; then
+    log_success "✅ Pull request created successfully"
 else
-    echo "⚠️  No GitHub token found, checking gh auth status..."
-    if ! gh auth status >/dev/null 2>&1; then
-        echo "❌ Error: GitHub CLI not authenticated and no token provided"
-        echo "   Please run 'gh auth login' or set GH_TOKEN/PAT_TOKEN"
-        exit 1
-    fi
-fi
-
-# Build PR body with enhanced information
-PR_BODY=$(cat <<EOF_PR_BODY
-## 🌱 AI-Driven Growth Cycle Completed
-
-**Growth Mode:** "$GROWTH_MODE"  
-**Original Prompt:** "$PROMPT"  
-**Evolution Version:** v0.3.0  
-**Branch:** \`$BRANCH_NAME\`
-
-### 🌿 Summary of Changes in this Cycle:
-This cycle focused on evolving the codebase based on the provided prompt. The AI Evolution Engine analyzed the repository structure, current metrics, and applied targeted improvements.
-
-**Key Changes Include:**
-- 📊 Updated evolution-metrics.json with new cycle data
-- 📝 Modified README.md dynamic content blocks
-- 🧬 Applied growth-specific modifications based on prompt analysis
-- 🌰 Generated next-generation seed for future evolution
-
-### 🎯 Growth Analysis:
-- **Prompt Processing:** Successfully analyzed and interpreted growth instructions
-- **Code Evolution:** Applied systematic improvements following DFF principles
-- **Documentation Updates:** Maintained consistency across all documentation
-- **Metrics Tracking:** Recorded evolution progress and adaptation history
-
-### 🌰 Next Generation Seed (.seed.md) Highlights:
-The following .seed.md has been generated to guide the next evolution cycle:
-
-\`\`\`markdown
-$NEXT_SEED_PREVIEW
-... (see .seed.md in branch for full content)
-\`\`\`
-
-### 🔍 Pre-merge Checklist:
-- [ ] Review all changed files for quality and consistency
-- [ ] Verify evolution metrics are correctly updated
-- [ ] Confirm documentation changes align with code modifications  
-- [ ] Test that new seed file is properly formatted
-- [ ] Validate that repository structure remains intact
-
-### 🚀 Next Steps:
-1. Review and merge this PR to apply the evolution
-2. The planted seed (\`.seed.md\`) will guide the next growth cycle
-3. Consider running another evolution cycle with refined prompts
-4. Monitor repository health and adaptation success
-
----
-*🌱 Generated by AI Evolution Engine v0.3.0*  
-*Commit: $COMMIT_MSG*  
-*Timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)*
-EOF_PR_BODY
-)
-
-echo "🚀 Creating pull request..."
-
-# Create the pull request with error handling
-if gh pr create \
-  --title "$COMMIT_MSG" \
-  --body "$PR_BODY" \
-  --base main \
-  --head "$BRANCH_NAME" \
-  --label "ai-evolution,automated" 2>/dev/null; then
-    
-    echo "✅ Pull request created successfully!"
-    
-    # Get PR URL for reference
-    PR_URL=$(gh pr view "$BRANCH_NAME" --json url --jq .url 2>/dev/null || echo "")
-    if [ -n "$PR_URL" ]; then
-        echo "🔗 PR URL: $PR_URL"
-    fi
-    
-else
-    echo "❌ Failed to create pull request"
-    echo "   This might be due to:"
-    echo "   - Branch already has an open PR"
-    echo "   - Insufficient permissions"
-    echo "   - Network connectivity issues"
-    echo "   - Invalid repository configuration"
-    
-    # Try to get more information
-    echo ""
-    echo "🔍 Debugging information:"
-    echo "  - Current branch: $(git branch --show-current 2>/dev/null || echo 'unknown')"
-    echo "  - Remote origin: $(git remote get-url origin 2>/dev/null || echo 'not set')"
-    echo "  - Repository: $(gh repo view --json nameWithOwner --jq .nameWithOwner 2>/dev/null || echo 'unknown')"
-    
+    log_error "❌ Failed to create pull request"
     exit 1
 fi
