@@ -5,7 +5,7 @@
 # Description: Validates environment setup for the AI Evolution Engine
 # Supports both CI/CD and local development environments
 
-set -e
+# Note: Removed set -e to allow better error handling
 
 # Get script directory for relative imports
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -67,15 +67,18 @@ check_command() {
     local install_hint=$4
     
     if command -v "$cmd" >/dev/null 2>&1; then
-        local version=$(eval "$cmd --version 2>/dev/null | head -n1" || echo "Version unknown")
+        # Use timeout to prevent hanging on version commands
+        local version=$(timeout 3 "$cmd" --version 2>/dev/null | head -n1 || echo "Version unknown")
         print_status "pass" "$friendly_name is installed" "$version"
         return 0
     else
         if [ "$required" = "true" ]; then
             print_status "fail" "$friendly_name is not installed" "$install_hint"
+            PREREQ_FAILED=1
             return 1
         else
             print_status "warn" "$friendly_name is not installed (optional)" "$install_hint"
+            WARNINGS=$((WARNINGS + 1))
             return 0
         fi
     fi
@@ -178,7 +181,7 @@ check_command "python3" "Python 3" "false" "Install from: https://python.org/ (u
 echo -e "\n${PURPLE}🔍 Checking File Permissions...${NC}"
 
 check_file_permissions "./init_setup.sh" "Initialization script"
-check_file_permissions "./check-prereqs.sh" "This prerequisite checker"
+check_file_permissions "./scripts/check-prereqs.sh" "This prerequisite checker"
 
 echo -e "\n${PURPLE}🔍 Checking Environment Variables...${NC}"
 

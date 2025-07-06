@@ -23,10 +23,24 @@
   "environment": {
     "ci_mode": false,
     "container_mode": false,
-    "last_setup": "2025-07-04T23:45:00Z",
-    "supported_platforms": ["macos", "linux", "windows", "container"],
-    "package_managers": ["brew", "apt", "yum", "pacman"],
-    "authentication_methods": ["pat_token", "github_token", "gh_auth"]
+    "last_setup": "2025-07-06T00:43:35Z",
+    "supported_platforms": [
+      "macos",
+      "linux",
+      "windows",
+      "container"
+    ],
+    "package_managers": [
+      "brew",
+      "apt",
+      "yum",
+      "pacman"
+    ],
+    "authentication_methods": [
+      "pat_token",
+      "github_token",
+      "gh_auth"
+    ]
   },
   "evolution_history": [
     {

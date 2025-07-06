@@ -129,7 +129,7 @@ jobs:
       - name: 🔍 Dry Run - Preview Evolution
         if: steps.health_check.outputs.should_evolve == 'true' && env.DRY_RUN == 'true'
         run: |
-          echo "� DRY RUN MODE - Evolution that would be triggered:"
+          echo "🔍 DRY RUN MODE - Evolution that would be triggered:"
           echo "Evolution Type: $EVOLUTION_TYPE"
           echo "Intensity: $INTENSITY"
           echo "Suggestions:"
@@ -137,7 +137,7 @@ jobs:
             cat /tmp/health_check_suggestions.txt
           fi
 
-      - name: �📊 Update Daily Evolution Metrics
+      - name: 📊 Update Daily Evolution Metrics
         if: steps.health_check.outputs.should_evolve == 'true' && env.DRY_RUN != 'true'
         run: |
           chmod +x ./scripts/update-evolution-metrics.sh
