@@ -40,6 +40,17 @@ tests/
 ├── comprehensive-refactoring-test.sh   # Refactoring validation
 ├── test_runner.sh                      # Legacy test runner
 ├── workflow_test_runner.sh             # Workflow-specific test runner
+├── workflows/                           # Workflow testing directory
+│   ├── README.md                      # Workflow testing documentation
+│   ├── test-all-workflows-local.sh   # Comprehensive workflow testing
+│   ├── test-daily-evolution-local.sh # Daily evolution workflow testing
+│   └── test-workflow.sh              # Advanced workflow debugging
+├── seed/                              # Seed testing directory
+│   ├── README.md                      # Seed testing documentation
+│   └── test-evolved-seed.sh          # Evolved seed functionality testing
+├── lib/                               # Library testing directory
+│   ├── README.md                      # Library testing documentation
+│   └── test-modular-library.sh       # Modular library system testing
 ├── fixtures/                           # Test data and fixtures
 ├── unit/                               # Unit tests
 │   ├── logs/                          # Unit test execution logs

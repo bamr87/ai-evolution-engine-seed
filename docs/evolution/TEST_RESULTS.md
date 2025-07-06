@@ -21,10 +21,10 @@ The ai_evolver.yml workflow has been successfully tested and is working correctl
 #### 🧪 Test Commands Used:
 ```bash
 # Initial setup
-./scripts/test-workflow.sh setup
+./tests/workflows/test-workflow.sh setup
 
 # Workflow validation  
-./scripts/test-workflow.sh validate
+./tests/workflows/test-workflow.sh validate
 
 # Local testing with act
 act workflow_dispatch --secret-file .secrets --input prompt='Test workflow' --input dry_run=true --workflows .github/workflows/ai_evolver.yml

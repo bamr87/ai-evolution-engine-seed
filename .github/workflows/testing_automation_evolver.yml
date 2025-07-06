@@ -117,5 +117,5 @@ jobs:
           
       - name: 🧪 Test Evolved Seed
         run: |
-          chmod +x ./scripts/test-evolved-seed.sh
-          ./scripts/test-evolved-seed.sh "$GROWTH_MODE"
+          chmod +x ./tests/seed/test-evolved-seed.sh
+          ./tests/seed/test-evolved-seed.sh "$GROWTH_MODE"

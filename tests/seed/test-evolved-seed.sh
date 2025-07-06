@@ -1,12 +1,36 @@
 #!/bin/bash
-# scripts/test-evolved-seed.sh
-# Tests the evolved seed functionality
+#
+# @file tests/seed/test-evolved-seed.sh
+# @description Tests the evolved seed functionality
+# @author IT-Journey Team <team@it-journey.org>
+# @created 2025-07-05
+# @lastModified 2025-07-06
+# @version 1.0.0
+#
+# @relatedIssues 
+#   - Evolved seed functionality testing
+#
+# @relatedEvolutions
+#   - v1.0.0: Migrated from scripts/ to tests/seed/
+#
+# @dependencies
+#   - bash: >=4.0
+#   - src/lib/core/logger.sh: Logging functionality
+#   - src/lib/utils/env_detect.sh: Environment detection
+#
+# @changelog
+#   - 2025-07-06: Migrated to tests/seed/ directory - ITJ
+#   - 2025-07-05: Initial creation - ITJ
+#
+# @usage ./tests/seed/test-evolved-seed.sh [GROWTH_MODE]
+# @notes Tests the evolved seed functionality
+#
 
 set -euo pipefail
 
 # Source modular libraries
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 
 # Source logger
 source "$PROJECT_ROOT/src/lib/core/logger.sh"

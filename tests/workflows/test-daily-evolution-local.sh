@@ -1,11 +1,34 @@
 #!/bin/bash
-# scripts/test-daily-evolution-local.sh
-# Test the daily evolution workflow locally to identify failures
+#
+# @file tests/workflows/test-daily-evolution-local.sh
+# @description Test the daily evolution workflow locally to identify failures
+# @author IT-Journey Team <team@it-journey.org>
+# @created 2025-07-05
+# @lastModified 2025-07-06
+# @version 1.0.0
+#
+# @relatedIssues 
+#   - Daily evolution workflow testing
+#
+# @relatedEvolutions
+#   - v1.0.0: Migrated from scripts/ to tests/workflows/
+#
+# @dependencies
+#   - bash: >=4.0
+#   - scripts/setup-environment.sh: Environment setup
+#
+# @changelog
+#   - 2025-07-06: Migrated to tests/workflows/ directory - ITJ
+#   - 2025-07-05: Initial creation - ITJ
+#
+# @usage ./tests/workflows/test-daily-evolution-local.sh
+# @notes Test the daily evolution workflow locally to identify failures
+#
 
 set -euo pipefail
 
 # Get project root directory
-PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$PROJECT_ROOT"
 
 echo "🧪 Testing Daily Evolution Workflow Locally"

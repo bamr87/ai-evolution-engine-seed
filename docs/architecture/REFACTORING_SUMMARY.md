@@ -22,7 +22,7 @@ Successfully refactored the GitHub workflow files in the ai-evolution-engine-see
 - `scripts/update-evolution-metrics.sh` - Metrics updates
 
 **Testing Scripts:**
-- `scripts/test-evolved-seed.sh` - Seed functionality testing
+- `tests/seed/test-evolved-seed.sh` - Seed functionality testing
 
 ### 2. Refactored Workflow Files
 

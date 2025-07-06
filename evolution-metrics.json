@@ -23,7 +23,7 @@
   "environment": {
     "ci_mode": false,
     "container_mode": false,
-    "last_setup": "2025-07-06T00:43:35Z",
+    "last_setup": "2025-07-06T17:27:51Z",
     "supported_platforms": [
       "macos",
       "linux",

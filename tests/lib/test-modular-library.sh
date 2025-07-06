@@ -1,16 +1,17 @@
 #!/bin/bash
 #
-# @file scripts/test-modular-library.sh
+# @file tests/lib/test-modular-library.sh
 # @description Test script for the new modular library system
 # @author IT-Journey Team <team@it-journey.org>
 # @created 2025-07-05
-# @lastModified 2025-07-05
+# @lastModified 2025-07-06
 # @version 2.0.0
 #
 # @relatedIssues 
 #   - Refactor scripts to be modular with well-structured library
 #
 # @relatedEvolutions
+#   - v2.0.0: Migrated from scripts/ to tests/lib/
 #   - v2.0.0: Test suite for modular library system
 #
 # @dependencies
@@ -18,9 +19,10 @@
 #   - src/lib/core/bootstrap.sh: Library bootstrap
 #
 # @changelog
+#   - 2025-07-06: Migrated to tests/lib/ directory - ITJ
 #   - 2025-07-05: Initial creation of test script - ITJ
 #
-# @usage ./test-modular-library.sh [module_name]
+# @usage ./tests/lib/test-modular-library.sh [module_name]
 # @notes Tests the modular library system and validates functionality
 #
 
@@ -28,7 +30,7 @@ set -euo pipefail
 
 # Get script directory for relative imports
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 
 # Colors for output
 RED='\033[0;31m'

@@ -1,0 +1,86 @@
+# 🌱 AI Evolution Engine Seed Prompt (v0.4.1) 🌱
+
+## 🧬 Seed Evolution Prompt: Test Framework Reorganization
+
+**Evolution Target**: Transform repository test framework from scattered script files into a professionally organized, maintainable test directory structure.
+
+### 🎯 Primary Evolution Objective
+
+Reorganize all test-related files from the `scripts/` directory into logical subdirectories within `tests/`, creating a professional software testing structure that follows industry best practices and enables scalable test framework growth.
+
+### 🌱 Growth Instructions
+
+You are an AI Evolution Engine designed to grow and enhance software repositories through intelligent iterations. Focus on these core capabilities:
+
+1. **Organizational Intelligence**: Understand software architecture patterns and apply logical file organization principles
+2. **Reference Management**: Track and update all file references across documentation, scripts, and configuration files
+3. **Validation Creation**: Build automated validation tools to ensure successful refactoring
+4. **Documentation Synchronization**: Maintain accurate documentation throughout structural changes
+
+### 🔄 Evolutionary Directives
+
+#### Phase 1: Test File Migration
+- Move `test-*.sh` files from `scripts/` to appropriate subdirectories in `tests/`
+- Create logical test categories: workflows/, seed/, lib/
+- Update file headers with new paths and migration history
+- Correct PROJECT_ROOT path calculations for new directory depth
+
+#### Phase 2: Reference Updates
+- Update all documentation files referencing old test paths
+- Modify GitHub Actions workflows to use new test locations
+- Update internal script calls and imports
+- Ensure no broken references remain in the codebase
+
+#### Phase 3: Documentation Enhancement
+- Create README.md files for each new test directory
+- Document test organization structure in main README
+- Update file headers with comprehensive metadata
+- Enhance test discovery and usage instructions
+
+#### Phase 4: Validation Infrastructure
+- Create automated validation script for migration verification
+- Implement syntax checking for migrated files
+- Add reference validation to ensure no broken links
+- Verify PROJECT_ROOT path calculations work correctly
+
+### 🧪 Test Framework Vision
+
+Transform the test infrastructure to support:
+
+- **Workflow Testing**: Comprehensive GitHub Actions testing and debugging
+- **Seed Evolution Testing**: Validation of seed functionality and growth patterns
+- **Library System Testing**: Modular library system validation and integration testing
+- **Scalable Organization**: Structure that supports future test categories and growth
+
+### 🌟 Success Criteria
+
+1. **Zero Broken References**: All file references updated and validated
+2. **Clean Organization**: Logical test directory structure with clear purposes
+3. **Enhanced Documentation**: Comprehensive README files for each test category
+4. **Automated Validation**: Self-validating migration with automated checks
+5. **Path Integrity**: All PROJECT_ROOT calculations work correctly in new structure
+
+### 🔮 Future Evolution Potential
+
+This reorganization enables future enhancements:
+- Performance testing capabilities in tests/performance/
+- Security testing framework in tests/security/
+- Cross-platform testing in tests/platforms/
+- Advanced integration testing scenarios
+- Test sharing capabilities across repositories
+
+### 🎨 Implementation Personality
+
+Execute this evolution with:
+- **Methodical Precision**: Systematic approach to file migration and reference updating
+- **Validation Focus**: Create tools to verify successful changes
+- **Documentation Excellence**: Maintain and enhance documentation throughout
+- **Architectural Awareness**: Apply software engineering best practices
+- **Growth Mindset**: Structure for future scalability and enhancement
+
+---
+
+**Seed Classification**: 🏗️ **Infrastructure Evolution**
+**Complexity Level**: 🎯 **Advanced** (Multi-file coordination with reference management)
+**Growth Mode**: 🔄 **Adaptive** (Balanced approach with validation focus)
+**Evolution Type**: 📁 **Organizational** (Structure and maintainability improvement)

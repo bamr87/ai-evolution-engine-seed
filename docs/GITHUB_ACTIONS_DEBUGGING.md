@@ -10,7 +10,7 @@ This guide provides the best practices for testing and debugging GitHub Actions 
 
 ```bash
 # One-time setup
-./scripts/test-workflow.sh setup
+./tests/workflows/test-workflow.sh setup
 
 # Edit your secrets file (required for local testing)
 nano .secrets
@@ -20,13 +20,13 @@ nano .secrets
 
 ```bash
 # Test locally before pushing
-./scripts/test-workflow.sh local --prompt "Your test prompt"
+./tests/workflows/test-workflow.sh local --prompt "Your test prompt"
 
 # Debug mode with verbose output
-./scripts/test-workflow.sh debug --prompt "Your test prompt"
+./tests/workflows/test-workflow.sh debug --prompt "Your test prompt"
 
 # Dry run simulation
-./scripts/test-workflow.sh dry-run --prompt "Your test prompt"
+./tests/workflows/test-workflow.sh dry-run --prompt "Your test prompt"
 ```
 
 ### 3. Generate Debug Report for AI
@@ -87,7 +87,7 @@ When working with AI assistants:
 #### Test New Features
 ```bash
 # Test a new feature locally
-./scripts/test-workflow.sh local --prompt "Add user authentication system"
+./tests/workflows/test-workflow.sh local --prompt "Add user authentication system"
 
 # Monitor the output
 ./scripts/monitor-logs.sh local --filter "auth"
@@ -96,7 +96,7 @@ When working with AI assistants:
 #### Debug Failed Runs
 ```bash
 # Fetch recent GitHub logs
-./scripts/test-workflow.sh logs
+./tests/workflows/test-workflow.sh logs
 
 # Generate debug report
 ./scripts/ai-debug-helper.sh generate
@@ -107,11 +107,11 @@ When working with AI assistants:
 #### Validate Workflow Changes
 ```bash
 # Validate syntax
-./scripts/test-workflow.sh validate
+./tests/workflows/test-workflow.sh validate
 
 # Test with different modes
-./scripts/test-workflow.sh local --mode conservative
-./scripts/test-workflow.sh local --mode experimental
+./tests/workflows/test-workflow.sh local --mode conservative
+./tests/workflows/test-workflow.sh local --mode experimental
 ```
 
 ## Tools and Scripts Reference
@@ -119,12 +119,12 @@ When working with AI assistants:
 ### Main Testing Script: `test-workflow.sh`
 ```bash
 # Commands
-./scripts/test-workflow.sh setup      # Initial setup
-./scripts/test-workflow.sh local      # Run locally
-./scripts/test-workflow.sh debug      # Debug mode
-./scripts/test-workflow.sh validate   # Check syntax
-./scripts/test-workflow.sh logs       # Fetch GitHub logs
-./scripts/test-workflow.sh dry-run    # Simulate only
+./tests/workflows/test-workflow.sh setup      # Initial setup
+./tests/workflows/test-workflow.sh local      # Run locally
+./tests/workflows/test-workflow.sh debug      # Debug mode
+./tests/workflows/test-workflow.sh validate   # Check syntax
+./tests/workflows/test-workflow.sh logs       # Fetch GitHub logs
+./tests/workflows/test-workflow.sh dry-run    # Simulate only
 
 # Options
 --prompt "Your prompt"                # Test prompt
@@ -169,7 +169,7 @@ docker info
 act --list
 
 # Use debug mode
-./scripts/test-workflow.sh debug
+./tests/workflows/test-workflow.sh debug
 ```
 
 **Problem**: Permission denied
@@ -205,7 +205,7 @@ act --list
 
 **Step 1**: Reproduce the issue locally
 ```bash
-./scripts/test-workflow.sh local --prompt "Reproduce issue"
+./tests/workflows/test-workflow.sh local --prompt "Reproduce issue"
 ```
 
 **Step 2**: Generate debug report
@@ -221,7 +221,7 @@ act --list
 **Step 4**: Test fixes
 ```bash
 # Test AI-suggested fixes locally
-./scripts/test-workflow.sh local --prompt "Test fix"
+./tests/workflows/test-workflow.sh local --prompt "Test fix"
 
 # Monitor results
 ./scripts/monitor-logs.sh local
@@ -241,10 +241,10 @@ git push origin main
 ### Custom Testing Scenarios
 ```bash
 # Test specific job only
-./scripts/test-workflow.sh local --job evolve --prompt "Test specific job"
+./tests/workflows/test-workflow.sh local --job evolve --prompt "Test specific job"
 
 # Test with custom secrets
-./scripts/test-workflow.sh local --secrets ./custom-secrets --prompt "Test with custom auth"
+./tests/workflows/test-workflow.sh local --secrets ./custom-secrets --prompt "Test with custom auth"
 
 # Long-running test monitoring
 ./scripts/monitor-logs.sh both --interval 30 --filter "evolution"
@@ -253,7 +253,7 @@ git push origin main
 ### Integration with CI/CD
 ```bash
 # Add to your development workflow
-alias test-action='./scripts/test-workflow.sh local'
+alias test-action='./tests/workflows/test-workflow.sh local'
 alias debug-action='./scripts/ai-debug-helper.sh generate'
 alias monitor-action='./scripts/monitor-logs.sh both'
 ```
@@ -297,7 +297,7 @@ logs/                     # Local test logs
 
 ```bash
 # 1. Issue occurs
-./scripts/test-workflow.sh local --prompt "Feature X"
+./tests/workflows/test-workflow.sh local --prompt "Feature X"
 # -> Error occurs
 
 # 2. Generate debug report
@@ -313,7 +313,7 @@ logs/                     # Local test logs
 # -> Follow AI's step-by-step instructions
 
 # 5. Test fix
-./scripts/test-workflow.sh local --prompt "Test fix"
+./tests/workflows/test-workflow.sh local --prompt "Test fix"
 # -> Verify solution works
 
 # 6. Deploy

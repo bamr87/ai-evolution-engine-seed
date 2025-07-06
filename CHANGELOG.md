@@ -5,6 +5,27 @@ All notable changes to the AI Evolution Engine project will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.1] - 2025-07-06
+
+### 🧪 Test Framework Reorganization
+
+#### Changed
+- **Test File Migration**: Reorganized test files into logical directories
+  - Moved `scripts/test-all-workflows-local.sh` → `tests/workflows/test-all-workflows-local.sh`
+  - Moved `scripts/test-daily-evolution-local.sh` → `tests/workflows/test-daily-evolution-local.sh`
+  - Moved `scripts/test-workflow.sh` → `tests/workflows/test-workflow.sh`
+  - Moved `scripts/test-evolved-seed.sh` → `tests/seed/test-evolved-seed.sh`
+  - Moved `scripts/test-modular-library.sh` → `tests/lib/test-modular-library.sh`
+- **Updated References**: Updated all documentation and script references to new paths
+- **File Headers**: Updated all file headers with new paths and migration changelog entries
+- **Path Corrections**: Updated PROJECT_ROOT path calculations for new directory structure
+
+#### Added
+- **Directory Documentation**: Created README.md files for new test directories
+  - `tests/workflows/README.md`: Workflow testing documentation
+  - `tests/seed/README.md`: Seed testing documentation  
+  - `tests/lib/README.md`: Library testing documentation
+
 ## [0.4.0] - 2025-07-05
 
 ### 🏗️ Major: Modular Architecture Implementation
@@ -47,7 +68,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### Added Migration Tools
 - `scripts/migrate-to-modular.sh`: Automated migration helper
-- `scripts/test-modular-library.sh`: Comprehensive library testing
+- `tests/lib/test-modular-library.sh`: Comprehensive library testing
 - Backward compatibility support for existing scripts
 
 #### Technical Improvements

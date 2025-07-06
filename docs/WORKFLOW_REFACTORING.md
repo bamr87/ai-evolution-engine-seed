@@ -92,7 +92,7 @@ steps:
     run: ./scripts/setup-environment.sh
     
   - name: Test evolved seed
-    run: ./scripts/test-evolved-seed.sh ${{ github.event.inputs.growth_mode }}
+    run: ./tests/seed/test-evolved-seed.sh ${{ github.event.inputs.growth_mode }}
 ```
 
 ## Benefits of Refactoring

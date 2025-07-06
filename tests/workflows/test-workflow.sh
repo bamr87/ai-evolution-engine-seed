@@ -1,14 +1,37 @@
 #!/bin/bash
-# scripts/test-workflow.sh
-# Comprehensive GitHub Actions testing and debugging script
-# Supports both local testing with 'act' and remote workflow analysis
-# Version: 0.3.6-seed - Modular Architecture
+#
+# @file tests/workflows/test-workflow.sh
+# @description Comprehensive GitHub Actions testing and debugging script
+# @author IT-Journey Team <team@it-journey.org>
+# @created 2025-07-05
+# @lastModified 2025-07-06
+# @version 0.3.6-seed
+#
+# @relatedIssues 
+#   - GitHub Actions workflow testing and debugging
+#
+# @relatedEvolutions
+#   - v0.3.6: Migrated from scripts/ to tests/workflows/
+#   - v0.3.6-seed: Modular Architecture
+#
+# @dependencies
+#   - bash: >=4.0
+#   - act: For local workflow testing
+#   - gh: GitHub CLI for remote operations
+#
+# @changelog
+#   - 2025-07-06: Migrated to tests/workflows/ directory - ITJ
+#   - 2025-07-05: Initial creation with modular architecture - ITJ
+#
+# @usage ./tests/workflows/test-workflow.sh [COMMAND] [OPTIONS]
+# @notes Supports both local testing with 'act' and remote workflow analysis
+#
 
 set -euo pipefail
 
 # Get script directory for relative imports
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 
 # Import modular libraries
 source "$PROJECT_ROOT/src/lib/core/logger.sh"

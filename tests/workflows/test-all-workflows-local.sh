@@ -1,11 +1,34 @@
 #!/bin/bash
-# scripts/test-all-workflows-local.sh
-# Comprehensive local testing for all workflows in the repository
+#
+# @file tests/workflows/test-all-workflows-local.sh
+# @description Comprehensive local testing for all workflows in the repository
+# @author IT-Journey Team <team@it-journey.org>
+# @created 2025-07-05
+# @lastModified 2025-07-06
+# @version 1.0.0
+#
+# @relatedIssues 
+#   - Comprehensive workflow testing automation
+#
+# @relatedEvolutions
+#   - v1.0.0: Migrated from scripts/ to tests/workflows/
+#
+# @dependencies
+#   - python3: For YAML syntax validation
+#   - bash: >=4.0
+#
+# @changelog
+#   - 2025-07-06: Migrated to tests/workflows/ directory - ITJ
+#   - 2025-07-05: Initial creation - ITJ
+#
+# @usage ./tests/workflows/test-all-workflows-local.sh
+# @notes Comprehensive local testing for all workflows in the repository
+#
 
 set -euo pipefail
 
 # Get project root directory
-PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$PROJECT_ROOT"
 
 echo "🧪 Comprehensive Workflow Testing"
@@ -76,7 +99,7 @@ test_workflow() {
     case "$workflow_name" in
         "daily_evolution")
             echo "  Running daily evolution simulation..."
-            ./scripts/test-daily-evolution-local.sh > /tmp/daily_evolution_test.log 2>&1
+            ./tests/workflows/test-daily-evolution-local.sh > /tmp/daily_evolution_test.log 2>&1
             if [ $? -eq 0 ]; then
                 echo "    ✅ Daily evolution workflow test passed"
             else

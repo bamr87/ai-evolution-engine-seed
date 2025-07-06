@@ -242,7 +242,7 @@ log_info "Starting process..."
 - ✅ `generate-evolution-prompt.sh` - Prompt generation
 - ✅ `local-evolution.sh` - Local development runner
 - ✅ `setup-environment.sh` - Environment setup
-- ✅ `test-workflow.sh` - Workflow testing
+- ✅ `tests/workflows/test-workflow.sh` - Workflow testing
 - ✅ `update-evolution-metrics.sh` - Metrics updates
 
 ### 🧪 Enhanced Testing Framework

@@ -401,7 +401,7 @@ export LOG_LEVEL="DEBUG"
 1. Check the module documentation in `src/lib/README.md`
 2. Run tests to identify issues: `./tests/run_modular_tests.sh`
 3. Review the migration helper: `./scripts/migrate-to-modular.sh --help`
-4. Check the comprehensive test suite: `./scripts/test-modular-library.sh`
+4. Check the comprehensive test suite: `./tests/lib/test-modular-library.sh`
 
 ## Migration Checklist
 

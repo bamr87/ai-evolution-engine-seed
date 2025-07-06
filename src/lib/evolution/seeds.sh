@@ -188,7 +188,7 @@ logging:
 
 \`\`\`bash
 # Run all tests
-./scripts/test-all-workflows-local.sh
+./tests/workflows/test-all-workflows-local.sh
 
 # Test specific module
 src/lib/core/testing.sh --module evolution/engine
