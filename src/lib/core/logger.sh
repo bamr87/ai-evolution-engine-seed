@@ -112,7 +112,9 @@ _log() {
     local level="${1:-INFO}"
     local message="${2:-}"
     local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
-    local caller="${BASH_SOURCE[2]:-${BASH_SOURCE[1]:-unknown}}:${BASH_LINENO[1]:-0}"
+    local caller_source="${BASH_SOURCE[2]:-${BASH_SOURCE[1]:-unknown}}"
+    local caller_file="${caller_source##*/}"
+    local caller="${caller_file}:${BASH_LINENO[1]:-0}"
     
     # Skip if log level is below threshold
     case "$level" in
