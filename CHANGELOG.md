@@ -5,6 +5,28 @@ All notable changes to the AI Evolution Engine project will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.2] - 2025-07-07
+
+### 🧹 Repository Root Directory Cleanup
+
+#### Removed
+- **System Files**: Removed `.DS_Store` macOS system file
+- **Duplicate Files**: Removed backup and duplicate files
+  - `README.md.new`, `init_setup.sh.new`, `seed_prompt.md.new`
+  - `.seed.md.new`, `.seed.md.bak`, `.seed-new.md`
+  - `init_setup_new.sh`
+
+#### Changed
+- **File Organization**: Moved files to appropriate directories for better organization
+  - Reports moved to `docs/`: `enhanced-version-management-summary.md`, `enhanced-version-report.md`, `TEST_CYCLE_REPORT.md`, `version-correlation-report.markdown`
+  - Metrics moved to `logs/`: `evolution-metrics.json`, `test-metrics.json`, `version-changes.json`
+  - Seed archives moved to `docs/seeds/archive/`: `.seed-version-management.md`, `seed-updated.md`
+  - Test files moved to `tests/`: `test_bootstrap_simple.sh`, `test_logger_debug.sh`, `test_logger_simple.sh`
+
+#### Added
+- **Documentation**: Created `docs/CLEANUP_SUMMARY.md` with detailed cleanup documentation
+- **Archive Structure**: Created `docs/seeds/archive/` for historical seed versions
+
 ## [0.4.1] - 2025-07-06
 
 ### 🧪 Test Framework Reorganization
