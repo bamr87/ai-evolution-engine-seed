@@ -33,9 +33,17 @@ fi
 
 readonly CONFIG_VERSION="2.0.0"
 
-# Configuration state
-declare -A CONFIG_VALUES=()
-declare -A CONFIG_METADATA=()
+# Configuration state - using bash 3.2 compatible syntax
+if [[ "${BASH_VERSION_MODERN:-false}" == "true" ]]; then
+    # Modern bash with associative arrays
+    declare -A CONFIG_VALUES=()
+    declare -A CONFIG_METADATA=()
+else
+    # Bash 3.2 compatibility - use regular arrays and string manipulation
+    CONFIG_VALUES=()
+    CONFIG_METADATA=()
+fi
+
 declare -g CONFIG_FILE=""
 declare -g CONFIG_FORMAT=""
 declare -g CONFIG_LOADED=false

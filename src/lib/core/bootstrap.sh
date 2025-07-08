@@ -172,6 +172,17 @@ load_module() {
         return 0
     fi
     
+    # Bash 3.2 compatibility: skip modules that require modern bash features
+    if [[ "${BASH_VERSION_MODERN:-false}" != "true" ]]; then
+        case "$module_path" in
+            "core/config")
+                bootstrap_info "Skipping $module_path (requires bash 4.0+), loading simple version instead"
+                load_module "core/config_simple"
+                return $?
+                ;;
+        esac
+    fi
+    
     # Validate module exists
     if [[ ! -f "$module_file" ]]; then
         bootstrap_error "Module not found: $module_path"

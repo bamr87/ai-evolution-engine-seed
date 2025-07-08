@@ -1,16 +1,49 @@
 #!/bin/bash
-# scripts/setup-environment.sh
-# Sets up the necessary environment for evolution workflows
-# Supports both CI/CD environments and local development
+#
+# @file scripts/setup-environment.sh
+# @description Sets up the necessary environment for evolution workflows using modular architecture
+# @author IT-Journey Team <team@it-journey.org>
+# @created 2025-07-05
+# @lastModified 2025-07-07
+# @version 2.0.0
+#
+# @relatedIssues 
+#   - Modular refactoring: Migrate to modular architecture
+#   - Environment setup: Enhanced environment configuration
+#
+# @relatedEvolutions
+#   - v2.0.0: Migrated to modular architecture with enhanced setup
+#   - v1.0.0: Original implementation
+#
+# @dependencies
+#   - ../src/lib/core/bootstrap.sh: Modular bootstrap system
+#   - ../src/lib/core/environment.sh: Environment detection module
+#
+# @changelog
+#   - 2025-07-07: Migrated to modular architecture - ITJ
+#   - 2025-07-05: Enhanced environment setup logic - ITJ
+#
+# @usage ./scripts/setup-environment.sh
+# @notes Supports both CI/CD environments and local development
+#
 
 set -euo pipefail
 
-# Get project root directory
-PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# Get script directory and project root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
-# Source modular libraries
-source "$PROJECT_ROOT/src/lib/core/logger.sh"
-source "$PROJECT_ROOT/src/lib/core/environment.sh"
+# Bootstrap the modular system
+source "$PROJECT_ROOT/src/lib/core/bootstrap.sh"
+bootstrap_library
+
+# Load required modules
+require_module "core/logger"
+require_module "core/environment"
+require_module "core/validation"
+
+# Initialize logging
+init_logger "logs" "setup-environment"
 
 # Detect environment
 CI_ENVIRONMENT="${CI_ENVIRONMENT:-false}"
@@ -26,7 +59,7 @@ install_dependencies() {
     
     log_info "Installing dependencies for $os..."
     
-    if [ "$CI_ENVIRONMENT" = "true" ]; then
+    if [[ "$CI_ENVIRONMENT" == "true" ]]; then
         # CI environment - use package manager available
         if command -v apt-get >/dev/null 2>&1; then
             # Ubuntu/Debian CI
@@ -48,6 +81,24 @@ install_dependencies() {
                     brew install jq tree gh || echo "⚠️  Brew install failed, trying alternatives..."
                 else
                     echo "⚠️  Homebrew not found. Please install: https://brew.sh/"
+                fi
+                ;;
+            "linux")
+                if command -v apt-get >/dev/null 2>&1; then
+                    sudo apt-get update
+                    sudo apt-get install -y jq tree curl git
+                elif command -v yum >/dev/null 2>&1; then
+                    sudo yum install -y jq tree curl git
+                elif command -v pacman >/dev/null 2>&1; then
+                    sudo pacman -S --noconfirm jq tree curl git
+                fi
+                ;;
+            *)
+                log_warn "Unknown OS: $os, manual dependency installation may be required"
+                ;;
+        esac
+    fi
+}
                 fi
                 ;;
             "linux")

@@ -3,6 +3,14 @@
 # Provides consistent logging across all scripts
 # Version: 0.3.6-seed
 
+# Save and temporarily disable nounset for initialization
+if [[ $- =~ u ]]; then
+    LOGGER_NOUNSET_WAS_SET=true
+    set +u
+else
+    LOGGER_NOUNSET_WAS_SET=false
+fi
+
 # Color codes for output (only set if not already defined)
 if [[ -z "${RED:-}" ]]; then
     RED='\033[0;31m'
@@ -24,8 +32,8 @@ if [[ -z "${LOG_LEVELS:-}" ]]; then
     LOG_LEVEL_SUCCESS=4
 fi
 
-# Configuration
-CURRENT_LOG_LEVEL=${LOG_LEVEL:-$LOG_LEVEL_INFO}
+# Configuration - defensive initialization for bash 3.2
+CURRENT_LOG_LEVEL=${LOG_LEVEL:-${LOG_LEVEL_INFO:-1}}
 LOG_FILE=${LOG_FILE:-""}
 QUIET_MODE=${QUIET_MODE:-false}
 CI_ENVIRONMENT=${CI_ENVIRONMENT:-false}
@@ -60,18 +68,18 @@ init_logger() {
 
 # Core logging function
 _log() {
-    local level="$1"
-    local message="$2"
+    local level="${1:-INFO}"
+    local message="${2:-}"
     local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
     local caller="${BASH_SOURCE[2]##*/}:${BASH_LINENO[1]}"
     
     # Skip if log level is below threshold
     case "$level" in
-        "DEBUG") [[ $CURRENT_LOG_LEVEL -le $LOG_LEVEL_DEBUG ]] || return 0 ;;
-        "INFO")  [[ $CURRENT_LOG_LEVEL -le $LOG_LEVEL_INFO ]] || return 0 ;;
-        "WARN")  [[ $CURRENT_LOG_LEVEL -le $LOG_LEVEL_WARN ]] || return 0 ;;
-        "ERROR") [[ $CURRENT_LOG_LEVEL -le $LOG_LEVEL_ERROR ]] || return 0 ;;
-        "SUCCESS") [[ $CURRENT_LOG_LEVEL -le $LOG_LEVEL_SUCCESS ]] || return 0 ;;
+        "DEBUG") [[ $CURRENT_LOG_LEVEL -le ${LOG_LEVEL_DEBUG:-0} ]] || return 0 ;;
+        "INFO")  [[ $CURRENT_LOG_LEVEL -le ${LOG_LEVEL_INFO:-1} ]] || return 0 ;;
+        "WARN")  [[ $CURRENT_LOG_LEVEL -le ${LOG_LEVEL_WARN:-2} ]] || return 0 ;;
+        "ERROR") [[ $CURRENT_LOG_LEVEL -le ${LOG_LEVEL_ERROR:-3} ]] || return 0 ;;
+        "SUCCESS") [[ $CURRENT_LOG_LEVEL -le ${LOG_LEVEL_SUCCESS:-4} ]] || return 0 ;;
     esac
     
     # Format message
@@ -114,11 +122,11 @@ info() { log_info "$*"; }
 set_log_level() {
     local level="$1"
     case "$level" in
-        "DEBUG") CURRENT_LOG_LEVEL=$LOG_LEVEL_DEBUG ;;
-        "INFO")  CURRENT_LOG_LEVEL=$LOG_LEVEL_INFO ;;
-        "WARN")  CURRENT_LOG_LEVEL=$LOG_LEVEL_WARN ;;
-        "ERROR") CURRENT_LOG_LEVEL=$LOG_LEVEL_ERROR ;;
-        "SUCCESS") CURRENT_LOG_LEVEL=$LOG_LEVEL_SUCCESS ;;
+        "DEBUG") CURRENT_LOG_LEVEL=${LOG_LEVEL_DEBUG:-0} ;;
+        "INFO")  CURRENT_LOG_LEVEL=${LOG_LEVEL_INFO:-1} ;;
+        "WARN")  CURRENT_LOG_LEVEL=${LOG_LEVEL_WARN:-2} ;;
+        "ERROR") CURRENT_LOG_LEVEL=${LOG_LEVEL_ERROR:-3} ;;
+        "SUCCESS") CURRENT_LOG_LEVEL=${LOG_LEVEL_SUCCESS:-4} ;;
         *) log_warn "Unknown log level: $level" ;;
     esac
 }
@@ -127,3 +135,8 @@ enable_quiet_mode() { QUIET_MODE=true; }
 disable_quiet_mode() { QUIET_MODE=false; }
 
 get_log_file() { echo "$LOG_FILE"; }
+
+# Restore nounset if it was originally set
+if [[ "${LOGGER_NOUNSET_WAS_SET:-false}" == "true" ]]; then
+    set -u
+fi
