@@ -1,4 +1,4 @@
-name: 🌱 AI Evolution Growth Engine (v0.3.6)
+name: 🌱 AI Evolution Growth Engine (v0.4.1)
 
 on:
   workflow_dispatch:
@@ -16,6 +16,7 @@ on:
           - conservative
           - adaptive
           - experimental
+          - test-automation
       auto_plant_seeds:
         description: 'Automatically commit the newly generated .seed.md for next evolution?'
         required: false
@@ -38,7 +39,7 @@ permissions:
   issues: write
 
 env:
-  EVOLUTION_VERSION: "0.3.0"
+  EVOLUTION_VERSION: "0.4.1"
   WORKFLOW_TYPE: "manual_evolution"
   # Set environment context for cross-compatibility
   CI_ENVIRONMENT: "true"
@@ -46,203 +47,141 @@ env:
 
 jobs:
   evolve:
-    name: 🌿 Growth Cycle v0.3.0
+    name: 🌿 Growth Cycle v0.4.1
     runs-on: ubuntu-latest
     
-    env:
-      PROMPT: ${{ inputs.prompt }}
-      GROWTH_MODE: ${{ inputs.growth_mode }}
-      AUTO_PLANT_SEEDS: ${{ inputs.auto_plant_seeds }}
-      DRY_RUN: ${{ inputs.dry_run }}
-      USE_CONTAINER: ${{ inputs.use_container }}
-      # GitHub CLI authentication
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      # Fallback to PAT if GITHUB access insufficient
-      PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
-    
     steps:
-      - name: 🌱 Prepare Growth Environment
+      - name: 🌱 Initialize Evolution Environment
         uses: actions/checkout@v4
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
-          token: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
-          
-      - name: 🛠️ Setup Environment
+
+      - name: 🛠️ Setup Evolution Prerequisites  
         run: |
-          # Make scripts executable first
-          find ./scripts -name "*.sh" -exec chmod +x {} \;
-          
-          if [ ! -f "./scripts/setup-environment.sh" ]; then
-            echo "❌ Setup script not found!"
-            exit 1
-          fi
+          chmod +x ./scripts/setup-environment.sh
           ./scripts/setup-environment.sh
-          
-      - name: 🔍 Validate Prerequisites
-        run: |
-          ./scripts/check-prereqs.sh "$GROWTH_MODE" "$CI_ENVIRONMENT"
-          
-      - name: 🔢 Version Management - Pre-Evolution Check
-        run: |
-          echo "🔢 Checking version management status..."
-          ./scripts/version-integration.sh status
-          
-          # Store current version for later comparison
-          CURRENT_VERSION=$(./scripts/version-integration.sh version)
-          echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
-          echo "Current version: $CURRENT_VERSION"
-          
-          # Initialize change tracking for this evolution cycle
-          echo "🔍 Initializing change tracking..."
-          ./scripts/version-tracker.sh track-change --action "evolution-start" --version "$CURRENT_VERSION"
-
-      - name: 🧬 Collect Context
-        id: collect_context
-        run: |
-          # Check for existing evolution metrics or create default
-          if [ -f "evolution-metrics.json" ]; then
-            echo "📊 Using existing evolution metrics"
-          else
-            echo "📊 Creating default evolution metrics structure"
-            echo '{"cycle":0,"generation":0,"version":"1.0.0","metrics":{"total_evolutions":0}}' > evolution-metrics.json || echo "⚠️ Could not create metrics file"
-          fi
-          
-          # Check for .gptignore file
-          if [ -f .gptignore ]; then
-            echo "🔍 Found .gptignore configuration"
-          else
-            echo "🔍 No .gptignore file found, using defaults"
-          fi
-          
-          ./scripts/collect-context.sh \
-            "$PROMPT" \
-            "$GROWTH_MODE" \
-            "/tmp/repo_context.json"
-          
-      - name: 🧠 Invoke AI Growth Engine
-        id: ai_growth_simulation
-        run: |
-          ./scripts/simulate-ai-growth.sh \
-            "$PROMPT" \
-            "$GROWTH_MODE" \
-            "/tmp/repo_context.json" \
-            "/tmp/evolution_response.json"
-          
-          # Validate and fallback for invalid JSON
-          if ! jq empty "/tmp/evolution_response.json" 2>/dev/null; then
-            echo "⚠️ AI response invalid, using default structure"
-            echo '{"changes":[],"summary":"Fallback response due to invalid AI output","recommendations":["Review AI simulation script","Check input parameters"]}' > "/tmp/evolution_response.json"
-          fi
-
-      - name: 🌾 Apply Growth Changes
-        if: env.DRY_RUN != 'true'
-        run: |
-          ./scripts/apply-growth-changes.sh "/tmp/evolution_response.json"
-          
-      - name: 🔍 Dry Run - Preview Changes
-        if: env.DRY_RUN == 'true'
-        run: |
-          echo "🔍 DRY RUN MODE - Changes that would be applied:"
-          if [ -f "/tmp/evolution_response.json" ]; then
-            # Validate JSON before processing
-            if jq empty "/tmp/evolution_response.json" 2>/dev/null; then
-              cat "/tmp/evolution_response.json" | jq -r '.changes[] | "\(.type): \(.file)"'
-            else
-              echo "❌ Invalid JSON in evolution response file"
-              exit 1
-            fi
-          fi
-          
-      - name: 🔢 Version Management - Post-Evolution Update
-        if: env.DRY_RUN != 'true'
-        run: |
-          echo "🔢 Managing version for evolution cycle..."
-          
-          # Determine if significant changes were made
-          CHANGES_COUNT=0
-          if [ -f "/tmp/evolution_response.json" ]; then
-            if jq empty "/tmp/evolution_response.json" 2>/dev/null; then
-              CHANGES_COUNT=$(jq -r '.changes | length // 0' /tmp/evolution_response.json)
-            fi
-          fi
-          
-          echo "Changes detected: $CHANGES_COUNT"
-          
-          # Only update version if significant changes were made
-          if [ "$CHANGES_COUNT" -gt 0 ]; then
-            # Pre-track the files before version update
-            echo "🔍 Tracking files before version update..."
-            ./scripts/version-tracker.sh track-change --action "pre-version-update" --version "$CURRENT_VERSION"
-            
-            # Update version
-            ./scripts/version-integration.sh evolution "AI evolution cycle: $PROMPT" patch false
-            
-            # Get new version for summary
-            NEW_VERSION=$(./scripts/version-integration.sh version)
-            echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
-            echo "Version updated: $CURRENT_VERSION → $NEW_VERSION"
-            
-            # Post-track the files after version update and correlate changes
-            echo "🔍 Tracking files after version update and correlating changes..."
-            ./scripts/version-tracker.sh track-change --action "post-version-update" --version "$NEW_VERSION"
-            ./scripts/version-tracker.sh correlate-files --old-version "$CURRENT_VERSION" --new-version "$NEW_VERSION"
-            
-            # Generate enhanced changelog entry with file correlations
-            echo "📝 Updating changelog with file correlations..."
-            ./scripts/version-tracker.sh update-changelog --version "$NEW_VERSION" --prompt "$PROMPT"
-            
-          else
-            echo "No significant changes detected, skipping version update"
-            echo "NEW_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
-          fi
-
-      - name: 🌰 Plant New Seeds
-        if: env.AUTO_PLANT_SEEDS == 'true' && env.DRY_RUN != 'true'
-        run: |
-          # Generate new seed content using helper script
-          ./scripts/generate_seed.sh "$PROMPT" "$GROWTH_MODE" "3" "4" > "/tmp/next_seed.md"
-          ./scripts/plant-new-seeds.sh "/tmp/evolution_response.json" "$AUTO_PLANT_SEEDS"
-          
-      - name: 🌳 Create Growth Pull Request
-        if: env.DRY_RUN != 'true'
         env:
-          # Ensure GitHub CLI has proper authentication
-          GH_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN || github.token }}
+          EVOLUTION_TYPE: "manual"
+          GROWTH_MODE: ${{ github.event.inputs.growth_mode }}
+          DRY_RUN: ${{ github.event.inputs.dry_run }}
+
+      - name: 🔍 Pre-Evolution Validation
         run: |
-          # Configure git for PR creation if needed
-          git config --global user.name "AI Evolution Engine"
-          git config --global user.email "ai-evolution@users.noreply.github.com"
-          
-          # Generate AI response and create PR using helper scripts
-          ./scripts/generate_ai_response.sh "/tmp/evolution_response.json" "$PROMPT" "$GROWTH_MODE" > "/tmp/ai_response.json"
-          ./scripts/create_pr.sh "/tmp/ai_response.json" "$PROMPT" "$GROWTH_MODE"
-          
-      - name: 📊 Evolution Summary
-        if: always()
+          chmod +x ./scripts/check-prereqs.sh
+          ./scripts/check-prereqs.sh \
+            --growth-mode "${{ github.event.inputs.growth_mode }}" \
+            --dry-run "${{ github.event.inputs.dry_run }}"
+
+      - name: � Version Management Pre-Process
         run: |
-          echo "🌱 Evolution Cycle Complete!"
-          echo "  - Version: $EVOLUTION_VERSION"
-          echo "  - Prompt: $PROMPT"
-          echo "  - Growth Mode: $GROWTH_MODE"
-          echo "  - Dry Run: $DRY_RUN"
-          echo "  - Auto Plant Seeds: $AUTO_PLANT_SEEDS"
-          echo "  - Version Update: ${CURRENT_VERSION:-unknown} → ${NEW_VERSION:-unknown}"
-          
-          if [ -f "/tmp/evolution_response.json" ]; then
-            # Validate JSON before processing
-            if jq empty "/tmp/evolution_response.json" 2>/dev/null; then
-              echo "  - Changes Applied: $(jq -r '.changes | length' /tmp/evolution_response.json)"
-            else
-              echo "  - Changes Applied: Unable to parse (invalid JSON)"
-            fi
-          fi
-          
-          # Generate comprehensive version correlation report
-          if [ "${NEW_VERSION:-unknown}" != "${CURRENT_VERSION:-unknown}" ] && [ "$DRY_RUN" != 'true' ]; then
-            echo "📈 Generating version correlation report..."
-            ./scripts/version-tracker.sh generate-report --format markdown --output "evolution-report-${NEW_VERSION}.md"
-            
-            # Display summary of file changes
-            echo "📁 File Changes Summary:"
-            ./scripts/version-tracker.sh show-history --version "$NEW_VERSION" --format summary
-          fi
+          chmod +x ./scripts/version-integration.sh
+          ./scripts/version-integration.sh prepare
+        env:
+          GROWTH_MODE: ${{ github.event.inputs.growth_mode }}
+
+      - name: 🏷️ Evolution Cycle Tracking
+        run: |
+          chmod +x ./scripts/version-tracker.sh
+          ./scripts/version-tracker.sh start \
+            --type "manual" \
+            --mode "${{ github.event.inputs.growth_mode }}" \
+            --prompt "${{ github.event.inputs.prompt }}"
+
+      - name: 🧠 Context Collection & Analysis
+        run: |
+          chmod +x ./scripts/collect-context.sh
+          ./scripts/collect-context.sh \
+            --include-health \
+            --include-tests \
+            --growth-mode "${{ github.event.inputs.growth_mode }}"
+
+      - name: 🚀 AI Growth Simulation
+        run: |
+          chmod +x ./scripts/simulate-ai-growth.sh
+          ./scripts/simulate-ai-growth.sh \
+            --prompt "${{ github.event.inputs.prompt }}" \
+            --growth-mode "${{ github.event.inputs.growth_mode }}" \
+            --dry-run "${{ github.event.inputs.dry_run }}"
+
+      - name: 🔄 Apply Growth Changes
+        if: github.event.inputs.dry_run == 'false'
+        run: |
+          chmod +x ./scripts/apply-growth-changes.sh
+          ./scripts/apply-growth-changes.sh \
+            --growth-mode "${{ github.event.inputs.growth_mode }}" \
+            --auto-plant "${{ github.event.inputs.auto_plant_seeds }}"
+
+      - name: 📈 Post-Evolution Tracking
+        run: |
+          chmod +x ./scripts/version-tracker.sh
+          ./scripts/version-tracker.sh complete \
+            --mode "${{ github.event.inputs.growth_mode }}"
+
+      - name: � Version Integration Post-Process
+        run: |
+          chmod +x ./scripts/version-integration.sh
+          ./scripts/version-integration.sh finalize
+        env:
+          GROWTH_MODE: ${{ github.event.inputs.growth_mode }}
+
+      - name: 🧪 Validate Evolution with Test Framework
+        run: |
+          echo "Running test framework validation..."
+          chmod +x ./tests/workflows/test-all-workflows-local.sh
+          ./tests/workflows/test-all-workflows-local.sh
+
+      - name: 🧪 Test Evolved Components
+        run: |
+          echo "Testing evolved seed functionality..."
+          chmod +x ./tests/seed/test-evolved-seed.sh
+          ./tests/seed/test-evolved-seed.sh "${{ github.event.inputs.growth_mode }}"
+
+      - name: 📝 Evolution Version Update
+        run: |
+          chmod +x ./scripts/version-tracker.sh
+          ./scripts/version-tracker.sh version-bump
+        env:
+          GROWTH_MODE: ${{ github.event.inputs.growth_mode }}
+
+      - name: � Generate New Evolution Seeds
+        if: github.event.inputs.auto_plant_seeds == 'true'
+        run: |
+          chmod +x ./scripts/generate_seed.sh
+          ./scripts/generate_seed.sh \
+            --cycle "$(date +%Y%m%d)" \
+            --generation "1" \
+            --prompt "${{ github.event.inputs.prompt }}" \
+            --growth-mode "${{ github.event.inputs.growth_mode }}"
+
+      - name: 🌿 Plant New Seeds in Repository
+        if: github.event.inputs.auto_plant_seeds == 'true'
+        run: |
+          chmod +x ./scripts/plant-new-seeds.sh
+          ./scripts/plant-new-seeds.sh
+
+      - name: 🤖 Generate AI Evolution Response
+        run: |
+          chmod +x ./scripts/generate_ai_response.sh
+          ./scripts/generate_ai_response.sh \
+            --prompt "${{ github.event.inputs.prompt }}" \
+            --mode "${{ github.event.inputs.growth_mode }}" \
+            --dry-run "${{ github.event.inputs.dry_run }}"
+
+      - name: 📋 Create Evolution Pull Request
+        if: github.event.inputs.dry_run == 'false'
+        run: |
+          chmod +x ./scripts/create_pr.sh
+          ./scripts/create_pr.sh \
+            --prompt "${{ github.event.inputs.prompt }}" \
+            --mode "${{ github.event.inputs.growth_mode }}" \
+            --type "manual_evolution"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 📊 Final Evolution Tracking
+        run: |
+          chmod +x ./scripts/version-tracker.sh
+          ./scripts/version-tracker.sh log \
+            --final \
+            --mode "${{ github.event.inputs.growth_mode }}"
