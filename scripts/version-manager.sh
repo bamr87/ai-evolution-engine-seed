@@ -167,10 +167,16 @@ file_needs_version_update() {
     # If last_version equals current_version, file hasn't been updated
     [[ "$last_version" == "$current_version" ]] && return 1
     
-    # Check git status for modifications
+    # Check git status for modifications with timeout to prevent hanging
     if git rev-parse --git-dir >/dev/null 2>&1; then
         # If file has uncommitted changes or was modified in recent commits
-        if git diff --name-only HEAD~1..HEAD | grep -q "$(basename "$file_path")" 2>/dev/null; then
+        local git_check_result
+        git_check_result=$(timeout 10s git diff --name-only HEAD~1..HEAD 2>/dev/null | grep -q "$(basename "$file_path")" && echo "changed" || echo "unchanged") || git_check_result="timeout"
+        
+        if [[ "$git_check_result" == "changed" ]]; then
+            return 0
+        elif [[ "$git_check_result" == "timeout" ]]; then
+            log_warn "Git check timed out for $file_path, assuming update needed"
             return 0
         fi
     fi
@@ -335,24 +341,39 @@ scan_files() {
     log_info "Scanning files for version update requirements..."
     log_info "Current version: $current_version"
     
-    # Get tracked files from config
-    local tracked_files
-    tracked_files=$(jq -r '.tracked_files | to_entries[] | .value[]' "$VERSION_CONFIG")
+    # Get tracked files from config using a safer approach
+    local tracked_files_json
+    tracked_files_json=$(jq -r '.tracked_files | to_entries[] | .value[]' "$VERSION_CONFIG" 2>/dev/null || echo "[]")
     
-    echo "$tracked_files" | jq -c '.' | while read -r file_config; do
-        local file_path=$(echo "$file_config" | jq -r '.path')
-        local last_modified_version=$(echo "$file_config" | jq -r '.last_modified_version')
+    # Process files using process substitution to avoid pipeline hanging
+    local temp_file=$(mktemp)
+    echo "$tracked_files_json" > "$temp_file"
+    
+    # Read each file configuration
+    while IFS= read -r file_config; do
+        [[ -z "$file_config" || "$file_config" == "null" ]] && continue
+        
+        local file_path last_modified_version
+        file_path=$(echo "$file_config" | jq -r '.path' 2>/dev/null || echo "")
+        last_modified_version=$(echo "$file_config" | jq -r '.last_modified_version' 2>/dev/null || echo "0.0.0")
+        
+        [[ -z "$file_path" || "$file_path" == "null" ]] && continue
         
         # Handle wildcard paths
         if [[ "$file_path" == *"*"* ]]; then
-            find "$PROJECT_ROOT" -name "$(basename "$file_path")" -type f | while read -r actual_file; do
+            local wildcard_temp=$(mktemp)
+            find "$PROJECT_ROOT" -name "$(basename "$file_path")" -type f > "$wildcard_temp" 2>/dev/null || true
+            
+            while IFS= read -r actual_file; do
+                [[ -z "$actual_file" ]] && continue
                 local rel_path=${actual_file#$PROJECT_ROOT/}
                 if file_needs_version_update "$actual_file" "$last_modified_version" "$current_version"; then
                     echo "NEEDS_UPDATE: $rel_path (last: $last_modified_version, current: $current_version)"
                 else
                     echo "UP_TO_DATE: $rel_path (version: $last_modified_version)"
                 fi
-            done
+            done < "$wildcard_temp"
+            rm -f "$wildcard_temp"
         else
             local full_path="$PROJECT_ROOT/$file_path"
             if file_needs_version_update "$full_path" "$last_modified_version" "$current_version"; then
@@ -361,7 +382,9 @@ scan_files() {
                 echo "UP_TO_DATE: $file_path (version: $last_modified_version)"
             fi
         fi
-    done
+    done < <(echo "$tracked_files_json" | jq -c '.' 2>/dev/null || echo "")
+    
+    rm -f "$temp_file"
 }
 
 # Update all tracked files with new version
@@ -374,22 +397,44 @@ update_all_files() {
     for category in core_files documentation_files script_files; do
         log_info "Processing $category..."
         
-        jq -c ".tracked_files.$category[]" "$VERSION_CONFIG" | while read -r file_config; do
-            local file_path=$(echo "$file_config" | jq -r '.path')
-            local patterns=$(echo "$file_config" | jq -c '.patterns')
+        # Use process substitution to avoid pipeline hanging
+        local category_files
+        category_files=$(jq -c ".tracked_files.$category[]" "$VERSION_CONFIG" 2>/dev/null || echo "")
+        
+        while IFS= read -r file_config; do
+            [[ -z "$file_config" || "$file_config" == "null" ]] && continue
+            
+            local file_path patterns
+            file_path=$(echo "$file_config" | jq -r '.path' 2>/dev/null || echo "")
+            patterns=$(echo "$file_config" | jq -c '.patterns' 2>/dev/null || echo "[]")
+            
+            [[ -z "$file_path" || "$file_path" == "null" ]] && continue
             
             # Handle wildcard paths
             if [[ "$file_path" == *"*"* ]]; then
-                find "$PROJECT_ROOT" -name "$(basename "$file_path")" -type f | while read -r actual_file; do
-                    [[ "$DRY_RUN" == true ]] && log_info "DRY RUN: Would update $actual_file" || update_file_version "$actual_file" "$new_version" "$patterns"
-                done
+                local wildcard_temp=$(mktemp)
+                find "$PROJECT_ROOT" -name "$(basename "$file_path")" -type f > "$wildcard_temp" 2>/dev/null || true
+                
+                while IFS= read -r actual_file; do
+                    [[ -z "$actual_file" ]] && continue
+                    if [[ "$DRY_RUN" == true ]]; then
+                        log_info "DRY RUN: Would update $actual_file"
+                    else
+                        update_file_version "$actual_file" "$new_version" "$patterns"
+                    fi
+                done < "$wildcard_temp"
+                rm -f "$wildcard_temp"
             else
                 local full_path="$PROJECT_ROOT/$file_path"
                 if [[ -f "$full_path" ]]; then
-                    [[ "$DRY_RUN" == true ]] && log_info "DRY RUN: Would update $full_path" || update_file_version "$full_path" "$new_version" "$patterns"
+                    if [[ "$DRY_RUN" == true ]]; then
+                        log_info "DRY RUN: Would update $full_path"
+                    else
+                        update_file_version "$full_path" "$new_version" "$patterns"
+                    fi
                 fi
             fi
-        done
+        done < <(echo "$category_files")
     done
 }
 
@@ -484,7 +529,14 @@ action_check_status() {
     echo "Changelog: $CHANGELOG_FILE"
     echo ""
     
-    scan_files
+    # Call scan_files directly - timeout protection is handled in the scan_files function itself
+    log_info "Starting file scan..."
+    if scan_files; then
+        log_success "File scan completed successfully"
+    else
+        log_warn "File scan failed, but continuing..."
+        echo "SCAN_ERROR: File scanning encountered an error"
+    fi
 }
 
 action_evolution() {
