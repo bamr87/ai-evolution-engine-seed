@@ -25,6 +25,10 @@
 # @notes Handles all CI/CD operations and workflow management
 #
 
+# Prevent multiple imports
+[[ "${__CI_MODULE_LOADED:-}" == "true" ]] && return 0
+readonly __CI_MODULE_LOADED=true
+
 # Source dependencies if not already loaded
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 if ! declare -F log_info >/dev/null 2>&1; then
@@ -34,12 +38,12 @@ fi
 readonly CI_MODULE_VERSION="2.0.0"
 
 # CI/CD integration state
-declare -g CI_ENVIRONMENT=""
-declare -g CI_BUILD_ID=""
-declare -g CI_COMMIT_SHA=""
-declare -g CI_BRANCH=""
-declare -g CI_PR_NUMBER=""
-declare -g CI_DETECTED=false
+CI_ENVIRONMENT=""
+CI_BUILD_ID=""
+CI_COMMIT_SHA=""
+CI_BRANCH=""
+CI_PR_NUMBER=""
+CI_DETECTED=false
 
 # Detect CI environment
 # Returns:

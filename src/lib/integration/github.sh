@@ -27,6 +27,10 @@
 # @notes Handles all GitHub API interactions and workflow operations
 #
 
+# Prevent multiple imports
+[[ "${__GITHUB_MODULE_LOADED:-}" == "true" ]] && return 0
+readonly __GITHUB_MODULE_LOADED=true
+
 # Source dependencies if not already loaded
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 if ! declare -F log_info >/dev/null 2>&1; then
@@ -36,10 +40,10 @@ fi
 readonly GITHUB_MODULE_VERSION="2.0.0"
 
 # GitHub integration state
-declare -g GITHUB_REPO=""
-declare -g GITHUB_OWNER=""
-declare -g GITHUB_TOKEN=""
-declare -g GITHUB_CLI_AVAILABLE=false
+GITHUB_REPO=""
+GITHUB_OWNER=""
+GITHUB_TOKEN=""
+GITHUB_CLI_AVAILABLE=false
 
 # Initialize GitHub integration
 # Args:

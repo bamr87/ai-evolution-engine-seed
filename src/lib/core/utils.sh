@@ -24,6 +24,10 @@
 # @notes Provides cross-platform utilities and common operations
 #
 
+# Prevent multiple imports
+[[ "${__UTILS_LOADED:-}" == "true" ]] && return 0
+readonly __UTILS_LOADED=true
+
 readonly UTILS_VERSION="2.0.0"
 
 # String manipulation utilities

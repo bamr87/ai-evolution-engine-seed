@@ -25,6 +25,10 @@
 # @notes Supports JSON, YAML, and shell-style configuration files
 #
 
+# Prevent multiple imports
+[[ "${__CONFIG_LOADED:-}" == "true" ]] && return 0
+readonly __CONFIG_LOADED=true
+
 # Source dependencies if not already loaded
 if ! declare -F log_info >/dev/null 2>&1; then
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -44,9 +48,9 @@ else
     CONFIG_METADATA=()
 fi
 
-declare -g CONFIG_FILE=""
-declare -g CONFIG_FORMAT=""
-declare -g CONFIG_LOADED=false
+CONFIG_FILE=""
+CONFIG_FORMAT=""
+CONFIG_LOADED=false
 
 # Default configuration structure
 readonly DEFAULT_CONFIG='{

@@ -25,6 +25,10 @@
 # @notes Handles template processing, variable substitution, and generation
 #
 
+# Prevent multiple imports
+[[ "${__TEMPLATE_ENGINE_LOADED:-}" == "true" ]] && return 0
+readonly __TEMPLATE_ENGINE_LOADED=true
+
 # Source dependencies if not already loaded
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 if ! declare -F log_info >/dev/null 2>&1; then
@@ -33,11 +37,23 @@ fi
 
 readonly TEMPLATE_ENGINE_VERSION="2.0.0"
 
-# Template engine state
-declare -A TEMPLATE_VARIABLES=()
-declare -g TEMPLATE_DELIMITER_START="{{"
-declare -g TEMPLATE_DELIMITER_END="}}"
-declare -g TEMPLATE_BASE_DIR=""
+# Check bash version for compatibility
+BASH_VERSION_MAJOR=$(bash --version | head -1 | grep -oE '[0-9]+\.[0-9]+' | cut -d. -f1)
+
+# Template engine state - compatible with bash 3.2+
+if [[ "${BASH_VERSION_MAJOR:-3}" -ge 4 ]]; then
+    # Modern bash (4+) with associative arrays
+    declare -A TEMPLATE_VARIABLES=()
+    TEMPLATE_USE_ARRAYS=true
+else
+    # Legacy bash (3.2+) with simple variables
+    TEMPLATE_VARIABLES_LIST=""
+    TEMPLATE_USE_ARRAYS=false
+fi
+
+TEMPLATE_DELIMITER_START="{{"
+TEMPLATE_DELIMITER_END="}}"
+TEMPLATE_BASE_DIR=""
 
 # Initialize template engine
 # Args:
@@ -58,7 +74,11 @@ template_init() {
     TEMPLATE_DELIMITER_END="$delim_end"
     
     # Clear previous variables
-    TEMPLATE_VARIABLES=()
+    if [[ "$TEMPLATE_USE_ARRAYS" == "true" ]]; then
+        TEMPLATE_VARIABLES=()
+    else
+        TEMPLATE_VARIABLES_LIST=""
+    fi
     
     log_debug "Template base directory: $TEMPLATE_BASE_DIR"
     log_debug "Template delimiters: $TEMPLATE_DELIMITER_START ... $TEMPLATE_DELIMITER_END"
@@ -82,7 +102,11 @@ template_set_variable() {
         return 1
     fi
     
-    TEMPLATE_VARIABLES["$var_name"]="$var_value"
+    if [[ "$TEMPLATE_USE_ARRAYS" == "true" ]]; then
+        TEMPLATE_VARIABLES["$var_name"]="$var_value"
+    else
+        TEMPLATE_VARIABLES_LIST="$TEMPLATE_VARIABLES_LIST|$var_name:$var_value"
+    fi
     log_debug "Template variable set: $var_name=$var_value"
     
     return 0
@@ -102,13 +126,23 @@ template_get_variable() {
         return 1
     fi
     
-    if [[ -n "${TEMPLATE_VARIABLES[$var_name]:-}" ]]; then
-        echo "${TEMPLATE_VARIABLES[$var_name]}"
-        return 0
+    if [[ "$TEMPLATE_USE_ARRAYS" == "true" ]]; then
+        if [[ -n "${TEMPLATE_VARIABLES[$var_name]:-}" ]]; then
+            echo "${TEMPLATE_VARIABLES[$var_name]}"
+            return 0
+        fi
     else
-        log_debug "Template variable not found: $var_name"
-        return 1
+        # Extract from list format: |var:value|
+        local value
+        value=$(echo "$TEMPLATE_VARIABLES_LIST" | grep -oE "\|$var_name:[^|]*" | cut -d: -f2- 2>/dev/null || echo "")
+        if [[ -n "$value" ]]; then
+            echo "$value"
+            return 0
+        fi
     fi
+    
+    log_debug "Template variable not found: $var_name"
+    return 1
 }
 
 # Load variables from file

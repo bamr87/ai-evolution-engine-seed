@@ -27,6 +27,10 @@
 # @notes Central orchestrator for all evolution processes
 #
 
+# Prevent multiple imports
+[[ "${__EVOLUTION_ENGINE_LOADED:-}" == "true" ]] && return 0
+readonly __EVOLUTION_ENGINE_LOADED=true
+
 # Source dependencies if not already loaded
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 if ! declare -F log_info >/dev/null 2>&1; then
@@ -36,13 +40,13 @@ fi
 readonly EVOLUTION_ENGINE_VERSION="2.0.0"
 
 # Evolution engine state
-declare -g EVOLUTION_ACTIVE=false
-declare -g EVOLUTION_CYCLE=0
-declare -g EVOLUTION_GENERATION=1
-declare -g EVOLUTION_TYPE=""
-declare -g EVOLUTION_INTENSITY=""
-declare -g EVOLUTION_MODE=""
-declare -g EVOLUTION_PROMPT=""
+EVOLUTION_ACTIVE=false
+EVOLUTION_CYCLE=0
+EVOLUTION_GENERATION=1
+EVOLUTION_TYPE=""
+EVOLUTION_INTENSITY=""
+EVOLUTION_MODE=""
+EVOLUTION_PROMPT=""
 declare -A EVOLUTION_CONTEXT=()
 declare -A EVOLUTION_RESULTS=()
 

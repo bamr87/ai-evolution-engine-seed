@@ -26,6 +26,10 @@
 # @notes Provides comprehensive repository health metrics and analysis
 #
 
+# Prevent multiple imports
+[[ "${__HEALTH_MODULE_LOADED:-}" == "true" ]] && return 0
+readonly __HEALTH_MODULE_LOADED=true
+
 # Source dependencies if not already loaded
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 if ! declare -F log_info >/dev/null 2>&1; then

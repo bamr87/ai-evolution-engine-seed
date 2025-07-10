@@ -45,7 +45,6 @@ require_module "core/validation"
 require_module "core/utils"
 
 # Configuration
-PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 VERSION_CONFIG="$PROJECT_ROOT/.version-config.json"
 CHANGELOG_FILE="$PROJECT_ROOT/CHANGELOG.md"
 
@@ -529,7 +528,7 @@ main() {
 }
 
 # Show usage if --help
-if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
+if [[ "${1:-}" == "--help" ]] || [[ "${1:-}" == "-h" ]]; then
     cat << EOF
 AI Evolution Engine Version Manager
 

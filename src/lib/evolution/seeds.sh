@@ -25,6 +25,10 @@
 # @notes Manages the complete seed lifecycle and evolution tracking
 #
 
+# Prevent multiple imports
+[[ "${__SEEDS_LOADED:-}" == "true" ]] && return 0
+readonly __SEEDS_LOADED=true
+
 # Source dependencies if not already loaded
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 if ! declare -F log_info >/dev/null 2>&1; then
@@ -34,10 +38,10 @@ fi
 readonly SEEDS_VERSION="2.0.0"
 
 # Seed system configuration
-declare -g SEEDS_DIRECTORY="${SEEDS_DIRECTORY:-seeds}"
-declare -g CURRENT_SEED_FILE="${CURRENT_SEED_FILE:-.seed.md}"
-declare -g SEED_GENERATION=1
-declare -g SEED_CYCLE=0
+SEEDS_DIRECTORY="${SEEDS_DIRECTORY:-seeds}"
+CURRENT_SEED_FILE="${CURRENT_SEED_FILE:-.seed.md}"
+SEED_GENERATION=1
+SEED_CYCLE=0
 declare -A SEED_METADATA=()
 declare -A SEED_HISTORY=()
 

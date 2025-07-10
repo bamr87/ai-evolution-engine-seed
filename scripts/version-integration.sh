@@ -176,7 +176,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     # Parse command line arguments
     case "${1:-help}" in
         integrate)
-            integrate_version_management "$2" "$3" "$4" "$5"
+            integrate_version_management "${2:-}" "${3:-}" "${4:-}" "${5:-}"
             ;;
         version)
             get_current_version

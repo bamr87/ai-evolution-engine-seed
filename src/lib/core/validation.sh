@@ -25,6 +25,10 @@
 # @notes Provides type-safe validation with detailed error reporting
 #
 
+# Prevent multiple imports
+[[ "${__VALIDATION_LOADED:-}" == "true" ]] && return 0
+readonly __VALIDATION_LOADED=true
+
 # Source dependencies if not already loaded
 if ! declare -F log_info >/dev/null 2>&1; then
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
