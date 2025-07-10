@@ -64,7 +64,6 @@ fi
 
 HEALTH_OVERALL_SCORE=0
 HEALTH_ANALYSIS_TIMESTAMP=""
-)
 
 # Initialize health analysis
 # Returns:
