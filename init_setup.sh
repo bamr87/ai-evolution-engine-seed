@@ -2,8 +2,8 @@
 
 #############################################################################
 # 🌱 AI Evolution Engine - Seed Germination Script 🌱
-# Version: 0.3.6-seed
-# Purpose: Plant the seeds of self-evolving software, v0.3.6 with organized documentation structure
+# Version: 0.4.1-seed
+# Purpose: Plant the seeds of self-evolving software with enhanced workflow v0.4.1
 #############################################################################
 
 set -euo pipefail
@@ -13,9 +13,10 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 CYAN='\033[0;36m'
+PURPLE='\033[0;35m'
 NC='\033[0m' # No Color
 
-SEED_VERSION="0.3.6-seed"
+SEED_VERSION="0.4.1-seed"
 REPO_NAME="${REPO_NAME:-ai-evolution-engine}"
 
 # Display seed banner
@@ -23,27 +24,44 @@ show_seed_banner() {
     echo -e "${GREEN}"
     cat << "EOF"
     🌱 ════════════════════════════════════════════ 🌱
-           AI EVOLUTION ENGINE - SEED PLANTER v0.3.6
-         "Organized documentation structure implementation"
-         "Clean docs/ hierarchy following best practices"
+           AI EVOLUTION ENGINE - SEED PLANTER v0.4.1
+         "Enhanced Workflow Evolution with Test Automation"
+         "Comprehensive testing and version management"
     🌱 ════════════════════════════════════════════ 🌱
 EOF
     echo -e "${NC}"
 }
 
-# Create essential directories
+# Create essential directories with enhanced structure
 create_directories() {
     echo -e "${CYAN}Creating fertile soil (directories)...${NC}"
-    mkdir -p .github/workflows prompts src tests docs/guides docs/architecture docs/evolution docs/workflows docs/seeds
-    echo -e "${GREEN}✓ Directories created: .github/workflows, prompts, src, tests, docs/[guides|architecture|evolution|workflows|seeds]${NC}"
+    
+    # Core directories
+    mkdir -p .github/workflows prompts src/lib tests/workflows tests/seed tests/lib docs/guides docs/architecture docs/evolution docs/workflows docs/seeds
+    
+    # Enhanced modular structure
+    mkdir -p src/lib/core src/lib/evolution src/lib/integration src/lib/workflow src/lib/analysis src/lib/utils src/lib/template
+    
+    # Testing structure
+    mkdir -p tests/unit tests/integration tests/fixtures tests/results logs/evolution
+    
+    echo -e "${GREEN}✓ Enhanced directory structure created for v0.4.1${NC}"
+    echo -e "${PURPLE}  Enhanced with: modular libs, comprehensive testing, evolution logs${NC}"
 }
 
-# Check for growth requirements
+# Check for growth requirements with enhanced validation
 check_requirements() {
-    echo -e "${CYAN}Checking growth conditions...${NC}"
+    echo -e "${CYAN}Checking growth conditions for v0.4.1...${NC}"
+    
+    # Essential requirements
     command -v git >/dev/null 2>&1 || { echo -e "${YELLOW}Git is required for growth. Please install Git.${NC}"; exit 1; }
     command -v gh >/dev/null 2>&1 || { echo -e "${YELLOW}GitHub CLI (gh) is recommended for workflow interaction. Please install gh.${NC}"; }
-    echo -e "${GREEN}✓ Growth conditions met${NC}"
+    
+    # Enhanced requirements for v0.4.1
+    command -v jq >/dev/null 2>&1 || { echo -e "${YELLOW}jq is recommended for JSON processing in enhanced workflows.${NC}"; }
+    command -v yaml >/dev/null 2>&1 || command -v yq >/dev/null 2>&1 || { echo -e "${YELLOW}YAML processor (yq) is recommended for config management.${NC}"; }
+    
+    echo -e "${GREEN}✓ Growth conditions met for enhanced evolution${NC}"
 }
 
 # Initialize Git repository
