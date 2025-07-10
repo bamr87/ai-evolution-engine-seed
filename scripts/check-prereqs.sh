@@ -131,11 +131,19 @@ check_command "gh" "GitHub CLI" "true" "Install from: https://cli.github.com/"
 # Check if GitHub CLI is authenticated (context-aware)
 if command -v gh >/dev/null 2>&1; then
     if [ "$CI_ENVIRONMENT" = "true" ]; then
-        # In CI, check for token availability
-        if [ -n "${GH_TOKEN:-}" ] || [ -n "${PAT_TOKEN:-}" ]; then
-            print_status "pass" "GitHub authentication configured" "Token available in environment"
+        # In CI, check for token availability (multiple possible token variables)
+        if [ -n "${GH_TOKEN:-}" ] || [ -n "${PAT_TOKEN:-}" ] || [ -n "${GITHUB_TOKEN:-}" ]; then
+            token_source=""
+            if [ -n "${GH_TOKEN:-}" ]; then
+                token_source="GH_TOKEN"
+            elif [ -n "${PAT_TOKEN:-}" ]; then
+                token_source="PAT_TOKEN"
+            elif [ -n "${GITHUB_TOKEN:-}" ]; then
+                token_source="GITHUB_TOKEN"
+            fi
+            print_status "pass" "GitHub authentication configured" "Token available in environment ($token_source)"
         else
-            print_status "fail" "GitHub authentication not configured" "Set PAT_TOKEN or GH_TOKEN secret"
+            print_status "fail" "GitHub authentication not configured" "Set GH_TOKEN, PAT_TOKEN, or GITHUB_TOKEN secret"
         fi
     else
         # Local development - check auth status

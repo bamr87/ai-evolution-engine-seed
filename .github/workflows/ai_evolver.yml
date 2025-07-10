@@ -44,6 +44,8 @@ env:
   # Set environment context for cross-compatibility
   CI_ENVIRONMENT: "true"
   GITHUB_WORKSPACE: ${{ github.workspace }}
+  # GitHub authentication for CLI operations
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   evolve:
