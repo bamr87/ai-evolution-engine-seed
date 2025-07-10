@@ -76,8 +76,8 @@ jobs:
       - name: 📊 Analyze Repository Health
         id: health_check
         run: |
-          chmod +x ./scripts/analyze-repository-health.sh
-          ./scripts/analyze-repository-health.sh \
+          chmod +x ./scripts/analyze-repository-health-simple.sh
+          ./scripts/analyze-repository-health-simple.sh \
             "$EVOLUTION_TYPE" \
             "$INTENSITY" \
             "$FORCE_RUN"

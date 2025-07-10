@@ -34,20 +34,32 @@ fi
 
 readonly HEALTH_MODULE_VERSION="2.0.0"
 
-# Health analysis state
-declare -A HEALTH_METRICS=()
-declare -A HEALTH_SCORES=()
-declare -g HEALTH_OVERALL_SCORE=0
-declare -g HEALTH_ANALYSIS_TIMESTAMP=""
+# Check bash version for compatibility
+BASH_VERSION_MAJOR=$(bash --version | head -1 | grep -oE '[0-9]+\.[0-9]+' | cut -d. -f1)
 
-# Health check categories and their weights
-declare -A HEALTH_CATEGORIES=(
-    [code_quality]=25
-    [documentation]=20
-    [testing]=20
-    [security]=15
-    [maintenance]=10
-    [evolution]=10
+# Health analysis state - compatible with bash 3.2+
+if [[ "${BASH_VERSION_MAJOR:-3}" -ge 4 ]]; then
+    # Modern bash (4+) with associative arrays
+    declare -A HEALTH_METRICS=()
+    declare -A HEALTH_SCORES=()
+    declare -A HEALTH_CATEGORIES=(
+        [code_quality]=25
+        [documentation]=20
+        [testing]=20
+        [security]=15
+        [maintenance]=10
+        [evolution]=10
+    )
+    HEALTH_USE_ARRAYS=true
+else
+    # Legacy bash (3.2+) with simple variables
+    HEALTH_METRICS_LIST=""
+    HEALTH_SCORES_LIST=""
+    HEALTH_USE_ARRAYS=false
+fi
+
+HEALTH_OVERALL_SCORE=0
+HEALTH_ANALYSIS_TIMESTAMP=""
 )
 
 # Initialize health analysis

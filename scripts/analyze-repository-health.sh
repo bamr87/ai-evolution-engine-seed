@@ -5,30 +5,56 @@
 # @description Analyzes repository health and suggests improvements using modular analysis
 # @author IT-Journey Team <team@it-journey.org>
 # @created 2025-07-05
-# @lastModified 2025-07-05
-# @version 2.0.0
+# @lastModified 2025-07-09
+# @version 2.1.0
 #
 # @relatedIssues 
 #   - #modular-refactor: Migrate to modular architecture
 #   - #health-analysis: Comprehensive repository health analysis
+#   - #bash-compatibility: Add fallback for bash 3.2 compatibility
 #
 # @relatedEvolutions
+#   - v2.1.0: Added fallback to simple version for bash 3.2 compatibility
 #   - v2.0.0: Migrated to modular architecture with enhanced analysis
 #   - v1.0.0: Original implementation with basic health checks
 #
 # @dependencies
-#   - ../src/lib/core/bootstrap.sh: Modular bootstrap system
-#   - ../src/lib/analysis/health.sh: Health analysis module
+#   - ../src/lib/core/bootstrap.sh: Modular bootstrap system (bash 4+)
+#   - ../scripts/analyze-repository-health-simple.sh: Fallback for bash 3.2
 #
 # @changelog
+#   - 2025-07-09: Added bash 3.2 compatibility fallback - ITJ
 #   - 2025-07-05: Migrated to modular architecture - ITJ
 #   - 2025-07-05: Enhanced health analysis capabilities - ITJ
 #
 # @usage ./scripts/analyze-repository-health.sh [evolution_type] [intensity] [force_run]
-# @notes Provides comprehensive repository health analysis and improvement recommendations
+# @notes Provides comprehensive repository health analysis with compatibility fallback
 #
 
 set -euo pipefail
+
+# Check bash version and decide on implementation
+BASH_VERSION_MAJOR=$(bash --version | head -1 | grep -oE '[0-9]+\.[0-9]+' | cut -d. -f1)
+
+if [[ "${BASH_VERSION_MAJOR:-3}" -lt 4 ]]; then
+    echo "Bash version $BASH_VERSION_MAJOR detected - using compatibility mode" >&2
+    
+    # Get script directory and fall back to simple version
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    SIMPLE_SCRIPT="$SCRIPT_DIR/analyze-repository-health-simple.sh"
+    
+    if [[ -f "$SIMPLE_SCRIPT" ]]; then
+        echo "Falling back to simple health analysis script..." >&2
+        exec "$SIMPLE_SCRIPT" "$@"
+    else
+        echo "❌ Simple health analysis script not found: $SIMPLE_SCRIPT" >&2
+        echo "❌ Cannot run health analysis with bash $BASH_VERSION_MAJOR" >&2
+        exit 1
+    fi
+fi
+
+# Continue with modern implementation for bash 4+
+echo "Bash version $BASH_VERSION_MAJOR detected - using modern features" >&2
 
 # Get script directory and project root
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

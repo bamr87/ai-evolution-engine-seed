@@ -38,39 +38,47 @@ fi
 
 readonly VALIDATION_VERSION="2.0.0"
 
-# Validation state tracking
-declare -A VALIDATION_ERRORS=()
-declare -g VALIDATION_ERROR_COUNT=0
-declare -g VALIDATION_STRICT_MODE=false
+# Check bash version for compatibility
+BASH_VERSION_MAJOR=$(bash --version | head -1 | grep -oE '[0-9]+\.[0-9]+' | cut -d. -f1)
 
-# Validation rule definitions
-declare -A VALIDATION_RULES=(
-    [required]="not_empty"
-    [string]="is_string"
-    [integer]="is_integer"
-    [float]="is_float"
-    [boolean]="is_boolean"
-    [email]="is_valid_email"
-    [url]="is_valid_url"
-    [ip]="is_valid_ip"
-    [semver]="is_valid_semver"
-    [path]="is_valid_path"
-    [file]="file_exists"
-    [directory]="directory_exists"
-    [executable]="is_executable"
-    [readable]="is_readable"
-    [writable]="is_writable"
-    [json]="is_valid_json"
-    [yaml]="is_valid_yaml"
-    [git_repo]="is_git_repository"
-    [git_branch]="is_valid_git_branch"
-    [github_repo]="is_valid_github_repo"
-    [docker_image]="is_valid_docker_image"
-    [port]="is_valid_port"
-    [uuid]="is_valid_uuid"
-    [base64]="is_valid_base64"
-    [hex]="is_valid_hex"
-)
+# Validation state tracking - compatible with bash 3.2+
+if [[ "${BASH_VERSION_MAJOR:-3}" -ge 4 ]]; then
+    # Modern bash (4+) with associative arrays
+    declare -A VALIDATION_ERRORS=()
+    declare -A VALIDATION_RULES=(
+        [required]="not_empty"
+        [string]="is_string"
+        [integer]="is_integer"
+        [float]="is_float"
+        [boolean]="is_boolean"
+        [email]="is_valid_email"
+        [url]="is_valid_url"
+        [ip]="is_valid_ip"
+        [semver]="is_valid_semver"
+        [path]="is_valid_path"
+        [file]="file_exists"
+        [directory]="directory_exists"
+        [executable]="is_executable"
+        [readable]="is_readable"
+        [writable]="is_writable"
+        [json]="is_valid_json"
+        [yaml]="is_valid_yaml"
+        [git_repo]="is_git_repository"
+        [git_branch]="is_valid_git_branch"
+        [github_repo]="is_valid_github_repo"
+        [docker_image]="is_valid_docker_image"
+        [port]="is_valid_port"
+        [uuid]="is_valid_uuid"
+    )
+    VALIDATION_USE_ARRAYS=true
+else
+    # Legacy bash (3.2+) with simple variables
+    VALIDATION_ERRORS_LIST=""
+    VALIDATION_USE_ARRAYS=false
+fi
+
+VALIDATION_ERROR_COUNT=0
+VALIDATION_STRICT_MODE=false
 
 # Error handling for validation
 validation_error() {
@@ -78,7 +86,11 @@ validation_error() {
     local field="${2:-unknown}"
     local value="${3:-}"
     
-    VALIDATION_ERRORS["$field"]="$message"
+    if [[ "$VALIDATION_USE_ARRAYS" == "true" ]]; then
+        VALIDATION_ERRORS["$field"]="$message"
+    else
+        VALIDATION_ERRORS_LIST="$VALIDATION_ERRORS_LIST|$field:$message"
+    fi
     ((VALIDATION_ERROR_COUNT++))
     
     if [[ "$VALIDATION_STRICT_MODE" == "true" ]]; then
@@ -94,7 +106,11 @@ validation_error() {
 
 # Clear validation errors
 clear_validation_errors() {
-    VALIDATION_ERRORS=()
+    if [[ "$VALIDATION_USE_ARRAYS" == "true" ]]; then
+        VALIDATION_ERRORS=()
+    else
+        VALIDATION_ERRORS_LIST=""
+    fi
     VALIDATION_ERROR_COUNT=0
 }
 
@@ -106,9 +122,21 @@ get_validation_errors() {
     fi
     
     echo "🚨 Validation Errors ($VALIDATION_ERROR_COUNT):"
-    for field in "${!VALIDATION_ERRORS[@]}"; do
-        echo "  ❌ $field: ${VALIDATION_ERRORS[$field]}"
-    done
+    if [[ "$VALIDATION_USE_ARRAYS" == "true" ]]; then
+        for field in "${!VALIDATION_ERRORS[@]}"; do
+            echo "  ❌ $field: ${VALIDATION_ERRORS[$field]}"
+        done
+    else
+        # Parse the list format
+        IFS='|' read -ra error_list <<< "$VALIDATION_ERRORS_LIST"
+        for error_item in "${error_list[@]}"; do
+            if [[ -n "$error_item" ]]; then
+                local field="${error_item%%:*}"
+                local message="${error_item#*:}"
+                echo "  ❌ $field: $message"
+            fi
+        done
+    fi
 }
 
 # Enable/disable strict validation mode
@@ -465,6 +493,43 @@ validate_string_length() {
 # Main validation functions
 # ===========================================
 
+# Helper function to get validation rule (compatibility with bash 3.2)
+get_validation_rule() {
+    local rule="$1"
+    
+    if [[ "$VALIDATION_USE_ARRAYS" == "true" ]]; then
+        echo "${VALIDATION_RULES[$rule]:-}"
+    else
+        # Legacy mode - use case statement for rules
+        case "$rule" in
+            required) echo "not_empty" ;;
+            string) echo "is_string" ;;
+            integer) echo "is_integer" ;;
+            float) echo "is_float" ;;
+            boolean) echo "is_boolean" ;;
+            email) echo "is_valid_email" ;;
+            url) echo "is_valid_url" ;;
+            ip) echo "is_valid_ip" ;;
+            semver) echo "is_valid_semver" ;;
+            path) echo "is_valid_path" ;;
+            file) echo "file_exists" ;;
+            directory) echo "directory_exists" ;;
+            executable) echo "is_executable" ;;
+            readable) echo "is_readable" ;;
+            writable) echo "is_writable" ;;
+            json) echo "is_valid_json" ;;
+            yaml) echo "is_valid_yaml" ;;
+            git_repo) echo "is_git_repository" ;;
+            git_branch) echo "is_valid_git_branch" ;;
+            github_repo) echo "is_valid_github_repo" ;;
+            docker_image) echo "is_valid_docker_image" ;;
+            port) echo "is_valid_port" ;;
+            uuid) echo "is_valid_uuid" ;;
+            *) echo "" ;;
+        esac
+    fi
+}
+
 # Validate single input against a rule
 # Args:
 #   $1: rule_name
@@ -479,12 +544,12 @@ validate_input() {
     local field_name="${3:-$rule}"
     
     # Check if rule exists
-    if [[ -z "${VALIDATION_RULES[$rule]:-}" ]]; then
+    local validator_function
+    validator_function=$(get_validation_rule "$rule")
+    if [[ -z "$validator_function" ]]; then
         validation_error "Unknown validation rule: $rule" "$field_name" "$value"
         return 1
     fi
-    
-    local validator_function="${VALIDATION_RULES[$rule]}"
     
     # Execute validator function
     if ! "$validator_function" "$value"; then
@@ -656,6 +721,62 @@ benchmark_validation() {
     else
         echo "⏱️  Benchmark completed (timing unavailable)"
     fi
+}
+
+# Backward compatibility functions for legacy scripts
+# These functions provide a simpler interface for basic argument validation
+
+# Validate an argument against allowed values
+# Args:
+#   $1: argument_name
+#   $2: value
+#   $3: allowed_values (pipe-separated, e.g., "option1|option2|option3")
+# Returns:
+#   0: validation passed
+#   1: validation failed
+validate_argument() {
+    local arg_name="$1"
+    local value="$2"
+    local allowed_values="$3"
+    
+    if [[ -z "$value" ]]; then
+        log_error "Missing required argument: $arg_name"
+        return 1
+    fi
+    
+    # Convert pipe-separated values to array for checking
+    IFS='|' read -ra allowed_array <<< "$allowed_values"
+    
+    for allowed in "${allowed_array[@]}"; do
+        if [[ "$value" == "$allowed" ]]; then
+            return 0
+        fi
+    done
+    
+    log_error "Invalid value for $arg_name: '$value'. Allowed values: $allowed_values"
+    return 1
+}
+
+# Validate a boolean argument
+# Args:
+#   $1: argument_name
+#   $2: value
+# Returns:
+#   0: validation passed
+#   1: validation failed
+validate_boolean() {
+    local arg_name="$1"
+    local value="$2"
+    
+    case "${value,,}" in
+        true|false|1|0|yes|no|y|n)
+            return 0
+            ;;
+        *)
+            log_error "Invalid boolean value for $arg_name: '$value'. Expected: true/false, 1/0, yes/no, y/n"
+            return 1
+            ;;
+    esac
 }
 
 # Show validation module information
