@@ -20,6 +20,7 @@
 #   - ../src/lib/core/environment.sh: Environment detection module
 #
 # @changelog
+#   - 2025-07-10: Fixed CI permission issue by adding sudo for package management - ITJ
 #   - 2025-07-10: Fixed syntax error by removing orphaned duplicate code - ITJ
 #   - 2025-07-07: Migrated to modular architecture - ITJ
 #   - 2025-07-05: Enhanced environment setup logic - ITJ
@@ -65,14 +66,24 @@ install_dependencies() {
         if command -v apt-get >/dev/null 2>&1; then
             # Ubuntu/Debian CI
             export DEBIAN_FRONTEND=noninteractive
-            apt-get update -qq
-            apt-get install -y -qq jq tree curl git gh
+            sudo apt-get update -qq || {
+                log_warn "apt-get update failed, retrying..."
+                sleep 2
+                sudo apt-get update -qq
+            }
+            sudo apt-get install -y -qq jq tree curl git gh || {
+                log_warn "Some packages failed to install, continuing..."
+            }
         elif command -v yum >/dev/null 2>&1; then
             # RHEL/CentOS CI
-            yum install -y jq tree curl git
+            sudo yum install -y jq tree curl git || {
+                log_warn "Some packages failed to install, continuing..."
+            }
         elif command -v brew >/dev/null 2>&1; then
             # macOS CI (rare but possible)
-            brew install jq tree gh
+            brew install jq tree gh || {
+                log_warn "Some packages failed to install, continuing..."
+            }
         fi
     else
         # Local development environment
