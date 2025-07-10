@@ -1,32 +1,35 @@
 #!/bin/bash
 #
 # @file src/lib/core/logger.sh
-# @description Core logging library for AI Evolution Engine - Provides consistent logging across all scripts
+# @description Core logging library for AI Evolution Engine providing consistent logging across all scripts
 # @author IT-Journey Team <team@it-journey.org>
 # @created 2025-07-05
-# @lastModified 2025-07-08
+# @lastModified 2025-07-10
 # @version 0.3.7-seed
 #
 # @relatedIssues 
+#   - #1: Fix GitHub Actions workflow failures
 #   - Workflow failure: "unbound variable" error from logger.sh line 79
 #   - Bash strict mode compatibility issues
 #
 # @relatedEvolutions
-#   - v0.3.7: Fixed unbound variable errors in strict mode (set -u)
-#   - v0.3.6: Enhanced defensive initialization and error handling
+#   - v0.3.7: Fixed LOG_LEVEL string to numeric conversion and unbound variable errors in strict mode
+#   - v0.3.6: Enhanced bash 3.2 compatibility and defensive initialization
 #
 # @dependencies
 #   - bash: >=3.2
 #   - date: POSIX compliant
 #
 # @changelog
+#   - 2025-07-10: Fixed LOG_LEVEL initialization for string values - ITJ
+#   - 2025-07-10: Added defensive variable handling for bash strict mode - ITJ
 #   - 2025-07-08: Fixed unbound variable errors for strict mode compatibility - ITJ
 #   - 2025-07-08: Added defensive initialization for DEBUG, INFO, WARN, ERROR, SUCCESS variables - ITJ
 #   - 2025-07-08: Fixed BASH_SOURCE array access with fallback values - ITJ
 #   - 2025-07-05: Enhanced modular architecture and logging capabilities - ITJ
 #
-# @usage source src/lib/core/logger.sh && log_info "message"
-# @notes Compatible with bash strict mode (set -euo pipefail) and all shell environments
+# @usage source src/lib/core/logger.sh; log_info "message"
+# @notes Compatible with bash strict mode (set -euo pipefail) and supports both CI/CD environments and local development
 #
 
 # Save and temporarily disable nounset for initialization
@@ -74,7 +77,17 @@ ERROR=${ERROR:-}
 SUCCESS=${SUCCESS:-}
 
 # Configuration - defensive initialization for bash 3.2
-CURRENT_LOG_LEVEL=${LOG_LEVEL:-${LOG_LEVEL_INFO:-1}}
+# Convert string log levels to numeric values
+case "${LOG_LEVEL:-INFO}" in
+    "DEBUG") CURRENT_LOG_LEVEL=0 ;;
+    "INFO")  CURRENT_LOG_LEVEL=1 ;;
+    "WARN")  CURRENT_LOG_LEVEL=2 ;;
+    "ERROR") CURRENT_LOG_LEVEL=3 ;;
+    "SUCCESS") CURRENT_LOG_LEVEL=4 ;;
+    [0-9]*) CURRENT_LOG_LEVEL="${LOG_LEVEL:-1}" ;;  # Already numeric
+    *) CURRENT_LOG_LEVEL=1 ;;  # Default to INFO
+esac
+
 LOG_FILE=${LOG_FILE:-""}
 QUIET_MODE=${QUIET_MODE:-false}
 CI_ENVIRONMENT=${CI_ENVIRONMENT:-false}
@@ -117,32 +130,33 @@ _log() {
     local caller="${caller_file}:${BASH_LINENO[1]:-0}"
     
     # Skip if log level is below threshold
+    local current_level="${CURRENT_LOG_LEVEL:-1}"  # Default to INFO level
     case "$level" in
-        "DEBUG") [[ $CURRENT_LOG_LEVEL -le ${LOG_LEVEL_DEBUG:-0} ]] || return 0 ;;
-        "INFO")  [[ $CURRENT_LOG_LEVEL -le ${LOG_LEVEL_INFO:-1} ]] || return 0 ;;
-        "WARN")  [[ $CURRENT_LOG_LEVEL -le ${LOG_LEVEL_WARN:-2} ]] || return 0 ;;
-        "ERROR") [[ $CURRENT_LOG_LEVEL -le ${LOG_LEVEL_ERROR:-3} ]] || return 0 ;;
-        "SUCCESS") [[ $CURRENT_LOG_LEVEL -le ${LOG_LEVEL_SUCCESS:-4} ]] || return 0 ;;
+        "DEBUG") [[ $current_level -le 0 ]] || return 0 ;;
+        "INFO")  [[ $current_level -le 1 ]] || return 0 ;;
+        "WARN")  [[ $current_level -le 2 ]] || return 0 ;;
+        "ERROR") [[ $current_level -le 3 ]] || return 0 ;;
+        "SUCCESS") [[ $current_level -le 4 ]] || return 0 ;;
     esac
     
     # Format message
     local color=""
     local prefix=""
     case "$level" in
-        "DEBUG")   color="$CYAN";   prefix="🔍" ;;
-        "INFO")    color="$BLUE";   prefix="ℹ️" ;;
-        "WARN")    color="$YELLOW"; prefix="⚠️" ;;
-        "ERROR")   color="$RED";    prefix="❌" ;;
-        "SUCCESS") color="$GREEN";  prefix="✅" ;;
+        "DEBUG")   color="${CYAN:-}";   prefix="🔍" ;;
+        "INFO")    color="${BLUE:-}";   prefix="ℹ️" ;;
+        "WARN")    color="${YELLOW:-}"; prefix="⚠️" ;;
+        "ERROR")   color="${RED:-}";    prefix="❌" ;;
+        "SUCCESS") color="${GREEN:-}";  prefix="✅" ;;
     esac
     
     # Log to stdout (unless in quiet mode)
-    if [[ "$QUIET_MODE" != "true" ]]; then
-        echo -e "${color}${prefix} [${level}]${NC} $message" >&2
+    if [[ "${QUIET_MODE:-false}" != "true" ]]; then
+        echo -e "${color}${prefix} [${level}]${NC:-} $message" >&2
     fi
     
     # Log to file if configured
-    if [[ -n "$LOG_FILE" ]]; then
+    if [[ -n "${LOG_FILE:-}" ]]; then
         echo "[$timestamp] [$level] [$caller] $message" >> "$LOG_FILE"
     fi
 }

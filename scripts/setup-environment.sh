@@ -4,7 +4,7 @@
 # @description Sets up the necessary environment for evolution workflows using modular architecture
 # @author IT-Journey Team <team@it-journey.org>
 # @created 2025-07-05
-# @lastModified 2025-07-07
+# @lastModified 2025-07-10
 # @version 2.0.0
 #
 # @relatedIssues 
@@ -20,6 +20,7 @@
 #   - ../src/lib/core/environment.sh: Environment detection module
 #
 # @changelog
+#   - 2025-07-10: Fixed syntax error by removing orphaned duplicate code - ITJ
 #   - 2025-07-07: Migrated to modular architecture - ITJ
 #   - 2025-07-05: Enhanced environment setup logic - ITJ
 #
@@ -95,29 +96,6 @@ install_dependencies() {
                 ;;
             *)
                 log_warn "Unknown OS: $os, manual dependency installation may be required"
-                ;;
-        esac
-    fi
-}
-                fi
-                ;;
-            "linux")
-                if command -v apt-get >/dev/null 2>&1; then
-                    sudo apt-get update
-                    sudo apt-get install -y jq tree curl
-                elif command -v yum >/dev/null 2>&1; then
-                    sudo yum install -y jq tree curl
-                elif command -v pacman >/dev/null 2>&1; then
-                    sudo pacman -S jq tree curl
-                else
-                    echo "⚠️  Package manager not detected. Please install jq, tree, curl manually"
-                fi
-                ;;
-            "windows")
-                echo "⚠️  Windows detected. Please ensure WSL2 or use Git Bash with manual tool installation"
-                ;;
-            *)
-                echo "⚠️  Unknown OS. Please install jq, tree, curl manually"
                 ;;
         esac
     fi
