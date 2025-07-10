@@ -5,20 +5,23 @@
 # @description Integration helper for version management in AI Evolution workflows
 # @author IT-Journey Team <team@it-journey.org>
 # @created 2025-07-05
-# @lastModified 2025-07-05
-# @version 1.0.0
+# @lastModified 2025-07-10
+# @version 1.1.0
 #
 # @relatedIssues 
 #   - #auto-version-management: Integrate version management with evolution workflows
+#   - GitHub Actions workflow failure: Missing 'prepare' command
 #
 # @relatedEvolutions
 #   - v0.4.0: Version management system implementation
+#   - v0.4.1: Added prepare command for workflow integration
 #
 # @dependencies
 #   - scripts/version-manager.sh: Main version management script
 #   - git: Version control operations
 #
 # @changelog
+#   - 2025-07-10: Added prepare command for GitHub Actions workflow - ITJ
 #   - 2025-07-05: Initial creation for workflow integration - ITJ
 #
 # @usage Called by GitHub Actions and other automation scripts
@@ -190,6 +193,17 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
         evolution)
             integrate_version_management "evolution" "${2:-AI evolution cycle}" "patch" "${3:-false}"
             ;;
+        prepare)
+            log_info "Preparing version management for evolution cycle"
+            # Check current version status
+            check_version_status
+            # Ensure version manager is ready
+            if [[ ! -x "$VERSION_MANAGER" ]]; then
+                chmod +x "$VERSION_MANAGER"
+                log_info "Made version manager executable"
+            fi
+            log_success "Version management preparation complete"
+            ;;
         help|--help|-h)
             cat << EOF
 Version Integration Helper
@@ -202,6 +216,9 @@ Commands:
     
   evolution [description] [dry_run]
     Handle version management for evolution cycles
+    
+  prepare
+    Prepare version management system for evolution cycle
     
   version
     Get current version
