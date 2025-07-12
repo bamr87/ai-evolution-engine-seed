@@ -4,15 +4,16 @@
 # @description Core logging library for AI Evolution Engine providing consistent logging across all scripts
 # @author IT-Journey Team <team@it-journey.org>
 # @created 2025-07-05
-# @lastModified 2025-07-10
-# @version 0.3.7-seed
+# @lastModified 2025-07-12
+# @version 0.3.8-seed
 #
 # @relatedIssues 
 #   - #1: Fix GitHub Actions workflow failures
-#   - Workflow failure: "unbound variable" error from logger.sh line 79
+#   - Workflow failure: "unbound variable" error from logger.sh line 70
 #   - Bash strict mode compatibility issues
 #
 # @relatedEvolutions
+#   - v0.3.8: Fixed remaining unbound variable errors and improved strict mode compatibility
 #   - v0.3.7: Fixed LOG_LEVEL string to numeric conversion and unbound variable errors in strict mode
 #   - v0.3.6: Enhanced bash 3.2 compatibility and defensive initialization
 #
@@ -21,6 +22,7 @@
 #   - date: POSIX compliant
 #
 # @changelog
+#   - 2025-07-12: Fixed remaining unbound variable errors for strict mode - ITJ
 #   - 2025-07-10: Fixed LOG_LEVEL initialization for string values - ITJ
 #   - 2025-07-10: Added defensive variable handling for bash strict mode - ITJ
 #   - 2025-07-08: Fixed unbound variable errors for strict mode compatibility - ITJ
@@ -33,7 +35,7 @@
 #
 
 # Save and temporarily disable nounset for initialization
-if [[ $- =~ u ]]; then
+if [[ "${-}" =~ u ]]; then
     LOGGER_NOUNSET_WAS_SET=true
     set +u
 else
