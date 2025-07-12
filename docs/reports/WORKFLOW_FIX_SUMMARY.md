@@ -1,3 +1,29 @@
+<!--
+@file docs/reports/WORKFLOW_FIX_SUMMARY.md
+@description Summary report of GitHub Actions workflow fixes and improvements
+@author IT-Journey Team <team@it-journey.org>
+@created 2025-07-12
+@lastModified 2025-07-12
+@version 1.0.0
+
+@relatedIssues 
+  - #workflow-fixes: GitHub Actions workflow debugging and improvements
+
+@relatedEvolutions
+  - v0.4.1: Workflow modernization and fixes
+
+@dependencies
+  - GitHub Actions: workflow execution
+  - YAML: configuration format
+
+@changelog
+  - 2025-07-12: Moved to reports directory and added file header - ITJ
+  - Previous: Workflow fix implementation and documentation
+
+@usage Workflow fix documentation and troubleshooting reference
+@notes Contains debugging information and fix implementations
+-->
+
 # GitHub Actions Workflow Fix Summary
 
 ## Issue Report
