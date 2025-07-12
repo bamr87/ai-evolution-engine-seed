@@ -152,3 +152,14 @@ jobs:
           echo ""
           echo "To force an evolution cycle, run:"
           echo "  gh workflow run daily_evolution.yml -f force_run=true"
+
+      - name: 📋 Collect Workflow Errors & Warnings
+        if: always()
+        id: error_collection
+        run: |
+          chmod +x ./scripts/collect-workflow-errors.sh
+          ./scripts/collect-workflow-errors.sh \
+            --workflow-type "daily_evolution" \
+            --job-status "${{ job.status }}" \
+            --collect-from-logs \
+            --include-context

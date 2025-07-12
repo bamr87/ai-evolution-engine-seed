@@ -176,6 +176,20 @@ jobs:
           echo "🎯 Selected prompt: $prompt_name"
           echo "🔄 Should execute: $should_execute"
 
+      - name: 📋 Collect Prompt Selection Errors & Warnings
+        if: always()
+        id: error_collection
+        run: |
+          # Simple error collection for prompt determination job
+          if [[ "${{ job.status }}" == "success" ]]; then
+            echo "📊 Prompt selection completed successfully"
+            echo "Selected: ${{ steps.select.outputs.prompt_name || 'none' }}"
+            echo "Should execute: ${{ steps.select.outputs.should_execute || 'false' }}"
+          else
+            echo "❌ Prompt selection failed"
+            echo "Job status: ${{ job.status }}"
+          fi
+
   execute-periodic-evolution:
     name: 🌿 Execute Periodic Evolution
     runs-on: ubuntu-latest
@@ -296,6 +310,17 @@ jobs:
             --status "${{ job.status }}" \
             --execution-mode "${{ needs.determine-prompt.outputs.execution_mode }}"
 
+      - name: 📋 Collect Workflow Errors & Warnings
+        if: always()
+        id: error_collection
+        run: |
+          chmod +x ./scripts/collect-workflow-errors.sh
+          ./scripts/collect-workflow-errors.sh \
+            --workflow-type "periodic_evolution" \
+            --job-status "${{ job.status }}" \
+            --collect-from-logs \
+            --include-context
+
   skip-execution:
     name: ⏭️ Skip Evolution (No Prompt Scheduled)
     runs-on: ubuntu-latest
@@ -309,3 +334,13 @@ jobs:
           echo "📅 Current time does not match any scheduled prompt execution"
           echo "🎯 Determined prompt: ${{ needs.determine-prompt.outputs.prompt_name }}"
           echo "🔄 Should execute: ${{ needs.determine-prompt.outputs.should_execute }}"
+
+      - name: 📋 Collect Workflow Errors & Warnings
+        if: always()
+        id: error_collection
+        run: |
+          # For the skip-execution job, we don't have the full repository checkout
+          # So we'll create a minimal error summary
+          echo "📊 Workflow Summary: Periodic evolution skipped (no prompt scheduled)"
+          echo "Status: success (intentionally skipped)"
+          echo "Reason: No scheduled prompt matches current time"
