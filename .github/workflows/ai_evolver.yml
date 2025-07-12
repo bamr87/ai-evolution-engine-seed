@@ -94,9 +94,10 @@ jobs:
         run: |
           chmod +x ./scripts/collect-context.sh
           ./scripts/collect-context.sh \
+            --prompt "${{ github.event.inputs.prompt }}" \
+            --growth-mode "${{ github.event.inputs.growth_mode }}" \
             --include-health \
-            --include-tests \
-            --growth-mode "${{ github.event.inputs.growth_mode }}"
+            --include-tests
 
       - name: 🚀 AI Growth Simulation
         run: |

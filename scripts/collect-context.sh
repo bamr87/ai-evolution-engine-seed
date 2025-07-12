@@ -5,14 +5,16 @@
 # @description Collects repository context and metrics for AI evolution using modular architecture
 # @author IT-Journey Team <team@it-journey.org>
 # @created 2025-07-05
-# @lastModified 2025-07-05
-# @version 2.0.0
+# @lastModified 2025-07-12
+# @version 2.1.0
 #
 # @relatedIssues 
 #   - #modular-refactor: Migrate to modular architecture
 #   - #context-collection: Enhanced context collection capabilities
+#   - #workflow-fix: Fix command line argument parsing for GitHub Actions
 #
 # @relatedEvolutions
+#   - v2.1.0: Fixed command line argument parsing to support flags
 #   - v2.0.0: Migrated to modular architecture with enhanced context collection
 #   - v0.3.6: Original implementation with basic context collection
 #
@@ -22,10 +24,11 @@
 #   - ../src/lib/analysis/health.sh: Health analysis for context
 #
 # @changelog
+#   - 2025-07-12: Fixed command line argument parsing to support --flags - ITJ
 #   - 2025-07-05: Migrated to modular architecture - ITJ
 #   - 2025-07-05: Enhanced context collection with health analysis - ITJ
 #
-# @usage ./scripts/collect-context.sh [prompt] [growth_mode] [context_file]
+# @usage ./scripts/collect-context.sh [--prompt "text"] [--growth-mode mode] [--context-file path] [--include-health] [--include-tests]
 # @notes Collects comprehensive repository context for AI evolution processing
 #
 
@@ -45,10 +48,51 @@ require_module "core/validation"
 require_module "evolution/metrics"
 require_module "analysis/health"
 
-# Parse and validate arguments
-PROMPT="${1:-}"
-GROWTH_MODE="${2:-adaptive}"
-CONTEXT_FILE="${3:-/tmp/repo_context.json}"
+# Parse command line arguments
+PROMPT=""
+GROWTH_MODE="adaptive"
+CONTEXT_FILE="/tmp/repo_context.json"
+INCLUDE_HEALTH=false
+INCLUDE_TESTS=false
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --prompt)
+            PROMPT="$2"
+            shift 2
+            ;;
+        --growth-mode)
+            GROWTH_MODE="$2"
+            shift 2
+            ;;
+        --context-file)
+            CONTEXT_FILE="$2"
+            shift 2
+            ;;
+        --include-health)
+            INCLUDE_HEALTH=true
+            shift
+            ;;
+        --include-tests)
+            INCLUDE_TESTS=true
+            shift
+            ;;
+        *)
+            # Handle positional arguments for backward compatibility
+            if [[ -z "$PROMPT" ]]; then
+                PROMPT="$1"
+            elif [[ "$GROWTH_MODE" == "adaptive" ]]; then
+                GROWTH_MODE="$1"
+            elif [[ "$CONTEXT_FILE" == "/tmp/repo_context.json" ]]; then
+                CONTEXT_FILE="$1"
+            else
+                log_error "Unknown argument: $1"
+                exit 1
+            fi
+            shift
+            ;;
+    esac
+done
 
 # Validate arguments using modular validation
 validate_argument "growth_mode" "$GROWTH_MODE" "adaptive|conservative|aggressive|experimental"

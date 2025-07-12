@@ -6,9 +6,36 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [Unreleased] - 2025-07-12
+
+### 🔧 Fixed Context Collection Script Argument Parsing
+
+- **Description**: Fixed collect-context.sh script to properly handle command-line flags
+- **Issue**: GitHub Actions workflow was failing with "Invalid value for growth_mode: '--include-tests'" error
+- **Root Cause**: Script expected positional arguments but workflow was passing flags (--include-health, --include-tests, --growth-mode)
+- **Solution**: Enhanced script to support both flag-based and positional arguments for backward compatibility
+
+#### 📝 Modified Files
+
+- `scripts/collect-context.sh` - Added proper command-line flag parsing
+- `.github/workflows/ai_evolver.yml` - Updated to pass prompt parameter correctly
+
+#### 🔍 Script Enhancement Details
+
+- **Added Flag Support**: --prompt, --growth-mode, --context-file, --include-health, --include-tests
+- **Backward Compatibility**: Still supports original positional arguments
+- **Improved Error Handling**: Better validation and error messages for unknown arguments
+- **Updated Documentation**: Fixed usage examples and file headers
+
+#### ✅ Verified Commands
+
+- `./scripts/collect-context.sh --prompt "update docs" --growth-mode "adaptive" --include-health --include-tests`
+- `./scripts/collect-context.sh "prompt" "conservative" "/tmp/custom.json"` (backward compatibility)
+
 ## [0.3.7] - 2025-07-12
 
 ### 🔧 Fixed GitHub Actions Workflow Failure (patch increment)
+
 - **Description**: Fixed version-tracker.sh script missing workflow commands
 - **Issue**: GitHub Actions workflow was failing with "Unknown command: start" error
 - **Solution**: Added missing workflow commands (start, complete, version-bump, log) to version-tracker.sh
@@ -16,9 +43,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Change Tracking**: Full correlation available in `version-changes.json`
 
 #### 📝 Modified Files
+
 - `scripts/version-tracker.sh` - Added workflow command support
 
-#### 🔍 Details
+#### 🔍 Implementation Details
+
 - Added `start` command for evolution cycle tracking initialization
 - Added `complete` command for evolution cycle completion
 - Added `version-bump` command that delegates to version-integration.sh
@@ -27,7 +56,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated help documentation to include new workflow commands
 - Corrected version-integration.sh delegation to use 'evolution' command instead of 'bump'
 
-#### ✅ Verified Commands
+#### ✅ Verified Workflow Commands
+
 - `./scripts/version-tracker.sh start --type "manual" --mode "adaptive" --prompt "description"`
 - `./scripts/version-tracker.sh complete --mode "adaptive"`
 - `./scripts/version-tracker.sh version-bump --prompt "description"`
@@ -36,6 +66,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.3.6] - 2025-07-11
 
 ### 🔄 Version Management (patch increment)
+
 - **Description**: Automatic version increment
 - **Files Modified**: 5 files updated
 - **Change Tracking**: Full correlation available in `version-changes.json`
