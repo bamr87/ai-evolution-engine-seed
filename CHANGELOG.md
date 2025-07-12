@@ -6,6 +6,39 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.4.7] - 2025-07-12
+
+### 🛠️ GitHub Actions Ubuntu 24.04 Compatibility Fix
+
+- **Description**: Critical fix for GitHub Actions workflow failure on Ubuntu 24.04 runners
+- **Root Cause**: Workflow attempted to install non-existent `timeout` package - timeout command is part of coreutils package
+- **Changes**:
+  - **Fixed:** Removed invalid `timeout` package from apt-get install command
+  - **Enhanced:** Added verification that timeout command is available after coreutils installation
+  - **Updated:** Workflow version from v0.4.6 to v0.4.7 across all references
+  - **Improved:** Error handling and validation in prerequisite setup step
+  - **Added:** Clear success/failure indicators for dependency installation
+
+#### 🔧 Technical Details
+
+- **Package Management**: Fixed Ubuntu 24.04 package dependencies - timeout is built into coreutils
+- **Workflow Robustness**: Added command verification to ensure all required utilities are available
+- **Version Consistency**: Updated all version references to maintain consistency
+- **Error Prevention**: Added checks to prevent similar package naming issues in the future
+
+#### � Files Modified in v0.4.7
+
+- `.github/workflows/ai_evolver.yml`: Fixed package installation and updated version to v0.4.7
+- `CHANGELOG.md`: Added documentation for v0.4.7 fix
+
+#### 🧪 Validation
+
+- **GitHub Actions**: Workflow should now complete prerequisite setup successfully
+- **Package Verification**: All required commands (jq, tree, curl, git, timeout) are properly validated
+- **Backward Compatibility**: Maintains compatibility with existing script interfaces
+
+---
+
 ## [0.4.6] - 2025-07-12
 
 ### � GitHub Actions Workflow Fixes and Enhanced Compatibility

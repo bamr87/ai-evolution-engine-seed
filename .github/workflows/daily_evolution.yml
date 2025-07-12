@@ -1,4 +1,4 @@
-name: 🌱 Daily Evolution & Maintenance (v0.4.6)
+name: 🌱 Daily Evolution & Maintenance (v0.4.7)
 
 on:
   schedule:
@@ -43,7 +43,7 @@ permissions:
   issues: write
 
 env:
-  EVOLUTION_VERSION: "0.3.0"
+  EVOLUTION_VERSION: "0.4.7"
   WORKFLOW_TYPE: "scheduled_evolution"
 
 jobs:

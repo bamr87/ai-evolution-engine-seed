@@ -1,4 +1,4 @@
-name: 🌱 AI Evolution - Testing & Build Automation (v0.4.6)
+name: 🌱 AI Evolution - Testing & Build Automation (v0.4.7)
 
 on:
   workflow_dispatch:
@@ -35,7 +35,7 @@ permissions:
   issues: write
 
 env:
-  EVOLUTION_VERSION: "0.3.0"
+  EVOLUTION_VERSION: "0.4.7"
   WORKFLOW_TYPE: "testing_automation"
   
 jobs:

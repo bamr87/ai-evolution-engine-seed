@@ -1,4 +1,4 @@
-name: 🌱 AI Evolution Growth Engine (v0.4.6)
+name: 🌱 AI Evolution Growth Engine (v0.4.7)
 
 on:
   workflow_dispatch:
@@ -39,7 +39,7 @@ permissions:
   issues: write
 
 env:
-  EVOLUTION_VERSION: "0.4.6"
+  EVOLUTION_VERSION: "0.4.7"
   WORKFLOW_TYPE: "manual_evolution"
   CI_ENVIRONMENT: "true"
   GITHUB_WORKSPACE: ${{ github.workspace }}
@@ -47,7 +47,7 @@ env:
 
 jobs:
   evolve:
-    name: 🌿 Growth Cycle v0.4.6
+    name: 🌿 Growth Cycle v0.4.7
     runs-on: ubuntu-latest
     
     steps:
@@ -60,7 +60,16 @@ jobs:
       - name: 🛠️ Setup Evolution Prerequisites  
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq jq tree curl git timeout coreutils findutils grep
+          # Install core utilities - timeout is part of coreutils, not a separate package
+          sudo apt-get install -y -qq jq tree curl git coreutils findutils grep
+          
+          # Verify timeout command is available (part of coreutils)
+          if ! command -v timeout >/dev/null 2>&1; then
+            echo "❌ timeout command not available"
+            exit 1
+          else
+            echo "✅ timeout command available"
+          fi
           
           if [[ -f "./scripts/setup-environment.sh" ]]; then
             chmod +x ./scripts/setup-environment.sh
@@ -185,7 +194,7 @@ jobs:
 
       - name: 📊 Final Evolution Summary
         run: |
-          echo "🎉 Evolution cycle v0.4.6 completed!"
+          echo "🎉 Evolution cycle v0.4.7 completed!"
           echo "Growth mode: ${{ github.event.inputs.growth_mode }}"
           echo "Dry run: ${{ github.event.inputs.dry_run }}"
           if [[ -f /tmp/repo_context.json ]]; then
