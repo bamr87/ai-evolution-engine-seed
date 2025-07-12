@@ -29,8 +29,8 @@
 set -euo pipefail
 
 # Bootstrap constants
-# Check bash version and set compatibility mode
-check_bash_version() {
+# Set compatibility mode based on bash version
+set_bash_compatibility() {
     local bash_version
     bash_version=$(bash --version | head -1 | grep -oE '[0-9]+\.[0-9]+' || echo "3.2")
     
@@ -49,7 +49,7 @@ check_bash_version() {
 }
 
 # Initialize bash version check
-check_bash_version
+set_bash_compatibility
 
 readonly BOOTSTRAP_VERSION="2.0.1"
 readonly MIN_BASH_VERSION="3.2"

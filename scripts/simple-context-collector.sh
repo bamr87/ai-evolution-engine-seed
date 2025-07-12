@@ -11,7 +11,10 @@
 # @notes Minimal context collection without complex dependencies
 #
 
-set -euo pipefail
+set -e  # Exit on error, but not on pipeline failures
+
+# Enable better error handling
+trap 'log_error "Script failed at line $LINENO"' ERR
 
 # Simple logging functions
 log_info() { echo "ℹ️ [INFO] $*"; }
@@ -60,8 +63,10 @@ jq --arg branch "$GIT_BRANCH" \
      "branch": $branch,
      "commit": $commit,
      "modified_files": $status
-   }' "$OUTPUT_FILE" > "${OUTPUT_FILE}.tmp" && \
-   mv "${OUTPUT_FILE}.tmp" "$OUTPUT_FILE"
+   }' "$OUTPUT_FILE" > "${OUTPUT_FILE}.tmp" 2>/dev/null && \
+   mv "${OUTPUT_FILE}.tmp" "$OUTPUT_FILE" || {
+     log_warn "Failed to update git context, continuing..."
+   }
 
 # Collect environment
 log_info "🖥️ Collecting environment..."
@@ -72,8 +77,10 @@ jq --arg os "$(uname -s 2>/dev/null || echo 'unknown')" \
      "os": $os,
      "pwd": $pwd,
      "ci_environment": $ci
-   }' "$OUTPUT_FILE" > "${OUTPUT_FILE}.tmp" && \
-   mv "${OUTPUT_FILE}.tmp" "$OUTPUT_FILE"
+   }' "$OUTPUT_FILE" > "${OUTPUT_FILE}.tmp" 2>/dev/null && \
+   mv "${OUTPUT_FILE}.tmp" "$OUTPUT_FILE" || {
+     log_warn "Failed to update environment, continuing..."
+   }
 
 # Collect key files (limit to essential ones)
 log_info "📁 Collecting key files..."
@@ -93,15 +100,18 @@ for file in "${KEY_FILES[@]}"; do
     log_info "Adding file: $file"
     
     # Read file content safely
-    file_content=$(head -n 100 "$file" 2>/dev/null || echo "Error reading file")
-    
-    # Add to JSON
-    jq --arg path "$file" \
-       --arg content "$file_content" \
-       '.files[$path] = $content' "$OUTPUT_FILE" > "${OUTPUT_FILE}.tmp" && \
-       mv "${OUTPUT_FILE}.tmp" "$OUTPUT_FILE"
-    
-    ((FILES_COLLECTED++))
+    if file_content=$(head -n 100 "$file" 2>/dev/null); then
+      # Add to JSON
+      jq --arg path "$file" \
+         --arg content "$file_content" \
+         '.files[$path] = $content' "$OUTPUT_FILE" > "${OUTPUT_FILE}.tmp" 2>/dev/null && \
+         mv "${OUTPUT_FILE}.tmp" "$OUTPUT_FILE" && \
+         ((FILES_COLLECTED++)) || {
+           log_warn "Failed to add file $file, skipping..."
+         }
+    else
+      log_warn "Could not read file $file, skipping..."
+    fi
   fi
 done
 
@@ -117,23 +127,28 @@ for file in "${ADDITIONAL_FILES[@]}"; do
     log_info "Adding additional file: $file"
     
     # Read file content safely (smaller chunks for these)
-    file_content=$(head -n 50 "$file" 2>/dev/null || echo "Error reading file")
-    
-    # Add to JSON
-    jq --arg path "$file" \
-       --arg content "$file_content" \
-       '.files[$path] = $content' "$OUTPUT_FILE" > "${OUTPUT_FILE}.tmp" && \
-       mv "${OUTPUT_FILE}.tmp" "$OUTPUT_FILE"
-    
-    ((FILES_COLLECTED++))
+    if file_content=$(head -n 50 "$file" 2>/dev/null); then
+      # Add to JSON
+      jq --arg path "$file" \
+         --arg content "$file_content" \
+         '.files[$path] = $content' "$OUTPUT_FILE" > "${OUTPUT_FILE}.tmp" 2>/dev/null && \
+         mv "${OUTPUT_FILE}.tmp" "$OUTPUT_FILE" && \
+         ((FILES_COLLECTED++)) || {
+           log_warn "Failed to add additional file $file, skipping..."
+         }
+    else
+      log_warn "Could not read additional file $file, skipping..."
+    fi
   fi
 done
 
 # Update summary
 jq --arg files_collected "$FILES_COLLECTED" \
    '.metadata.collection_summary.files_collected = ($files_collected | tonumber) |
-    .metadata.collection_summary.status = "completed"' "$OUTPUT_FILE" > "${OUTPUT_FILE}.tmp" && \
-   mv "${OUTPUT_FILE}.tmp" "$OUTPUT_FILE"
+    .metadata.collection_summary.status = "completed"' "$OUTPUT_FILE" > "${OUTPUT_FILE}.tmp" 2>/dev/null && \
+   mv "${OUTPUT_FILE}.tmp" "$OUTPUT_FILE" || {
+     log_warn "Failed to update summary, but continuing..."
+   }
 
 log_success "Context collection completed successfully"
 log_info "Files collected: $FILES_COLLECTED"

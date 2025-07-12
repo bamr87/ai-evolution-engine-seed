@@ -180,25 +180,6 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
-            INCLUDE_TESTS=true
-            shift
-            ;;
-        *)
-            # Handle positional arguments for backward compatibility
-            if [[ -z "$PROMPT" ]]; then
-                PROMPT="$1"
-            elif [[ "$GROWTH_MODE" == "adaptive" ]]; then
-                GROWTH_MODE="$1"
-            elif [[ "$CONTEXT_FILE" == "/tmp/repo_context.json" ]]; then
-                CONTEXT_FILE="$1"
-            else
-                log_error "Unknown argument: $1"
-                exit 1
-            fi
-            shift
-            ;;
-    esac
-done
 
 # Validate arguments using modular validation
 if command -v validate_argument >/dev/null 2>&1; then

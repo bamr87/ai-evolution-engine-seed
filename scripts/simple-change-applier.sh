@@ -116,13 +116,17 @@ fi
 if [[ -f "evolution-metrics.json" ]]; then
   # Simple metrics update
   CURRENT_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-  jq --arg timestamp "$CURRENT_TIME" \
+  if jq --arg timestamp "$CURRENT_TIME" \
      '.last_evolution = $timestamp | 
       .evolution_count = (.evolution_count // 0) + 1 |
       .last_change_applier = "simple-change-applier"' \
-     evolution-metrics.json > evolution-metrics.json.tmp && \
+     evolution-metrics.json > evolution-metrics.json.tmp 2>/dev/null; then
      mv evolution-metrics.json.tmp evolution-metrics.json
-  log_success "Updated evolution metrics"
+     log_success "Updated evolution metrics"
+  else
+     rm -f evolution-metrics.json.tmp 2>/dev/null
+     log_warn "Failed to update evolution metrics, continuing..."
+  fi
 fi
 
 # Commit changes
