@@ -58,6 +58,7 @@ GROWTH_MODE="adaptive"
 CONTEXT_FILE="/tmp/repo_context.json"
 RESPONSE_FILE="/tmp/evolution_response.json"
 DRY_RUN="false"
+CI_MODE="false"
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
@@ -81,6 +82,10 @@ while [[ $# -gt 0 ]]; do
         --dry-run)
             DRY_RUN="$2"
             shift 2
+            ;;
+        --ci-mode)
+            CI_MODE="true"
+            shift
             ;;
         *)
             # Handle positional arguments for backward compatibility

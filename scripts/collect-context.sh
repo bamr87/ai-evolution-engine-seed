@@ -51,6 +51,24 @@
 
 set -euo pipefail
 
+# Set global timeout for CI environments
+if [[ "${CI_ENVIRONMENT:-false}" == "true" ]]; then
+    # Set alarm for 90 seconds in CI
+    (
+        sleep 90
+        echo "⚠️ Context collection timed out after 90 seconds in CI"
+        pkill -P $$ 2>/dev/null || true
+        exit 124
+    ) &
+    TIMEOUT_PID=$!
+    
+    # Cleanup function for timeout
+    cleanup_timeout() {
+        kill $TIMEOUT_PID 2>/dev/null || true
+    }
+    trap cleanup_timeout EXIT
+fi
+
 # Custom error handler for better debugging
 error_handler() {
     local line_no=$1
@@ -128,6 +146,7 @@ GROWTH_MODE="adaptive"
 CONTEXT_FILE="/tmp/repo_context.json"
 INCLUDE_HEALTH=false
 INCLUDE_TESTS=false
+CI_MODE=false
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -148,6 +167,19 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         --include-tests)
+            INCLUDE_TESTS=true
+            shift
+            ;;
+        --ci-mode)
+            CI_MODE=true
+            shift
+            ;;
+        *)
+            echo "Unknown option: $1" >&2
+            exit 1
+            ;;
+    esac
+done
             INCLUDE_TESTS=true
             shift
             ;;
@@ -296,28 +328,39 @@ jq --argjson env_context "$ENV_CONTEXT" '.environment = $env_context' "$CONTEXT_
 
 # Determine file collection strategy based on growth mode and repository size
 log_info "📁 Determining file collection strategy..."
-case "$GROWTH_MODE" in
-    "conservative")
-        MAX_FILES=25
-        MAX_LINES=500
-        ;;
-    "adaptive")
-        MAX_FILES=50
-        MAX_LINES=1000
-        ;;
-    "aggressive")
-        MAX_FILES=100
-        MAX_LINES=2000
-        ;;
-    "experimental")
-        MAX_FILES=200
-        MAX_LINES=5000
-        ;;
-    *)
-        MAX_FILES=50
-        MAX_LINES=1000
-        ;;
-esac
+
+# Apply CI mode optimizations
+if [[ "$CI_MODE" == "true" ]]; then
+    log_info "🤖 CI mode enabled - using optimized settings"
+    MAX_FILES=20
+    MAX_LINES=300
+    INCLUDE_HEALTH=false  # Skip health analysis in CI
+    SKIP_LARGE_FILES=true
+else
+    case "$GROWTH_MODE" in
+        "conservative")
+            MAX_FILES=25
+            MAX_LINES=500
+            ;;
+        "adaptive")
+            MAX_FILES=50
+            MAX_LINES=1000
+            ;;
+        "aggressive")
+            MAX_FILES=100
+            MAX_LINES=2000
+            ;;
+        "experimental")
+            MAX_FILES=200
+            MAX_LINES=5000
+            ;;
+        *)
+            MAX_FILES=50
+            MAX_LINES=1000
+            ;;
+    esac
+    SKIP_LARGE_FILES=false
+fi
 
 # Override with configuration if available
 if [[ -f ".evolution.yml" ]]; then

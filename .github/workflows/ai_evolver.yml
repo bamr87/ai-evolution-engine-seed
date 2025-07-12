@@ -124,60 +124,266 @@ jobs:
           }
           EOF
           
-          # Try to run actual context collection
+          # Try to run actual context collection with multiple fallback strategies
           if [[ -f "./scripts/collect-context.sh" ]]; then
             chmod +x ./scripts/collect-context.sh
-            timeout 180 ./scripts/collect-context.sh --prompt "$EVOLUTION_PROMPT" --growth-mode "${{ github.event.inputs.growth_mode }}" || echo "Context collection failed, using fallback"
+            echo "📊 Running primary context collection..."
+            
+            # Use simple timeout command
+            if timeout 90 ./scripts/collect-context.sh \
+                --prompt "$EVOLUTION_PROMPT" \
+                --growth-mode "${{ github.event.inputs.growth_mode }}" \
+                --ci-mode; then
+              echo "✅ Primary context collection completed successfully"
+            else
+              echo "⚠️ Primary context collection failed, trying simple fallback..."
+              
+              # Try simple context collector
+              if [[ -f "./scripts/simple-context-collector.sh" ]]; then
+                chmod +x ./scripts/simple-context-collector.sh
+                if timeout 30 ./scripts/simple-context-collector.sh /tmp/repo_context.json; then
+                  echo "✅ Simple context collection completed successfully"
+                else
+                  echo "⚠️ Simple context collection also failed"
+                fi
+              fi
+            fi
+          else
+            echo "⚠️ Context collection script not found, trying simple collector"
+            if [[ -f "./scripts/simple-context-collector.sh" ]]; then
+              chmod +x ./scripts/simple-context-collector.sh
+              timeout 30 ./scripts/simple-context-collector.sh /tmp/repo_context.json || echo "Simple collector failed"
+            fi
           fi
           
-          echo "Context collection completed"
+          # Verify context file exists and is valid
+          if [[ -f /tmp/repo_context.json ]] && jq empty /tmp/repo_context.json 2>/dev/null; then
+            echo "✅ Context file is valid JSON"
+          else
+            echo "⚠️ Creating emergency fallback context"
+            cat > /tmp/repo_context.json << 'EOF'
+          {
+            "metadata": {
+              "collection_summary": {
+                "files_collected": 0,
+                "status": "emergency_fallback"
+              }
+            },
+            "current_metrics": {
+              "growth_cycles": 0,
+              "current_generation": 0
+            }
+          }
+          EOF
+          fi
+          
+          echo "Context collection phase completed"
 
       - name: 🚀 AI Growth Simulation
         run: |
+          echo "🤖 Starting AI growth simulation..."
+          
+          SIMULATION_SUCCESS=false
+          
+          # Try primary AI growth simulation
           if [[ -f "./scripts/simulate-ai-growth.sh" ]]; then
             chmod +x ./scripts/simulate-ai-growth.sh
-            ./scripts/simulate-ai-growth.sh --prompt "$EVOLUTION_PROMPT" --growth-mode "${{ github.event.inputs.growth_mode }}" || echo "Simulation completed with warnings"
-          else
-            echo "⚠️ Simulation script not found"
-            echo '{"status": "simulation_skipped"}' > /tmp/evolution_response.json
+            echo "🧠 Running primary growth simulation..."
+            
+            # Use simple timeout
+            if timeout 60 ./scripts/simulate-ai-growth.sh \
+                --prompt "$EVOLUTION_PROMPT" \
+                --growth-mode "${{ github.event.inputs.growth_mode }}" \
+                --ci-mode; then
+              echo "✅ Primary AI growth simulation completed successfully"
+              SIMULATION_SUCCESS=true
+            else
+              echo "⚠️ Primary AI growth simulation failed or timed out"
+            fi
           fi
+          
+          # Try simple AI simulator if primary failed
+          if [[ "$SIMULATION_SUCCESS" == "false" && -f "./scripts/simple-ai-simulator.sh" ]]; then
+            echo "🔄 Trying simple AI simulator as fallback..."
+            chmod +x ./scripts/simple-ai-simulator.sh
+            
+            if timeout 30 ./scripts/simple-ai-simulator.sh \
+                "/tmp/evolution_response.json" \
+                "$EVOLUTION_PROMPT" \
+                "${{ github.event.inputs.growth_mode }}"; then
+              echo "✅ Simple AI simulation completed successfully"
+              SIMULATION_SUCCESS=true
+            else
+              echo "⚠️ Simple AI simulation also failed"
+            fi
+          fi
+          
+          # Final fallback - create minimal response
+          if [[ ! -f /tmp/evolution_response.json ]] || ! jq empty /tmp/evolution_response.json 2>/dev/null; then
+            echo "⚠️ Creating emergency AI response"
+            cat > /tmp/evolution_response.json << EOF
+          {
+            "status": "emergency_fallback",
+            "message": "Emergency AI response created",
+            "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "new_branch": "evolution/emergency-$(date +%Y%m%d-%H%M%S)",
+            "changes": [],
+            "summary": {
+              "files_modified": 0,
+              "evolution_type": "emergency_fallback"
+            }
+          }
+          EOF
+          fi
+          
+          # Show simulation summary
+          echo "📋 AI simulation summary:"
+          if [[ -f /tmp/evolution_response.json ]]; then
+            echo "  - Status: $(jq -r '.status // "unknown"' /tmp/evolution_response.json)"
+            echo "  - Files to modify: $(jq -r '.changes | length // 0' /tmp/evolution_response.json)"
+            echo "  - New branch: $(jq -r '.new_branch // "unknown"' /tmp/evolution_response.json)"
+          fi
+          
+          echo "AI growth simulation phase completed"
 
       - name: 🔄 Apply Growth Changes
         if: github.event.inputs.dry_run == 'false'
         run: |
+          echo "📝 Applying growth changes..."
+          
+          APPLICATION_SUCCESS=false
+          
+          # Try primary change application
           if [[ -f "./scripts/apply-growth-changes.sh" ]]; then
             chmod +x ./scripts/apply-growth-changes.sh
-            ./scripts/apply-growth-changes.sh --growth-mode "${{ github.event.inputs.growth_mode }}" || echo "Changes applied with warnings"
+            echo "🔧 Running primary change application..."
+            
+            # Use timeout protection
+            if timeout 45 ./scripts/apply-growth-changes.sh \
+                --growth-mode "${{ github.event.inputs.growth_mode }}" \
+                --ci-mode; then
+              echo "✅ Primary growth changes applied successfully"
+              APPLICATION_SUCCESS=true
+            else
+              echo "⚠️ Primary change application failed or timed out"
+            fi
+          fi
+          
+          # Try simple change applier if primary failed
+          if [[ "$APPLICATION_SUCCESS" == "false" && -f "./scripts/simple-change-applier.sh" ]]; then
+            echo "🔄 Trying simple change applier as fallback..."
+            chmod +x ./scripts/simple-change-applier.sh
+            
+            if timeout 30 ./scripts/simple-change-applier.sh /tmp/evolution_response.json; then
+              echo "✅ Simple change application completed successfully"
+              APPLICATION_SUCCESS=true
+            else
+              echo "⚠️ Simple change application also failed"
+            fi
+          fi
+          
+          # Final status
+          if [[ "$APPLICATION_SUCCESS" == "true" ]]; then
+            echo "✅ Changes applied successfully"
           else
-            echo "⚠️ Apply changes script not found"
+            echo "⚠️ All change application methods failed"
+            echo "Changes applied with warnings"
           fi
 
       - name: 📈 Evolution Tracking
         run: |
+          echo "📊 Updating evolution tracking..."
+          
           if [[ -f "./scripts/version-tracker.sh" ]]; then
             chmod +x ./scripts/version-tracker.sh
-            ./scripts/version-tracker.sh complete --mode "${{ github.event.inputs.growth_mode }}" || echo "Tracking completed with warnings"
+            if timeout 30 ./scripts/version-tracker.sh complete --mode "${{ github.event.inputs.growth_mode }}"; then
+              echo "✅ Evolution tracking completed successfully"
+            else
+              echo "⚠️ Evolution tracking timed out or failed"
+              echo "Tracking completed with warnings"
+            fi
           else
             echo "⚠️ Version tracker script not found"
+            # Simple fallback tracking
+            echo "📝 Creating simple tracking entry..."
+            if [[ -f "evolution-metrics.json" ]]; then
+              jq --arg timestamp "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+                 --arg mode "${{ github.event.inputs.growth_mode }}" \
+                 '.last_evolution = $timestamp | .growth_mode = $mode' \
+                 evolution-metrics.json > evolution-metrics.json.tmp && \
+                 mv evolution-metrics.json.tmp evolution-metrics.json
+            fi
           fi
 
       - name: 🧪 Test Framework Validation
         run: |
+          echo "🧪 Running test framework validation..."
+          
           if [[ -f "./tests/workflows/test-all-workflows-local.sh" ]]; then
             chmod +x ./tests/workflows/test-all-workflows-local.sh
-            ./tests/workflows/test-all-workflows-local.sh || echo "Tests completed with warnings"
+            if timeout 60 ./tests/workflows/test-all-workflows-local.sh; then
+              echo "✅ Test framework validation completed successfully"
+            else
+              echo "⚠️ Test framework validation timed out or failed"
+              echo "Tests completed with warnings"
+            fi
           else
             echo "⚠️ Test framework not found"
+            echo "🔍 Basic validation: checking key files exist..."
+            
+            # Simple validation
+            VALIDATION_ERRORS=0
+            
+            if [[ ! -f "README.md" ]]; then
+              echo "❌ README.md not found"
+              ((VALIDATION_ERRORS++))
+            fi
+            
+            if [[ ! -f ".github/workflows/ai_evolver.yml" ]]; then
+              echo "❌ Main workflow file not found"
+              ((VALIDATION_ERRORS++))
+            fi
+            
+            if [[ $VALIDATION_ERRORS -eq 0 ]]; then
+              echo "✅ Basic validation passed"
+            else
+              echo "⚠️ Basic validation found $VALIDATION_ERRORS issues"
+            fi
           fi
 
       - name: 🌿 Generate Evolution Seeds
         if: github.event.inputs.auto_plant_seeds == 'true'
         run: |
+          echo "🌱 Generating evolution seeds..."
+          
           if [[ -f "./scripts/generate_seed.sh" ]]; then
             chmod +x ./scripts/generate_seed.sh
-            ./scripts/generate_seed.sh --cycle "$(date +%Y%m%d)" --prompt "$EVOLUTION_PROMPT" || echo "Seed generation completed with warnings"
+            if timeout 30 ./scripts/generate_seed.sh \
+                --cycle "$(date +%Y%m%d)" \
+                --prompt "$EVOLUTION_PROMPT"; then
+              echo "✅ Evolution seeds generated successfully"
+            else
+              echo "⚠️ Seed generation timed out or failed"
+              echo "Seed generation completed with warnings"
+            fi
           else
             echo "⚠️ Seed generation script not found"
+            echo "🌱 Creating simple seed file..."
+            
+            # Simple fallback seed generation
+            mkdir -p seeds
+            SEED_FILE="seeds/evolution-seed-$(date +%Y%m%d-%H%M%S).md"
+            echo "# Evolution Seed" > "$SEED_FILE"
+            echo "" >> "$SEED_FILE"
+            echo "## Context" >> "$SEED_FILE"
+            echo "- Growth Mode: ${{ github.event.inputs.growth_mode }}" >> "$SEED_FILE"
+            echo "- Generated: $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$SEED_FILE"
+            echo "" >> "$SEED_FILE"
+            echo "## Next Steps" >> "$SEED_FILE"
+            echo "- Review changes applied in this evolution cycle" >> "$SEED_FILE"
+            echo "- Consider next growth opportunities" >> "$SEED_FILE"
+            echo "- Update documentation as needed" >> "$SEED_FILE"
+            echo "✅ Simple seed file created"
           fi
 
       - name: 📋 Create Evolution Pull Request

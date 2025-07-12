@@ -53,6 +53,7 @@ init_logger "logs" "apply-growth-changes"
 # Parse command line arguments
 RESPONSE_FILE=""
 GROWTH_MODE=""
+CI_MODE="false"
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -63,6 +64,10 @@ while [[ $# -gt 0 ]]; do
         --response-file)
             RESPONSE_FILE="$2"
             shift 2
+            ;;
+        --ci-mode)
+            CI_MODE="true"
+            shift
             ;;
         *)
             if [[ -z "$RESPONSE_FILE" ]]; then
