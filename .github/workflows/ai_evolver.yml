@@ -1,4 +1,4 @@
-name: 🌱 AI Evolution Growth Engine (v0.4.4)
+name: 🌱 AI Evolution Growth Engine (v0.4.5)
 
 on:
   workflow_dispatch:
@@ -39,7 +39,7 @@ permissions:
   issues: write
 
 env:
-  EVOLUTION_VERSION: "0.4.4"
+  EVOLUTION_VERSION: "0.4.5"
   WORKFLOW_TYPE: "manual_evolution"
   # Set environment context for cross-compatibility
   CI_ENVIRONMENT: "true"
@@ -49,7 +49,7 @@ env:
 
 jobs:
   evolve:
-    name: 🌿 Growth Cycle v0.4.4
+    name: 🌿 Growth Cycle v0.4.5
     runs-on: ubuntu-latest
     
     steps:
@@ -125,11 +125,14 @@ jobs:
           fi
           echo "🔍 Debug: Starting context collection..."
           echo "🔍 Debug: Current working directory: $(pwd)"
-          echo "🔍 Debug: Available files: $(find . -name "*.md" -o -name "*.sh" | head -5)"
+          echo "🔍 Debug: Available files: $(find . -name "*.md" -o -name "*.sh" 2>/dev/null | head -5 || echo 'none found')"
+          echo "🔍 Debug: Required tools check:"
+          command -v jq >/dev/null && echo "✅ jq available" || echo "❌ jq missing"
+          command -v find >/dev/null && echo "✅ find available" || echo "❌ find missing"
+          command -v timeout >/dev/null && echo "✅ timeout available" || echo "❌ timeout missing"
           
-          # Run context collection with enhanced error handling
-          set -e
-          ./scripts/collect-context.sh \
+          # Run context collection with enhanced error handling and timeout protection
+          timeout 300 ./scripts/collect-context.sh \
             --prompt "$EVOLUTION_PROMPT" \
             --growth-mode "${{ github.event.inputs.growth_mode }}" \
             --include-health \
@@ -140,7 +143,18 @@ jobs:
                 echo "📁 Partial context file exists, size: $(wc -c < /tmp/repo_context.json) bytes"
                 echo "📋 Context file structure:"
                 jq 'keys' /tmp/repo_context.json 2>/dev/null || echo "Invalid JSON in context file"
+                echo "📄 Context file first few lines:"
+                head -20 /tmp/repo_context.json || echo "Cannot read context file"
+              else
+                echo "📁 No context file found at /tmp/repo_context.json"
+                echo "📄 Contents of /tmp:"
+                ls -la /tmp/ | grep -E "(repo|context)" || echo "No related files found"
               fi
+              echo "🔍 Debug: Checking script dependencies..."
+              echo "📁 Project structure:"
+              ls -la src/lib/core/ 2>/dev/null || echo "core lib not found"
+              echo "🔍 Debug: Recent system messages:"
+              dmesg | tail -10 2>/dev/null || echo "Cannot access dmesg"
               exit 1
             }
           

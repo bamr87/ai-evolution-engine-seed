@@ -6,7 +6,7 @@
 # @author IT-Journey Team <team@it-journey.org>
 # @created 2025-07-05
 # @lastModified 2025-07-12
-# @version 2.2.0
+# @version 2.3.0
 #
 # @relatedIssues 
 #   - #modular-refactor: Migrate to modular architecture
@@ -14,6 +14,7 @@
 #   - #workflow-fix: Fix command line argument parsing for GitHub Actions
 #
 # @relatedEvolutions
+#   - v2.3.0: Enhanced error handling, timeout protection, and pipeline fixes for GitHub Actions compatibility
 #   - v2.2.0: Major rewrite of file processing and .gptignore pattern handling for GitHub Actions compatibility
 #   - v2.1.5: Added comprehensive error handling and safe file processing
 #   - v2.1.4: Completely rewrote .gptignore pattern processing for better regex compatibility
@@ -30,6 +31,7 @@
 #   - ../src/lib/analysis/health.sh: Health analysis for context
 #
 # @changelog
+#   - 2025-07-12: Enhanced error handling, timeout protection, and pipeline fixes for GitHub Actions compatibility - ITJ
 #   - 2025-07-12: Major rewrite of file processing and .gptignore pattern handling for GitHub Actions compatibility - ITJ
 #   - 2025-07-12: Added comprehensive error handling and safe file processing - ITJ
 #   - 2025-07-12: Completely rewrote .gptignore pattern processing for better regex compatibility - ITJ
@@ -46,6 +48,19 @@
 
 set -euo pipefail
 
+# Custom error handler for better debugging
+error_handler() {
+    local line_no=$1
+    local error_code=$2
+    echo "❌ Error on line $line_no: Command exited with status $error_code" >&2
+    echo "🔍 Context: Current working directory: $(pwd)" >&2
+    echo "🔍 Context: Available files: $(find . -name "*.md" -o -name "*.sh" 2>/dev/null | head -3 | tr '\n' ' ')" >&2
+    exit "$error_code"
+}
+
+# Set up error trapping
+trap 'error_handler ${LINENO} $?' ERR
+
 # Get script directory and project root
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
@@ -53,6 +68,7 @@ PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 # Validate required tools are available
 validate_tools() {
     local tools=("jq" "find" "grep" "head" "wc" "sort")
+    local optional_tools=("timeout")
     local missing_tools=()
     
     for tool in "${tools[@]}"; do
@@ -66,21 +82,42 @@ validate_tools() {
         echo "Please install the missing tools and try again."
         exit 1
     fi
+    
+    # Check optional tools
+    for tool in "${optional_tools[@]}"; do
+        if ! command -v "$tool" >/dev/null 2>&1; then
+            echo "⚠️ Optional tool missing: $tool (will use alternatives)"
+        fi
+    done
 }
 
 # Validate tools before proceeding
 validate_tools
 
 # Bootstrap the modular system
-source "$PROJECT_ROOT/src/lib/core/bootstrap.sh"
-bootstrap_library
-
-# Load required modules
-require_module "core/logger"
-require_module "core/environment"
-require_module "core/validation"
-require_module "evolution/metrics"
-require_module "analysis/health"
+if [[ -f "$PROJECT_ROOT/src/lib/core/bootstrap.sh" ]]; then
+    source "$PROJECT_ROOT/src/lib/core/bootstrap.sh"
+    bootstrap_library
+    
+    # Load required modules
+    require_module "core/logger" 2>/dev/null || {
+        echo "⚠️ Warning: Could not load logger module, using basic logging" >&2
+        log_info() { echo "ℹ️ [INFO] $*"; }
+        log_warn() { echo "⚠️ [WARN] $*"; }
+        log_error() { echo "❌ [ERROR] $*"; }
+        log_success() { echo "✅ [SUCCESS] $*"; }
+    }
+    require_module "core/environment" 2>/dev/null || echo "⚠️ Warning: Could not load environment module" >&2
+    require_module "core/validation" 2>/dev/null || echo "⚠️ Warning: Could not load validation module" >&2
+    require_module "evolution/metrics" 2>/dev/null || echo "⚠️ Warning: Could not load metrics module" >&2
+    require_module "analysis/health" 2>/dev/null || echo "⚠️ Warning: Could not load health module" >&2
+else
+    echo "⚠️ Warning: Bootstrap system not found, using basic logging" >&2
+    log_info() { echo "ℹ️ [INFO] $*"; }
+    log_warn() { echo "⚠️ [WARN] $*"; }
+    log_error() { echo "❌ [ERROR] $*"; }
+    log_success() { echo "✅ [SUCCESS] $*"; }
+fi
 
 # Parse command line arguments
 PROMPT=""
@@ -129,7 +166,21 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Validate arguments using modular validation
-validate_argument "growth_mode" "$GROWTH_MODE" "adaptive|conservative|aggressive|experimental"
+if command -v validate_argument >/dev/null 2>&1; then
+    validate_argument "growth_mode" "$GROWTH_MODE" "adaptive|conservative|aggressive|experimental" 2>/dev/null || {
+        log_warn "Validation function failed, using basic validation"
+        case "$GROWTH_MODE" in
+            adaptive|conservative|aggressive|experimental) ;;
+            *) log_error "Invalid growth mode: $GROWTH_MODE"; exit 1 ;;
+        esac
+    }
+else
+    # Basic validation fallback
+    case "$GROWTH_MODE" in
+        adaptive|conservative|aggressive|experimental) ;;
+        *) log_error "Invalid growth mode: $GROWTH_MODE"; exit 1 ;;
+    esac
+fi
 
 # Validate context file is writable (create directory if needed)
 CONTEXT_DIR="$(dirname "$CONTEXT_FILE")"
@@ -150,17 +201,26 @@ log_info "Growth Mode: $GROWTH_MODE | Context File: $CONTEXT_FILE"
 # Initialize context collection with metadata and metrics using modular functions
 log_info "📊 Loading current metrics and health data..."
 
-# Initialize metrics if not already done
-init_metrics "evolution-metrics.json" 2>/dev/null || true
+# Initialize metrics if not already done - with fallback
+if command -v init_metrics >/dev/null 2>&1; then
+    init_metrics "evolution-metrics.json" 2>/dev/null || log_warn "Could not initialize metrics system"
+else
+    log_warn "Metrics system not available, using basic collection"
+fi
 
 # Try to get metrics, but don't fail if it doesn't work
 METRICS_CONTENT="{}"
 if [[ -f "evolution-metrics.json" ]]; then
-    METRICS_CONTENT=$(generate_metrics_report "evolution-metrics.json" "json" 2>/dev/null || echo "{}")
+    if command -v generate_metrics_report >/dev/null 2>&1; then
+        METRICS_CONTENT=$(generate_metrics_report "evolution-metrics.json" "json" 2>/dev/null || echo "{}")
+    else
+        # Basic metrics collection fallback
+        METRICS_CONTENT=$(cat "evolution-metrics.json" 2>/dev/null | jq '.' 2>/dev/null || echo "{}")
+    fi
 fi
 
 # Simplified health data for now - avoid complex analysis that might hang
-HEALTH_DATA='{"status": "basic_check", "timestamp": "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}'
+HEALTH_DATA='{"status": "basic_check", "timestamp": "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'", "version": "fallback"}'
 
 # Collect repository structure using tree command or fallback
 log_info "🌳 Analyzing repository structure..."
@@ -311,18 +371,29 @@ FILES_SKIPPED=0
 
 # Create a temporary file list to avoid pipeline issues
 TEMP_FILE_LIST="/tmp/evolution_files_$$"
-find . -type f \( -name "*.md" -o -name "*.sh" -o -name "*.yml" -o -name "*.yaml" -o -name "*.json" -o -name "*.js" -o -name "*.ts" -o -name "*.py" -o -name "*.txt" \) 2>/dev/null | sort > "$TEMP_FILE_LIST" || true
+
+# Use a more robust approach to find files
+{
+    find . -type f \( -name "*.md" -o -name "*.sh" -o -name "*.yml" -o -name "*.yaml" -o -name "*.json" -o -name "*.js" -o -name "*.ts" -o -name "*.py" -o -name "*.txt" \) 2>/dev/null || true
+} | {
+    sort 2>/dev/null || cat
+} > "$TEMP_FILE_LIST"
 
 # Filter out ignored patterns if we have any
 if [[ -s "$TEMP_FILE_LIST" ]]; then
-    if command -v grep >/dev/null 2>&1; then
-        grep -Ev "$IGNORE_PATTERNS" "$TEMP_FILE_LIST" > "${TEMP_FILE_LIST}.filtered" 2>/dev/null || cp "$TEMP_FILE_LIST" "${TEMP_FILE_LIST}.filtered"
+    if command -v grep >/dev/null 2>&1 && [[ -n "$IGNORE_PATTERNS" ]]; then
+        {
+            grep -Ev "$IGNORE_PATTERNS" "$TEMP_FILE_LIST" 2>/dev/null || cat "$TEMP_FILE_LIST"
+        } > "${TEMP_FILE_LIST}.filtered"
         mv "${TEMP_FILE_LIST}.filtered" "$TEMP_FILE_LIST"
     fi
 fi
 
-# Process files from the filtered list
-while IFS= read -r file; do
+# Process files from the filtered list with timeout protection
+file_count=0
+while IFS= read -r file && [[ $file_count -lt 1000 ]]; do
+    ((file_count++))
+    
     # Skip if we've reached our limit
     if [[ $FILES_ADDED -ge $MAX_FILES ]]; then
         log_info "Reached maximum file limit ($MAX_FILES), stopping collection"
@@ -358,20 +429,40 @@ while IFS= read -r file; do
         temp_content_file="/tmp/file_content_$$"
         printf '%s' "$file_content" > "$temp_content_file"
         
-        if jq --arg path "$file_key" \
-           --rawfile content "$temp_content_file" \
-           '.files[$path] = $content' "$CONTEXT_FILE" > "${CONTEXT_FILE}.tmp" 2>/dev/null; then
-            mv "${CONTEXT_FILE}.tmp" "$CONTEXT_FILE"
-            ((FILES_ADDED++))
-            
-            # Progress logging every 10 files
-            if [[ $((FILES_ADDED % 10)) -eq 0 ]]; then
-                log_info "Progress: $FILES_ADDED files processed..."
+        # Try to add to context with better error handling
+        if command -v timeout >/dev/null 2>&1; then
+            if timeout 10 jq --arg path "$file_key" \
+               --rawfile content "$temp_content_file" \
+               '.files[$path] = $content' "$CONTEXT_FILE" > "${CONTEXT_FILE}.tmp" 2>/dev/null; then
+                mv "${CONTEXT_FILE}.tmp" "$CONTEXT_FILE"
+                ((FILES_ADDED++))
+                
+                # Progress logging every 10 files
+                if [[ $((FILES_ADDED % 10)) -eq 0 ]]; then
+                    log_info "Progress: $FILES_ADDED files processed..."
+                fi
+            else
+                log_warn "Failed to process file: $file_key (timeout or JSON error)"
+                rm -f "${CONTEXT_FILE}.tmp" 2>/dev/null || true
+                ((FILES_SKIPPED++))
             fi
         else
-            log_warn "Failed to process file: $file_key (possibly due to special characters)"
-            rm -f "${CONTEXT_FILE}.tmp" 2>/dev/null || true
-            ((FILES_SKIPPED++))
+            # No timeout available, run without timeout
+            if jq --arg path "$file_key" \
+               --rawfile content "$temp_content_file" \
+               '.files[$path] = $content' "$CONTEXT_FILE" > "${CONTEXT_FILE}.tmp" 2>/dev/null; then
+                mv "${CONTEXT_FILE}.tmp" "$CONTEXT_FILE"
+                ((FILES_ADDED++))
+                
+                # Progress logging every 10 files
+                if [[ $((FILES_ADDED % 10)) -eq 0 ]]; then
+                    log_info "Progress: $FILES_ADDED files processed..."
+                fi
+            else
+                log_warn "Failed to process file: $file_key (JSON error)"
+                rm -f "${CONTEXT_FILE}.tmp" 2>/dev/null || true
+                ((FILES_SKIPPED++))
+            fi
         fi
         
         # Clean up temp file
@@ -386,7 +477,9 @@ rm -f "$TEMP_FILE_LIST" 2>/dev/null || true
 
 # Finalize context with summary information
 log_info "📊 Finalizing context with collection summary..."
-CONTEXT_SUMMARY=$(jq -n \
+
+# Create summary with error handling
+if ! CONTEXT_SUMMARY=$(jq -n \
     --arg files_added "$FILES_ADDED" \
     --arg files_skipped "$FILES_SKIPPED" \
     --arg growth_mode "$GROWTH_MODE" \
@@ -400,9 +493,17 @@ CONTEXT_SUMMARY=$(jq -n \
             "max_files": ($max_files | tonumber),
             "max_lines_per_file": ($max_lines | tonumber)
         }
-    }')
+    }' 2>/dev/null); then
+    log_warn "Failed to create context summary, using basic summary"
+    CONTEXT_SUMMARY='{"files_collected": '$FILES_ADDED', "files_skipped": '$FILES_SKIPPED', "growth_mode": "'$GROWTH_MODE'"}'
+fi
 
-jq --argjson summary "$CONTEXT_SUMMARY" '.metadata.collection_summary = $summary' "$CONTEXT_FILE" > "${CONTEXT_FILE}.tmp" && mv "${CONTEXT_FILE}.tmp" "$CONTEXT_FILE"
+# Try to add summary to context, but don't fail if it doesn't work
+if ! jq --argjson summary "$CONTEXT_SUMMARY" '.metadata.collection_summary = $summary' "$CONTEXT_FILE" > "${CONTEXT_FILE}.tmp" 2>/dev/null; then
+    log_warn "Failed to add summary to context file, but continuing"
+    cp "$CONTEXT_FILE" "${CONTEXT_FILE}.tmp"
+fi
+mv "${CONTEXT_FILE}.tmp" "$CONTEXT_FILE"
 
 # Display comprehensive results
 log_info "🧬 Context Collection Complete"
