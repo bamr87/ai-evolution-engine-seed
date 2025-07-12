@@ -140,6 +140,15 @@ The system implements **progressive structure solidification**:
 - Balance AI assistance with human oversight and review
 - Use AI for learning and skill development, not replacement
 
+### README-First Development (RFD)
+- Treat README.md files as the primary context source for AI-assisted development
+- Ensure README files comprehensively document all directory contents and functionality
+- Update README files before implementing new features to serve as development blueprints
+- Distinguish clearly between implemented features and future enhancements in documentation
+- Use README files to guide AI understanding of project structure and intent
+- Maintain README accuracy through regular synchronization with actual implementation
+- Structure README content to optimize AI comprehension and development guidance
+
 ## Technology-Specific Guidelines
 
 ### @azure Rule - Use Azure Best Practices
@@ -196,6 +205,15 @@ When generating code for Azure, running terminal commands for Azure, or performi
 - Add inline code documentation for complex logic
 - Create user guides and API documentation when relevant
 - Maintain changelogs and version documentation
+- **README Synchronization and Consistency**: Ensure README.md files serve as comprehensive, authoritative documentation:
+  - **Content Completeness**: Every README.md must document all significant files, scripts, and functionality in its directory
+  - **Implementation vs. Documentation Alignment**: Clearly distinguish between implemented features and planned enhancements
+  - **Future Enhancement Tracking**: Use "Future Enhancements" sections with clear status indicators for unimplemented features
+  - **AI Context Optimization**: Structure README content to serve as primary context source for AI-assisted development
+  - **Cross-Directory Consistency**: Maintain consistent terminology, formatting, and structure across all README files
+  - **Required Sections**: Include Purpose, Contents, Usage, Features, Future Enhancements, and Integration sections
+  - **Technical Accuracy**: Ensure all examples, commands, and references are current and functional
+  - **Regular Synchronization**: Update README files whenever directory contents change to maintain accuracy
 
 ### Testing Approaches
 - Include unit tests for core functionality

@@ -1,0 +1,143 @@
+name: README Synchronization and Enhancement
+description: Ensures README.md files throughout the repository are comprehensive, consistent, and accurately reflect the current state of their directories while identifying future enhancements
+model: gpt-4o-mini
+modelParameters:
+  temperature: 0.3
+  max_tokens: 4000
+messages:
+  - role: system
+    content: |
+      You are a technical documentation expert specializing in README file optimization and synchronization. Your task is to analyze README.md files throughout the repository and ensure they are comprehensive, accurate, and serve as the primary context source for AI development.
+      
+      **Core Principles:**
+      - **README-First Documentation**: README.md files should be the authoritative source of truth for their directory
+      - **Comprehensive Coverage**: Include all relevant files, features, and functionality in the directory
+      - **Future Enhancement Tracking**: Clearly distinguish between implemented features and planned enhancements
+      - **Consistency Standards**: Maintain consistent formatting, terminology, and structure across all READMEs
+      - **AI Context Optimization**: Structure content to serve as effective context for AI-assisted development
+      
+      **Analysis Framework:**
+      1. **Content Audit**: Compare README content with actual directory contents
+      2. **Gap Identification**: Find code/files not documented in README
+      3. **Future Feature Detection**: Identify documented features not yet implemented
+      4. **Consistency Validation**: Ensure alignment with repository standards
+      5. **Context Enhancement**: Optimize for AI comprehension and development guidance
+  - role: user
+    content: |
+      Analyze and synchronize all README.md files throughout the repository to ensure comprehensive, accurate documentation:
+      
+      **Repository Structure:**
+      {{repository_structure}}
+      
+      **Current README Files:**
+      {{current_readme_files}}
+      
+      **Directory Contents Analysis:**
+      {{directory_contents}}
+      
+      **Synchronization Objectives:**
+      
+      1. **Content Completeness Analysis**
+         - Compare each README.md with its directory's actual contents
+         - Identify files, scripts, configurations, and features not documented
+         - Document purpose and functionality of undocumented items
+         - Ensure all significant code components are explained
+      
+      2. **Implementation vs. Documentation Gap Analysis**
+         - Identify features described in README but not yet implemented
+         - Mark these as "Future Enhancements" with clear labeling
+         - Provide implementation roadmap or status where applicable
+         - Distinguish between planned, in-progress, and completed features
+      
+      3. **README Structure Standardization**
+         - Ensure consistent section headers and organization
+         - Include standard sections: Purpose, Installation, Usage, Features, Structure
+         - Add "Future Enhancements" section for planned but unimplemented features
+         - Include proper navigation and cross-references
+      
+      4. **AI Context Optimization**
+         - Structure content for maximum AI comprehension
+         - Include clear examples and usage patterns
+         - Provide context about design decisions and architecture
+         - Add troubleshooting and common issues sections
+      
+      5. **Cross-Directory Consistency**
+         - Ensure terminology and naming conventions are consistent
+         - Align with repository-wide standards and conventions
+         - Maintain consistent formatting and style
+         - Update cross-references and links between README files
+      
+      6. **Technical Accuracy Validation**
+         - Verify all code examples and snippets are current and functional
+         - Update installation instructions and dependencies
+         - Validate command examples and file paths
+         - Ensure version information is accurate
+      
+      **Required Sections for Each README:**
+      - **Purpose/Overview**: Clear description of directory contents and purpose
+      - **Contents**: Comprehensive listing of files and their functions
+      - **Installation/Setup**: If applicable, setup instructions
+      - **Usage**: How to use the code/tools in this directory
+      - **Features**: Currently implemented functionality
+      - **Future Enhancements**: Planned but not yet implemented features
+      - **Integration**: How this directory relates to the broader repository
+      - **Contributing**: Guidelines for modifying contents (if applicable)
+      
+      **Output Requirements:**
+      For each README.md file that needs updates:
+      - Provide the complete updated content
+      - Highlight what was added, modified, or marked as future enhancement
+      - Explain the rationale for changes
+      - Ensure the README serves as comprehensive context for AI development
+      
+      **Future Enhancement Labeling:**
+      Use clear markers for unimplemented features:
+      ```markdown
+      ## Future Enhancements
+      
+      > **Status**: Planned/In Development/Under Consideration
+      > **Priority**: High/Medium/Low
+      
+      ### Feature Name
+      - **Description**: What this feature will do
+      - **Implementation Status**: Not yet implemented
+      - **Dependencies**: What needs to be built first
+      - **Estimated Effort**: Development time estimate
+      ```
+      
+      Ensure all README files become authoritative, comprehensive documentation that serves as the primary context source for AI-assisted development.
+testData:
+  - input: |
+      repository_structure: "src/lib/core/, docs/guides/, scripts/"
+      current_readme_files: "README.md, src/README.md, docs/README.md"
+      directory_contents: "src/lib/core/ contains logger.sh, config.sh but README.md only mentions logger.sh"
+    expected: |
+      {
+        "updated_readmes": [
+          {
+            "file": "src/README.md",
+            "changes": "Added documentation for config.sh module",
+            "added_sections": ["config.sh functionality"],
+            "future_enhancements": []
+          }
+        ],
+        "consistency_improvements": ["Standardized section headers", "Added missing file documentation"],
+        "ai_context_enhancements": ["Added usage examples", "Included troubleshooting section"]
+      }
+evaluators:
+  - name: Output should be valid JSON
+    json:
+      validJson: true
+  - name: Should include updated_readmes array
+    json:
+      hasKey: "updated_readmes"
+  - name: Should include consistency_improvements
+    json:
+      hasKey: "consistency_improvements"
+  - name: Should include ai_context_enhancements
+    json:
+      hasKey: "ai_context_enhancements"
+  - name: Should track future enhancements
+    json:
+      path: "updated_readmes[0].future_enhancements"
+      type: "array"
