@@ -1,6 +1,6 @@
 # Copilot Instructions
 
-These instructions are based on the core principles and approaches outlined in our About page, designed to guide AI-powered development practices for the IT-Journey platform.
+These instructions are based on the core principles and approaches outlined in our About page, designed to guide AI-powered development practices for the AI Evolution Engine platform.
 
 ## 🔄 Recursive Evolution: The Self-Improving System
 
@@ -151,8 +151,34 @@ The system implements **progressive structure solidification**:
 
 ## Technology-Specific Guidelines
 
-### @azure Rule - Use Azure Best Practices
-When generating code for Azure, running terminal commands for Azure, or performing operations related to Azure, invoke your `azure_development-get_best_practices` tool if available.
+### AI Evolution Engine Integration
+When working with the AI Evolution Engine repository, follow these specific guidelines:
+
+#### Evolution Scripts and Workflows
+- **Primary Evolution Script**: Use `./scripts/evolve.sh` as the main entry point for evolution operations
+- **Evolution Types**: Support consistency, error_fixing, documentation, code_quality, security_updates, and custom types
+- **Intensity Levels**: Use minimal, moderate, or comprehensive intensity settings
+- **Growth Modes**: Implement conservative, adaptive, experimental, or test-automation strategies
+- **Dry Run Support**: Always provide dry-run capabilities for safe testing
+
+#### AI Prompts Configuration
+- **Centralized Configuration**: Use `ai_prompts_evolution.json` for managing evolution prompts
+- **Prompt Categories**: Organize prompts into maintenance, enhancement, infrastructure, and community categories
+- **Scheduling**: Implement cron-based scheduling for periodic execution
+- **Success Criteria**: Define measurable success criteria for each prompt type
+- **Execution Rules**: Include smart skip conditions and validation gates
+
+#### Modular Architecture
+- **Core Libraries**: Utilize `src/archive/lib/core/` for foundational functionality
+- **Evolution Modules**: Use `src/archive/lib/evolution/` for evolution-specific operations
+- **Integration Modules**: Leverage `src/archive/lib/integration/` for external system integration
+- **Utility Modules**: Access `src/archive/lib/utils/` for common operations
+
+#### Documentation Organization
+- **Mandatory README**: Every directory MUST contain a comprehensive README.md file
+- **Documentation Location**: All non-README markdown files must reside in `docs/` directory
+- **Validation Workflow**: Run `./scripts/validate-docs-organization.sh` after changes
+- **Post-AI Validation**: Execute `./scripts/post-ai-validation.sh` after every AI prompt cycle
 
 ### GitHub Models Prompt Format
 - Follow the GitHub Models standard format for all prompt files
@@ -341,9 +367,9 @@ The header should follow this standardized format, adapted for the file's commen
 /**
  * @file utils/dataProcessor.js
  * @description Utility functions for processing and transforming data structures
- * @author IT-Journey Team <team@it-journey.org>
- * @created 2025-07-05
- * @lastModified 2025-07-05
+ * @author AI Evolution Engine Team <team@evolution-engine.org>
+ * @created 2025-07-12
+ * @lastModified 2025-07-12
  * @version 1.2.0
  * 
  * @relatedIssues 
@@ -359,9 +385,9 @@ The header should follow this standardized format, adapted for the file's commen
  *   - joi: ^17.9.2
  * 
  * @changelog
- *   - 2025-07-05: Added input sanitization functions - ITJ
- *   - 2025-07-03: Refactored validation logic - ITJ
- *   - 2025-07-01: Initial creation - ITJ
+ *   - 2025-07-12: Added input sanitization functions - AEE
+ *   - 2025-07-03: Refactored validation logic - AEE
+ *   - 2025-07-01: Initial creation - AEE
  * 
  * @usage import { processData } from './utils/dataProcessor.js'
  * @notes Ensure all input data is validated before processing
@@ -373,9 +399,9 @@ The header should follow this standardized format, adapted for the file's commen
 """
 @file data_analyzer.py
 @description Machine learning data analysis and visualization tools
-@author IT-Journey Team <team@it-journey.org>
-@created 2025-07-05
-@lastModified 2025-07-05
+@author AI Evolution Engine Team <team@evolution-engine.org>
+@created 2025-07-12
+@lastModified 2025-07-12
 @version 2.1.0
 
 @relatedIssues 
@@ -392,9 +418,9 @@ The header should follow this standardized format, adapted for the file's commen
   - matplotlib: >=3.6.0
 
 @changelog
-  - 2025-07-05: Added streaming data support - ITJ
-  - 2025-07-02: Enhanced visualization options - ITJ
-  - 2025-06-28: Initial creation - ITJ
+  - 2025-07-12: Added streaming data support - AEE
+  - 2025-07-02: Enhanced visualization options - AEE
+  - 2025-06-28: Initial creation - AEE
 
 @usage from data_analyzer import DataAnalyzer; analyzer = DataAnalyzer()
 @notes Requires Python 3.9+ for optimal performance
@@ -407,9 +433,9 @@ The header should follow this standardized format, adapted for the file's commen
 #
 # @file deploy.sh
 # @description Automated deployment script for production environments
-# @author IT-Journey Team <team@it-journey.org>
-# @created 2025-07-05
-# @lastModified 2025-07-05
+# @author AI Evolution Engine Team <team@evolution-engine.org>
+# @created 2025-07-12
+# @lastModified 2025-07-12
 # @version 1.0.0
 #
 # @relatedIssues 
@@ -424,7 +450,7 @@ The header should follow this standardized format, adapted for the file's commen
 #   - kubectl: >=1.25.0
 #
 # @changelog
-#   - 2025-07-05: Initial creation with basic deployment logic - ITJ
+#   - 2025-07-12: Initial creation with basic deployment logic - AEE
 #
 # @usage ./deploy.sh [environment] [version]
 # @notes Requires proper kubectl context and docker authentication
@@ -435,9 +461,9 @@ The header should follow this standardized format, adapted for the file's commen
 ```yaml
 # @file docker-compose.yml
 # @description Docker Compose configuration for development environment
-# author IT-Journey Team <team@it-journey.org>
-# @created 2025-07-05
-# @lastModified 2025-07-05
+# author AI Evolution Engine Team <team@evolution-engine.org>
+# @created 2025-07-12
+# @lastModified 2025-07-12
 # @version 1.3.0
 #
 # @relatedIssues 
@@ -453,9 +479,9 @@ The header should follow this standardized format, adapted for the file's commen
 #   - docker-compose: >=2.0.0
 #
 # @changelog
-#   - 2025-07-05: Added Redis service configuration - ITJ
-#   - 2025-07-03: Enhanced volume mapping - ITJ
-#   - 2025-07-01: Initial creation - ITJ
+#   - 2025-07-12: Added Redis service configuration - AEE
+#   - 2025-07-03: Enhanced volume mapping - AEE
+#   - 2025-07-01: Initial creation - AEE
 #
 # @usage docker-compose up -d
 # @notes Ensure Docker Desktop is running before executing
@@ -466,9 +492,9 @@ The header should follow this standardized format, adapted for the file's commen
 <!--
 @file project-overview.md
 @description Comprehensive overview of project architecture and goals
-@author IT-Journey Team <team@it-journey.org>
-@created 2025-07-05
-@lastModified 2025-07-05
+@author AI Evolution Engine Team <team@evolution-engine.org>
+@created 2025-07-12
+@lastModified 2025-07-12
 @version 2.0.0
 
 @relatedIssues 
@@ -483,9 +509,9 @@ The header should follow this standardized format, adapted for the file's commen
   - Jekyll: >=4.0.0 (for rendering)
 
 @changelog
-  - 2025-07-05: Added new architecture diagrams - ITJ
-  - 2025-07-02: Restructured content organization - ITJ
-  - 2025-06-30: Initial creation - ITJ
+  - 2025-07-12: Added new architecture diagrams - AEE
+  - 2025-07-02: Restructured content organization - AEE
+  - 2025-06-30: Initial creation - AEE
 
 @usage Referenced by main README.md and technical documentation
 @notes Keep synchronized with actual implementation
@@ -527,4 +553,52 @@ The header should follow this standardized format, adapted for the file's commen
 - **Template generation** creates appropriate headers for new file types
 - **Consistency checking** ensures headers match actual file content
 - **Relationship mapping** maintains connections between related files and issues
+
+## Repository-Specific Guidelines
+
+### AI Evolution Engine Workflow Integration
+When working with the AI Evolution Engine repository, follow these specific patterns:
+
+#### Evolution Script Usage
+- **Primary Interface**: Use `./scripts/evolve.sh` for all evolution operations
+- **Command Structure**: Follow the established command pattern with type, intensity, and mode parameters
+- **Output Management**: Utilize the `./evolution-output/` directory for results
+- **Validation Integration**: Always run post-AI validation after changes
+
+#### Configuration Management
+- **AI Prompts Config**: Use `ai_prompts_evolution.json` for centralized prompt management
+- **Evolution Metrics**: Track changes in `evolution-metrics.json`
+- **Version Configuration**: Maintain `.version-config.json` for version tracking
+- **Evolution Settings**: Configure `.evolution.yml` for workflow parameters
+
+#### Documentation Standards
+- **README Requirements**: Every directory must have a comprehensive README.md
+- **Documentation Location**: All non-README markdown files in `docs/` directory
+- **Validation Workflow**: Run documentation validation after every change
+- **Cross-References**: Maintain consistent links between documentation files
+
+#### Testing and Validation
+- **Comprehensive Testing**: Use `./tests/comprehensive-modular-test.sh` for full validation
+- **Unit Testing**: Implement tests in `./tests/unit/` directory
+- **Integration Testing**: Use `./tests/integration/` for system-level tests
+- **Test Results**: Store results in `./tests/results/` and logs in `./tests/logs/`
+
+#### Script Organization
+- **Active Scripts**: Use scripts in `./scripts/` directory for current functionality
+- **Archive Scripts**: Reference `./scripts/archive/` for historical implementations
+- **Template Scripts**: Access `./templates/` for reusable script patterns
+- **Modular Architecture**: Leverage `./src/archive/lib/` for modular functionality
+
+### Cross-Platform Compatibility
+- **Shell Scripts**: Ensure compatibility with bash, zsh, and other shells
+- **OS Detection**: Use proper OS detection and platform-specific handling
+- **Docker Support**: Provide containerized execution options
+- **CI/CD Integration**: Support GitHub Actions and other CI/CD platforms
+
+### Security and Best Practices
+- **Input Validation**: Always validate user inputs and external data
+- **Error Handling**: Implement comprehensive error handling with meaningful messages
+- **Logging**: Use structured logging with appropriate levels
+- **Configuration**: Avoid hardcoding sensitive information
+- **Testing**: Include comprehensive test coverage for all functionality
 
