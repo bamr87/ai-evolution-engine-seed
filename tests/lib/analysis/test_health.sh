@@ -301,7 +301,7 @@ test_error_handling() {
 
 # Main test execution
 main() {
-    log_header "Health Analysis Module Tests"
+    log_info "🏥 Health Analysis Module Tests"
     
     # Ensure bc is available for calculations
     if ! command -v bc >/dev/null 2>&1; then
@@ -325,7 +325,7 @@ main() {
     run_test "Error Handling" test_error_handling
     
     # Display results
-    log_header "Test Results Summary"
+    log_info "📊 Test Results Summary"
     for result in "${TEST_RESULTS[@]}"; do
         if [[ "$result" == PASS:* ]]; then
             log_success "$result"

@@ -15,7 +15,7 @@ source "$PROJECT_ROOT/src/lib/core/logger.sh"
 # Source environment detection
 source "$PROJECT_ROOT/src/lib/utils/env_detect.sh"
 
-log_header "AI Evolution Workflow Validation Script"
+log_info "🔍 AI Evolution Workflow Validation Script"
 
 WORKFLOWS_DIR=".github/workflows"
 ERRORS=0
@@ -107,7 +107,7 @@ validate_workflow "$WORKFLOWS_DIR/testing_automation_evolver.yml" "Testing & Bui
 validate_documentation
 
 # Summary
-log_header "Validation Summary"
+log_info "📊 Validation Summary"
 
 if [ $ERRORS -eq 0 ]; then
     log_success "All validations passed! Workflows are properly configured."

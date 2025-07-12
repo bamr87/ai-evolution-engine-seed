@@ -36,7 +36,7 @@ check_gh_cli() {
 
 # Show available workflows
 show_workflows() {
-    log_header "Available AI Evolution Workflows"
+    log_info "📋 Available AI Evolution Workflows"
     echo
     echo "1. ai_evolver.yml - Manual AI Evolution Engine"
     echo "   Purpose: Custom AI-driven evolution with human prompts"
@@ -60,7 +60,7 @@ run_ai_evolver() {
     local auto_plant_seeds="${4:-true}"
     local use_container="${5:-true}"
     
-    log_header "Running AI Evolution Workflow"
+    log_info "🚀 Running AI Evolution Workflow"
     log_info "Prompt: $prompt"
     log_info "Growth Mode: $growth_mode"
     log_info "Dry Run: $dry_run"
@@ -82,7 +82,7 @@ run_daily_evolution() {
     local force_run="${3:-false}"
     local dry_run="${4:-false}"
     
-    log_header "Running Daily Evolution Workflow"
+    log_info "📅 Running Daily Evolution Workflow"
     log_info "Evolution Type: $evolution_type"
     log_info "Intensity: $intensity"
     log_info "Force Run: $force_run"
@@ -104,7 +104,7 @@ run_testing_automation() {
     local generation="${3:-1}"
     local dry_run="${4:-false}"
     
-    log_header "Running Testing Automation Workflow"
+    log_info "🧪 Running Testing Automation Workflow"
     log_info "Growth Mode: $growth_mode"
     log_info "Cycle: $cycle"
     log_info "Generation: $generation"
@@ -121,7 +121,7 @@ run_testing_automation() {
 
 # Function to monitor workflow runs
 monitor_workflows() {
-    log_header "Recent Workflow Runs"
+    log_info "📜 Recent Workflow Runs"
     gh run list --limit 10
     echo
     
@@ -135,14 +135,14 @@ monitor_workflows() {
 # Function to view workflow logs
 view_logs() {
     local run_id="$1"
-    log_header "Viewing Logs for Run: $run_id"
+    log_info "🔍 Viewing Logs for Run: $run_id"
     gh run view "$run_id" --log
 }
 
 # Function to watch workflow
 watch_workflow() {
     local run_id="$1"
-    log_header "Watching Workflow Run: $run_id"
+    log_info "👀 Watching Workflow Run: $run_id"
     gh run watch "$run_id"
 }
 

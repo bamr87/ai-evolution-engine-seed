@@ -188,7 +188,7 @@ run_test_category() {
         return 1
     fi
     
-    log_header "Running $category tests"
+    log_info "🧪 Running $category tests"
     
     local test_files="${TEST_SUITES[$category]}"
     for test_file in $test_files; do
@@ -197,7 +197,7 @@ run_test_category() {
 }
 
 run_all_tests() {
-    log_header "Running All Modular Library Tests"
+    log_info "🔬 Running All Modular Library Tests"
     
     for category in core evolution integration analysis template; do
         if [[ "${TEST_SUITES[$category]+exists}" ]]; then
@@ -207,7 +207,7 @@ run_all_tests() {
 }
 
 run_performance_tests() {
-    log_header "Running Performance Tests"
+    log_info "⚡ Running Performance Tests"
     
     # Test bootstrap performance
     log_info "Testing bootstrap performance..."
@@ -239,7 +239,7 @@ run_performance_tests() {
 }
 
 run_security_tests() {
-    log_header "Running Security Tests"
+    log_info "🔒 Running Security Tests"
     
     # Test for potential security issues in modules
     log_info "Scanning for potential security issues..."

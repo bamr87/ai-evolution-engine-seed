@@ -384,7 +384,7 @@ test_template_performance() {
 
 # Main test execution
 main() {
-    log_header "Template Engine Module Tests"
+    log_info "🎨 Template Engine Module Tests"
     
     # Run all tests
     run_test "Module Loading" test_template_module_loading
@@ -398,7 +398,7 @@ main() {
     run_test "Template Performance" test_template_performance
     
     # Display results
-    log_header "Test Results Summary"
+    log_info "📊 Test Results Summary"
     for result in "${TEST_RESULTS[@]}"; do
         if [[ "$result" == PASS:* ]]; then
             log_success "$result"

@@ -198,7 +198,7 @@ test_error_handling() {
 
 # Main test execution
 main() {
-    log_header "GitHub Integration Module Tests"
+    log_info "🔗 GitHub Integration Module Tests"
     
     # Run all tests
     run_test "Module Loading" test_github_module_loading
@@ -210,7 +210,7 @@ main() {
     run_test "Error Handling" test_error_handling
     
     # Display results
-    log_header "Test Results Summary"
+    log_info "📊 Test Results Summary"
     for result in "${TEST_RESULTS[@]}"; do
         if [[ "$result" == PASS:* ]]; then
             log_success "$result"
