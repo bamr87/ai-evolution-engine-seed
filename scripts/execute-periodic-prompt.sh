@@ -32,12 +32,18 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 PROMPTS_DIR="$REPO_ROOT/prompts/templates"
 LOGS_DIR="$REPO_ROOT/logs"
 
-# Source common utilities
+# Source common utilities and load AI prompts configuration
 source "$REPO_ROOT/src/lib/core/logger.sh" 2>/dev/null || {
     echo "Warning: Logger not available, using basic logging"
     log_info() { echo "[INFO] $*"; }
     log_error() { echo "[ERROR] $*" >&2; }
     log_warning() { echo "[WARNING] $*" >&2; }
+}
+
+# Source JSON processor for AI prompts support
+source "$REPO_ROOT/src/lib/utils/json_processor.sh" 2>/dev/null || {
+    log_error "JSON processor module not available"
+    exit 1
 }
 
 # Default values
@@ -46,6 +52,7 @@ DRY_RUN="true"
 EXECUTION_MODE="scheduled"
 OUTPUT_FILE=""
 CONTEXT_FILE=""
+FORCE_EXECUTION="false"
 
 # Function to display usage
 usage() {
@@ -60,6 +67,7 @@ Options:
     --execution-mode <mode>  Execution mode: scheduled, manual, test (default: scheduled)
     --output-file <file>     Output file for AI response (default: auto-generated)
     --context-file <file>    Context file for AI input (default: auto-generated)
+    --force-execution        Force execution even if conditions suggest skipping
     --help                   Show this help message
 
 Examples:
@@ -93,6 +101,10 @@ while [[ $# -gt 0 ]]; do
             CONTEXT_FILE="$2"
             shift 2
             ;;
+        --force-execution)
+            FORCE_EXECUTION="true"
+            shift
+            ;;
         --help)
             usage
             exit 0
@@ -112,8 +124,55 @@ if [[ -z "$PROMPT_NAME" ]]; then
     exit 1
 fi
 
+# Load and validate AI prompts configuration
+log_info "Loading AI prompts configuration..."
+AI_PROMPTS_CONFIG=$(ai_prompts_load_config)
+if [[ $? -ne 0 ]]; then
+    log_error "Failed to load AI prompts configuration"
+    exit 1
+fi
+
+# Get prompt definition from configuration
+PROMPT_DEFINITION=$(ai_prompts_get_definition "$PROMPT_NAME" "$AI_PROMPTS_CONFIG")
+if [[ $? -ne 0 ]]; then
+    log_error "Prompt '$PROMPT_NAME' not found in configuration"
+    exit 1
+fi
+
+# Get execution strategy
+EXECUTION_STRATEGY=$(ai_prompts_get_strategy "$PROMPT_NAME" "$AI_PROMPTS_CONFIG")
+if [[ $? -ne 0 ]]; then
+    log_warning "Could not load execution strategy, using defaults"
+    EXECUTION_STRATEGY="{}"
+fi
+
+# Validate execution conditions
+if ! ai_prompts_should_execute "$PROMPT_NAME" "$AI_PROMPTS_CONFIG"; then
+    log_warning "Execution conditions not met for prompt: $PROMPT_NAME"
+    if [[ "$FORCE_EXECUTION" != "true" ]]; then
+        log_info "Skipping execution (use --force-execution to override)"
+        exit 0
+    fi
+fi
+
+# Override dry run setting from configuration if not explicitly set
+if [[ -z "${DRY_RUN_OVERRIDE:-}" ]]; then
+    CONFIG_DRY_RUN=$(ai_prompts_get_global_setting "default_dry_run" "$AI_PROMPTS_CONFIG")
+    if [[ "$CONFIG_DRY_RUN" != "null" && "$DRY_RUN" == "true" ]]; then
+        DRY_RUN="$CONFIG_DRY_RUN"
+        log_info "Using dry run setting from configuration: $DRY_RUN"
+    fi
+fi
+
+# Get template file from configuration
+TEMPLATE_FILE_CONFIG=$(echo "$PROMPT_DEFINITION" | jq -r '.template_file // null')
+if [[ "$TEMPLATE_FILE_CONFIG" != "null" ]]; then
+    PROMPT_TEMPLATE="$REPO_ROOT/$TEMPLATE_FILE_CONFIG"
+else
+    PROMPT_TEMPLATE="$PROMPTS_DIR/$PROMPT_NAME.md"
+fi
+
 # Validate prompt template exists
-PROMPT_TEMPLATE="$PROMPTS_DIR/$PROMPT_NAME.md"
 if [[ ! -f "$PROMPT_TEMPLATE" ]]; then
     log_error "Prompt template not found: $PROMPT_TEMPLATE"
     exit 1

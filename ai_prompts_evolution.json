@@ -1,0 +1,359 @@
+{
+  "version": "1.0.0",
+  "description": "AI Evolution Engine prompt configuration for automated evolution cycles",
+  "metadata": {
+    "created": "2025-07-12",
+    "author": "AI Evolution Engine",
+    "compatible_with": ">=0.4.3",
+    "schema_version": "1.0"
+  },
+  "global_settings": {
+    "default_dry_run": false,
+    "max_execution_time": "30m",
+    "require_validation": true,
+    "enable_rollback": true,
+    "log_level": "info",
+    "context_collection": {
+      "max_files": 50,
+      "max_lines_per_file": 1000,
+      "include_tests": true,
+      "include_docs": true,
+      "exclude_patterns": [
+        "*.log",
+        "*.tmp",
+        "*/node_modules/*",
+        "*/.git/*",
+        "*/dist/*",
+        "*/_site/*"
+      ]
+    }
+  },
+  "evolution_strategies": {
+    "conservative": {
+      "description": "Safe, minimal changes with thorough validation",
+      "safety_level": "high",
+      "change_scope": "minimal",
+      "require_tests": true,
+      "max_file_changes": 5,
+      "validation_steps": ["syntax", "tests", "lint"]
+    },
+    "adaptive": {
+      "description": "Balanced approach with moderate changes",
+      "safety_level": "medium",
+      "change_scope": "moderate",
+      "require_tests": true,
+      "max_file_changes": 15,
+      "validation_steps": ["syntax", "tests"]
+    },
+    "experimental": {
+      "description": "Advanced features and experimental changes",
+      "safety_level": "low",
+      "change_scope": "extensive",
+      "require_tests": false,
+      "max_file_changes": 50,
+      "validation_steps": ["syntax"]
+    },
+    "test-automation": {
+      "description": "Focus on testing infrastructure and automation",
+      "safety_level": "high",
+      "change_scope": "testing-focused",
+      "require_tests": true,
+      "max_file_changes": 20,
+      "validation_steps": ["syntax", "tests", "coverage"]
+    }
+  },
+  "prompt_categories": {
+    "maintenance": {
+      "description": "Regular maintenance and code quality",
+      "frequency": "weekly",
+      "priority": "high",
+      "prompts": ["doc_harmonization", "security_scan", "changelog_versioning"]
+    },
+    "enhancement": {
+      "description": "Feature improvements and optimizations",
+      "frequency": "monthly", 
+      "priority": "medium",
+      "prompts": ["code_refactor", "performance_optimization", "test_enhancement"]
+    },
+    "infrastructure": {
+      "description": "Development infrastructure and workflow improvements",
+      "frequency": "monthly",
+      "priority": "medium", 
+      "prompts": ["workflow_optimization", "dependency_updates"]
+    },
+    "community": {
+      "description": "Community-focused improvements",
+      "frequency": "monthly",
+      "priority": "low",
+      "prompts": ["community_guidelines", "prompt_refinement"]
+    }
+  },
+  "prompt_definitions": {
+    "doc_harmonization": {
+      "name": "Documentation Harmonization",
+      "description": "Review and standardize all documentation for consistent styling, syntax, keywords, and frontmatter",
+      "category": "maintenance",
+      "template_file": "prompts/templates/doc_harmonization.md",
+      "schedule": {
+        "cron": "0 2 * * 1",
+        "description": "Mondays at 2 AM UTC"
+      },
+      "execution_settings": {
+        "strategy": "conservative",
+        "timeout": "15m",
+        "max_changes": 10,
+        "focus_areas": ["documentation", "formatting", "consistency"]
+      },
+      "success_criteria": {
+        "documentation_score": ">= 8.0",
+        "consistency_score": ">= 9.0",
+        "no_broken_links": true
+      }
+    },
+    "security_scan": {
+      "name": "Security Vulnerability Scan",
+      "description": "Identify and fix security vulnerabilities in code, workflows, and configurations",
+      "category": "maintenance",
+      "template_file": "prompts/templates/security_scan.md",
+      "schedule": {
+        "cron": "0 3 * * 3",
+        "description": "Wednesdays at 3 AM UTC"
+      },
+      "execution_settings": {
+        "strategy": "conservative",
+        "timeout": "20m",
+        "max_changes": 5,
+        "focus_areas": ["security", "vulnerabilities", "permissions"]
+      },
+      "success_criteria": {
+        "security_score": ">= 9.0",
+        "no_critical_vulns": true,
+        "all_deps_updated": true
+      }
+    },
+    "changelog_versioning": {
+      "name": "Changelog and Versioning",
+      "description": "Maintain accurate changelog and version tracking across the repository",
+      "category": "maintenance", 
+      "template_file": "prompts/templates/changelog_versioning.md",
+      "schedule": {
+        "cron": "0 4 * * 5",
+        "description": "Fridays at 4 AM UTC"
+      },
+      "execution_settings": {
+        "strategy": "conservative",
+        "timeout": "10m",
+        "max_changes": 3,
+        "focus_areas": ["versioning", "changelog", "documentation"]
+      },
+      "success_criteria": {
+        "version_consistency": true,
+        "changelog_complete": true,
+        "no_missing_entries": true
+      }
+    },
+    "test_enhancement": {
+      "name": "Test Suite Enhancement",
+      "description": "Expand and improve test coverage to prevent regressions and ensure robustness",
+      "category": "enhancement",
+      "template_file": "prompts/templates/test_enhancement.md",
+      "schedule": {
+        "cron": "0 2 * * 2",
+        "description": "Tuesdays at 2 AM UTC (bi-weekly)"
+      },
+      "execution_settings": {
+        "strategy": "adaptive",
+        "timeout": "25m",
+        "max_changes": 15,
+        "focus_areas": ["testing", "coverage", "quality"]
+      },
+      "success_criteria": {
+        "test_coverage": ">= 80%",
+        "test_pass_rate": "100%",
+        "no_flaky_tests": true
+      }
+    },
+    "code_refactor": {
+      "name": "Code Quality and Refactoring",
+      "description": "Improve code readability, maintainability, and adherence to best practices",
+      "category": "enhancement",
+      "template_file": "prompts/templates/code_refactor.md",
+      "schedule": {
+        "cron": "0 1 1 * *",
+        "description": "1st of month at 1 AM UTC"
+      },
+      "execution_settings": {
+        "strategy": "adaptive",
+        "timeout": "30m",
+        "max_changes": 20,
+        "focus_areas": ["code_quality", "maintainability", "readability"]
+      },
+      "success_criteria": {
+        "code_quality_score": ">= 8.5",
+        "maintainability_index": ">= 85",
+        "no_code_smells": true
+      }
+    },
+    "dependency_updates": {
+      "name": "Dependency Updates",
+      "description": "Update and manage project dependencies for security and compatibility",
+      "category": "infrastructure",
+      "template_file": "prompts/templates/dependency_updates.md",
+      "schedule": {
+        "cron": "0 2 15 * *",
+        "description": "15th of month at 2 AM UTC"
+      },
+      "execution_settings": {
+        "strategy": "conservative",
+        "timeout": "20m",
+        "max_changes": 10,
+        "focus_areas": ["dependencies", "security", "compatibility"]
+      },
+      "success_criteria": {
+        "no_vulnerable_deps": true,
+        "no_deprecated_deps": true,
+        "all_tests_pass": true
+      }
+    },
+    "performance_optimization": {
+      "name": "Performance Optimization",
+      "description": "Identify and implement performance improvements across the codebase",
+      "category": "enhancement",
+      "template_file": "prompts/templates/performance_optimization.md",
+      "schedule": {
+        "cron": "0 3 8 * *",
+        "description": "8th of month at 3 AM UTC"
+      },
+      "execution_settings": {
+        "strategy": "adaptive",
+        "timeout": "25m",
+        "max_changes": 12,
+        "focus_areas": ["performance", "optimization", "efficiency"]
+      },
+      "success_criteria": {
+        "performance_score": ">= 8.0",
+        "no_performance_regressions": true,
+        "improved_metrics": true
+      }
+    },
+    "workflow_optimization": {
+      "name": "Workflow Optimization",
+      "description": "Improve CI/CD workflows, automation, and development processes",
+      "category": "infrastructure",
+      "template_file": "prompts/templates/workflow_optimization.md",
+      "schedule": {
+        "cron": "0 4 22 * *",
+        "description": "22nd of month at 4 AM UTC"
+      },
+      "execution_settings": {
+        "strategy": "adaptive",
+        "timeout": "20m",
+        "max_changes": 8,
+        "focus_areas": ["workflows", "automation", "ci_cd"]
+      },
+      "success_criteria": {
+        "workflow_efficiency": ">= 8.0",
+        "no_workflow_failures": true,
+        "reduced_execution_time": true
+      }
+    },
+    "community_guidelines": {
+      "name": "Community Guidelines",
+      "description": "Update and maintain community guidelines, contributing docs, and project standards",
+      "category": "community",
+      "template_file": "prompts/templates/community_guidelines.md",
+      "schedule": {
+        "cron": "0 5 28 * *",
+        "description": "28th of month at 5 AM UTC"
+      },
+      "execution_settings": {
+        "strategy": "conservative",
+        "timeout": "15m",
+        "max_changes": 5,
+        "focus_areas": ["community", "guidelines", "documentation"]
+      },
+      "success_criteria": {
+        "guideline_completeness": ">= 9.0",
+        "community_clarity": ">= 8.0",
+        "up_to_date_standards": true
+      }
+    },
+    "prompt_refinement": {
+      "name": "Prompt Refinement",
+      "description": "Improve the AI prompt templates themselves for enhanced future evolution cycles",
+      "category": "community",
+      "template_file": "prompts/templates/prompt_refinement.md",
+      "schedule": {
+        "cron": "0 6 30 * *",
+        "description": "30th of month at 6 AM UTC"
+      },
+      "execution_settings": {
+        "strategy": "experimental",
+        "timeout": "20m",
+        "max_changes": 10,
+        "focus_areas": ["prompts", "ai_effectiveness", "self_improvement"]
+      },
+      "success_criteria": {
+        "prompt_effectiveness": ">= 8.5",
+        "success_rate_improvement": true,
+        "clarity_enhancement": true
+      }
+    }
+  },
+  "execution_rules": {
+    "skip_conditions": [
+      {
+        "condition": "recent_commits",
+        "threshold": "24h",
+        "description": "Skip if commits made in last 24 hours (unless forced)"
+      },
+      {
+        "condition": "open_issues",
+        "threshold": 10,
+        "description": "Skip if more than 10 open issues"
+      },
+      {
+        "condition": "failed_tests",
+        "threshold": 1,
+        "description": "Skip if any tests are currently failing"
+      }
+    ],
+    "conflict_resolution": {
+      "strategy": "abort",
+      "notification": true,
+      "create_issue": true
+    },
+    "validation_gates": [
+      "syntax_check",
+      "test_execution",
+      "lint_validation",
+      "security_scan"
+    ]
+  },
+  "monitoring": {
+    "metrics": {
+      "track_execution_time": true,
+      "track_success_rate": true,
+      "track_change_impact": true,
+      "track_quality_scores": true
+    },
+    "alerting": {
+      "on_failure": true,
+      "on_quality_degradation": true,
+      "on_security_issues": true
+    },
+    "reporting": {
+      "generate_reports": true,
+      "report_frequency": "weekly",
+      "include_metrics": true,
+      "include_recommendations": true
+    }
+  },
+  "integration": {
+    "evolution_config": ".evolution.yml",
+    "version_config": ".version-config.json",
+    "metrics_file": "evolution-metrics.json",
+    "log_directory": "logs/",
+    "workflow_directory": ".github/workflows/"
+  }
+}

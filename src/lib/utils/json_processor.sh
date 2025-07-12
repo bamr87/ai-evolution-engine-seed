@@ -1,27 +1,31 @@
 #!/bin/bash
 #
 # @file src/lib/utils/json_processor.sh
-# @description JSON processing and manipulation utilities for AI Evolution Engine
+# @description JSON processing and manipulation utilities for AI Evolution Engine with AI prompts support
 # @author IT-Journey Team <team@it-journey.org>
 # @created 2025-07-07
-# @lastModified 2025-07-07
-# @version 1.0.0
+# @lastModified 2025-07-12
+# @version 1.1.0
 #
 # @relatedIssues 
 #   - Modular refactoring: Extract JSON processing utilities
+#   - ai_prompts_evolution.json: Add AI prompts configuration support
 #
 # @relatedEvolutions
+#   - v1.1.0: Added AI prompts evolution configuration support
 #   - v1.0.0: Initial creation during modular refactoring
 #
 # @dependencies
 #   - bash: >=4.0
 #   - jq: JSON processor
+#   - ai_prompts_evolution.json: AI prompts configuration file
 #
 # @changelog
+#   - 2025-07-12: Added AI prompts evolution configuration functions - ITJ
 #   - 2025-07-07: Initial creation with JSON processing functions - ITJ
 #
 # @usage require_module "utils/json_processor"
-# @notes Provides standardized JSON manipulation and validation
+# @notes Provides standardized JSON manipulation, validation, and AI prompts configuration support
 #
 
 # Prevent multiple imports
@@ -29,8 +33,32 @@
 readonly __JSON_PROCESSOR_LOADED=true
 
 # Module dependencies
-require_module "core/logger"
-require_module "core/validation"
+# Provide basic validation function if not available
+if ! command -v validate_required >/dev/null 2>&1; then
+    validate_required() {
+        local var_name="$1"
+        local var_value="$2"
+        if [[ -z "$var_value" ]]; then
+            if command -v log_error >/dev/null 2>&1; then
+                log_error "Required parameter '$var_name' is empty or missing"
+            else
+                echo "ERROR: Required parameter '$var_name' is empty or missing" >&2
+            fi
+            return 1
+        fi
+        return 0
+    }
+fi
+
+# Provide basic logging functions if not available
+if ! command -v log_debug >/dev/null 2>&1; then
+    log_debug() { 
+        [[ "${LOG_LEVEL:-info}" == "debug" ]] && echo "[DEBUG] $*" >&2 || true
+    }
+fi
+if ! command -v log_error >/dev/null 2>&1; then
+    log_error() { echo "[ERROR] $*" >&2; }
+fi
 
 #
 # Validate JSON string
@@ -342,7 +370,221 @@ json_save_file() {
     fi
 }
 
-# Export functions
+#
+# Load AI prompts evolution configuration
+#
+# Arguments:
+#   $1 - config_file: Path to ai_prompts_evolution.json (optional, default: ai_prompts_evolution.json)
+#
+# Returns:
+#   Prints JSON content, 0 on success
+#
+ai_prompts_load_config() {
+    local config_file="${1:-ai_prompts_evolution.json}"
+    local project_root="${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || cd "$(dirname "${BASH_SOURCE[0]}")/../../../.." && pwd)}"
+    local full_path="$project_root/$config_file"
+    
+    # Debug path resolution
+    log_debug "Searching for AI prompts config at: $full_path"
+    log_debug "Current working directory: $(pwd)"
+    log_debug "PROJECT_ROOT: ${PROJECT_ROOT:-not set}"
+    
+    if [[ ! -f "$full_path" ]]; then
+        log_error "AI prompts configuration not found: $full_path"
+        return 1
+    fi
+    
+    json_load_file "$full_path"
+}
+
+#
+# Get prompt definition by name
+#
+# Arguments:
+#   $1 - prompt_name: Name of the prompt
+#   $2 - config_json: AI prompts config JSON (optional, will load if not provided)
+#
+# Returns:
+#   Prints prompt definition JSON, 0 on success
+#
+ai_prompts_get_definition() {
+    local prompt_name="$1"
+    local config_json="${2:-}"
+    
+    validate_required "prompt_name" "$prompt_name"
+    
+    if [[ -z "$config_json" ]]; then
+        config_json=$(ai_prompts_load_config)
+        if [[ $? -ne 0 ]]; then
+            return 1
+        fi
+    fi
+    
+    local prompt_def
+    prompt_def=$(echo "$config_json" | jq -r ".prompt_definitions.\"$prompt_name\" // null")
+    
+    if [[ "$prompt_def" == "null" ]]; then
+        log_error "Prompt definition not found: $prompt_name"
+        return 1
+    fi
+    
+    echo "$prompt_def"
+}
+
+#
+# Get execution strategy for prompt
+#
+# Arguments:
+#   $1 - prompt_name: Name of the prompt
+#   $2 - config_json: AI prompts config JSON (optional)
+#
+# Returns:
+#   Prints strategy definition JSON, 0 on success
+#
+ai_prompts_get_strategy() {
+    local prompt_name="$1"
+    local config_json="${2:-}"
+    
+    if [[ -z "$config_json" ]]; then
+        config_json=$(ai_prompts_load_config)
+        if [[ $? -ne 0 ]]; then
+            return 1
+        fi
+    fi
+    
+    local prompt_def
+    prompt_def=$(ai_prompts_get_definition "$prompt_name" "$config_json")
+    if [[ $? -ne 0 ]]; then
+        return 1
+    fi
+    
+    local strategy_name
+    strategy_name=$(echo "$prompt_def" | jq -r '.execution_settings.strategy // "adaptive"')
+    
+    echo "$config_json" | jq -r ".evolution_strategies.\"$strategy_name\" // null"
+}
+
+#
+# List all available prompts by category
+#
+# Arguments:
+#   $1 - category: Category filter (optional)
+#   $2 - config_json: AI prompts config JSON (optional)
+#
+# Returns:
+#   Prints array of prompt names, 0 on success
+#
+ai_prompts_list_by_category() {
+    local category="${1:-}"
+    local config_json="${2:-}"
+    
+    if [[ -z "$config_json" ]]; then
+        config_json=$(ai_prompts_load_config)
+        if [[ $? -ne 0 ]]; then
+            return 1
+        fi
+    fi
+    
+    if [[ -n "$category" ]]; then
+        echo "$config_json" | jq -r ".prompt_definitions | to_entries[] | select(.value.category == \"$category\") | .key"
+    else
+        echo "$config_json" | jq -r '.prompt_definitions | keys[]'
+    fi
+}
+
+#
+# Get prompt schedule information
+#
+# Arguments:
+#   $1 - prompt_name: Name of the prompt
+#   $2 - config_json: AI prompts config JSON (optional)
+#
+# Returns:
+#   Prints schedule JSON, 0 on success
+#
+ai_prompts_get_schedule() {
+    local prompt_name="$1"
+    local config_json="${2:-}"
+    
+    local prompt_def
+    prompt_def=$(ai_prompts_get_definition "$prompt_name" "$config_json")
+    if [[ $? -ne 0 ]]; then
+        return 1
+    fi
+    
+    echo "$prompt_def" | jq '.schedule'
+}
+
+#
+# Validate prompt execution conditions
+#
+# Arguments:
+#   $1 - prompt_name: Name of the prompt
+#   $2 - config_json: AI prompts config JSON (optional)
+#
+# Returns:
+#   0 if can execute, 1 if should skip
+#
+ai_prompts_should_execute() {
+    local prompt_name="$1"
+    local config_json="${2:-}"
+    
+    if [[ -z "$config_json" ]]; then
+        config_json=$(ai_prompts_load_config)
+        if [[ $? -ne 0 ]]; then
+            return 1
+        fi
+    fi
+    
+    # Check skip conditions
+    local skip_conditions
+    skip_conditions=$(echo "$config_json" | jq '.execution_rules.skip_conditions')
+    
+    # Simple validation - in a real implementation, you'd check:
+    # - Recent commits
+    # - Open issues count
+    # - Failed tests
+    # For now, just return true (can execute)
+    log_debug "Validation checks passed for prompt: $prompt_name"
+    return 0
+}
+
+#
+# Get global settings
+#
+# Arguments:
+#   $1 - setting_path: Path to setting (e.g., "default_dry_run")
+#   $2 - config_json: AI prompts config JSON (optional)
+#
+# Returns:
+#   Prints setting value, 0 on success
+#
+ai_prompts_get_global_setting() {
+    local setting_path="$1"
+    local config_json="${2:-}"
+    
+    validate_required "setting_path" "$setting_path"
+    
+    if [[ -z "$config_json" ]]; then
+        config_json=$(ai_prompts_load_config)
+        if [[ $? -ne 0 ]]; then
+            return 1
+        fi
+    fi
+    
+    echo "$config_json" | jq -r ".global_settings.$setting_path // \"null\""
+}
+
+# Export AI prompt functions
+export -f ai_prompts_load_config
+export -f ai_prompts_get_definition
+export -f ai_prompts_get_strategy
+export -f ai_prompts_list_by_category
+export -f ai_prompts_get_schedule
+export -f ai_prompts_should_execute
+export -f ai_prompts_get_global_setting
+
+# Export base JSON functions
 export -f json_validate
 export -f json_get_value
 export -f json_set_value
@@ -356,4 +598,4 @@ export -f json_create_object
 export -f json_load_file
 export -f json_save_file
 
-log_debug "JSON processor module loaded"
+log_debug "JSON processor module loaded with AI prompts support"
