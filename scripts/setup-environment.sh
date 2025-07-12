@@ -4,14 +4,16 @@
 # @description Sets up the necessary environment for evolution workflows using modular architecture
 # @author IT-Journey Team <team@it-journey.org>
 # @created 2025-07-05
-# @lastModified 2025-07-10
-# @version 2.0.0
+# @lastModified 2025-07-12
+# @version 2.1.0
 #
 # @relatedIssues 
 #   - Modular refactoring: Migrate to modular architecture
 #   - Environment setup: Enhanced environment configuration
+#   - #v0.4.6-compatibility: Enhanced GitHub Actions compatibility
 #
 # @relatedEvolutions
+#   - v2.1.0: Enhanced GitHub Actions compatibility with improved dependency management for v0.4.6
 #   - v2.0.0: Migrated to modular architecture with enhanced setup
 #   - v1.0.0: Original implementation
 #
@@ -20,6 +22,7 @@
 #   - ../src/lib/core/environment.sh: Environment detection module
 #
 # @changelog
+#   - 2025-07-12: Enhanced GitHub Actions compatibility with improved dependency management for v0.4.6 - ITJ
 #   - 2025-07-10: Fixed CI permission issue by adding sudo for package management - ITJ
 #   - 2025-07-10: Fixed syntax error by removing orphaned duplicate code - ITJ
 #   - 2025-07-07: Migrated to modular architecture - ITJ

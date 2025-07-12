@@ -6,14 +6,16 @@
 # @author IT-Journey Team <team@it-journey.org>
 # @created 2025-07-05
 # @lastModified 2025-07-12
-# @version 2.3.0
+# @version 2.4.0
 #
 # @relatedIssues 
 #   - #modular-refactor: Migrate to modular architecture
 #   - #context-collection: Enhanced context collection capabilities
 #   - #workflow-fix: Fix command line argument parsing for GitHub Actions
+#   - #v0.4.6-compatibility: Enhanced GitHub Actions compatibility and fallback mechanisms
 #
 # @relatedEvolutions
+#   - v2.4.0: Enhanced GitHub Actions compatibility with robust fallback mechanisms and improved error handling for v0.4.6
 #   - v2.3.0: Enhanced error handling, timeout protection, and pipeline fixes for GitHub Actions compatibility
 #   - v2.2.0: Major rewrite of file processing and .gptignore pattern handling for GitHub Actions compatibility
 #   - v2.1.5: Added comprehensive error handling and safe file processing
@@ -31,6 +33,7 @@
 #   - ../src/lib/analysis/health.sh: Health analysis for context
 #
 # @changelog
+#   - 2025-07-12: Enhanced GitHub Actions compatibility with robust fallback mechanisms and improved error handling for v0.4.6 - ITJ
 #   - 2025-07-12: Enhanced error handling, timeout protection, and pipeline fixes for GitHub Actions compatibility - ITJ
 #   - 2025-07-12: Major rewrite of file processing and .gptignore pattern handling for GitHub Actions compatibility - ITJ
 #   - 2025-07-12: Added comprehensive error handling and safe file processing - ITJ

@@ -1,6 +1,20 @@
-# AI Evolution Engine - GitHub Actions Workflows
+# AI Evolution Engine - GitHub Actions Workflows (v0.4.6)
 
 This directory contains the GitHub Actions workflows that power the AI Evolution Engine, enabling automated and manual evolution of the codebase through AI-driven growth cycles.
+
+## 🧹 Cleaned Workflow Structure
+
+As of v0.4.6, the workflow structure has been cleaned and optimized:
+
+### ✅ Active Workflows
+- `ai_evolver.yml` - Main manual evolution engine
+- `daily_evolution.yml` - Automated daily maintenance  
+- `periodic_evolution.yml` - Scheduled periodic evolutions
+- `testing_automation_evolver.yml` - Testing and build automation
+
+### 🗑️ Removed Files
+- `ai_evolver_fixed.yml` (duplicate - merged into main)
+- `ai_evolver_v0.4.6.yml` (temporary - merged into main)
 
 ## Workflow Overview
 
@@ -123,8 +137,9 @@ All workflows follow consistent patterns defined in `WORKFLOW_STANDARDS.md`:
 ## Evolution Tracking
 
 ### Version Management
-- Current system version: **v0.3.0**
+- Current system version: **v0.4.6**
 - Version consistency across all workflows
+- Enhanced compatibility and error handling
 - Breaking change documentation
 
 ### Metrics Collection

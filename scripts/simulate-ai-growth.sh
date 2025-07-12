@@ -4,14 +4,16 @@
 # @description Simulates AI growth and generates evolution response using modular architecture
 # @author IT-Journey Team <team@it-journey.org>
 # @created 2025-07-05
-# @lastModified 2025-07-07
-# @version 2.0.0
+# @lastModified 2025-07-12
+# @version 2.1.0
 #
 # @relatedIssues 
 #   - Modular refactoring: Migrate to modular architecture
 #   - AI growth simulation: Enhanced simulation capabilities
+#   - #v0.4.6-compatibility: Enhanced command-line argument handling
 #
 # @relatedEvolutions
+#   - v2.1.0: Enhanced command-line argument parsing and GitHub Actions compatibility for v0.4.6
 #   - v2.0.0: Migrated to modular architecture with enhanced growth simulation
 #   - v1.0.0: Original implementation
 #
@@ -21,11 +23,12 @@
 #   - ../src/lib/utils/json_processor.sh: JSON processing utilities
 #
 # @changelog
+#   - 2025-07-12: Enhanced command-line argument parsing and GitHub Actions compatibility for v0.4.6 - ITJ
 #   - 2025-07-07: Migrated to modular architecture - ITJ
 #   - 2025-07-05: Enhanced AI growth simulation - ITJ
 #
-# @usage ./scripts/simulate-ai-growth.sh <prompt> <growth_mode> <context_file> <response_file>
-# @notes Simulates AI growth cycles and generates evolution responses
+# @usage ./scripts/simulate-ai-growth.sh [--prompt "text"] [--growth-mode mode] [--context-file path] [--response-file path] [--dry-run true|false]
+# @notes Simulates AI growth cycles and generates evolution responses with enhanced GitHub Actions compatibility
 #
 
 set -euo pipefail
@@ -49,14 +52,66 @@ require_module "utils/json_processor"
 # Initialize logging
 init_logger "logs" "simulate-ai-growth"
 
-# Parse and validate arguments
-PROMPT="${1:-}"
-GROWTH_MODE="${2:-adaptive}"
-CONTEXT_FILE="${3:-/tmp/repo_context.json}"
-RESPONSE_FILE="${4:-/tmp/evolution_response.json}"
+# Parse and validate arguments - enhanced for GitHub Actions compatibility
+PROMPT=""
+GROWTH_MODE="adaptive"
+CONTEXT_FILE="/tmp/repo_context.json"
+RESPONSE_FILE="/tmp/evolution_response.json"
+DRY_RUN="false"
 
-validate_required "PROMPT" "$PROMPT"
-validate_file_readable "$CONTEXT_FILE"
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --prompt)
+            PROMPT="$2"
+            shift 2
+            ;;
+        --growth-mode)
+            GROWTH_MODE="$2"
+            shift 2
+            ;;
+        --context-file)
+            CONTEXT_FILE="$2"
+            shift 2
+            ;;
+        --response-file)
+            RESPONSE_FILE="$2"
+            shift 2
+            ;;
+        --dry-run)
+            DRY_RUN="$2"
+            shift 2
+            ;;
+        *)
+            # Handle positional arguments for backward compatibility
+            if [[ -z "$PROMPT" ]]; then
+                PROMPT="$1"
+            elif [[ "$GROWTH_MODE" == "adaptive" ]]; then
+                GROWTH_MODE="$1"
+            elif [[ "$CONTEXT_FILE" == "/tmp/repo_context.json" ]]; then
+                CONTEXT_FILE="$1"
+            elif [[ "$RESPONSE_FILE" == "/tmp/evolution_response.json" ]]; then
+                RESPONSE_FILE="$1"
+            else
+                log_error "Unknown argument: $1"
+                exit 1
+            fi
+            shift
+            ;;
+    esac
+done
+
+# Validate required arguments
+if [[ -z "$PROMPT" ]]; then
+    log_error "PROMPT is required"
+    exit 1
+fi
+
+# Validate files exist
+if [[ ! -f "$CONTEXT_FILE" ]]; then
+    log_warn "Context file not found: $CONTEXT_FILE, creating minimal context"
+    echo '{"current_metrics": {"growth_cycles": 0, "current_generation": 0}}' > "$CONTEXT_FILE"
+fi
 
 log_info "Simulating AI growth cycle based on prompt: $PROMPT"
 

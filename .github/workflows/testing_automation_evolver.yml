@@ -1,4 +1,4 @@
-name: 🌱 AI Evolution - Testing & Build Automation (v0.3.0)
+name: 🌱 AI Evolution - Testing & Build Automation (v0.4.6)
 
 on:
   workflow_dispatch:
