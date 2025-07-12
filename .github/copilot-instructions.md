@@ -195,12 +195,14 @@ When generating code for Azure, running terminal commands for Azure, or performi
   - Lists and describes key files and subdirectories within that directory
   - Provides examples of how to use or interact with directory contents
   - Maintains current and accurate information as directory contents evolve
-- **Documentation Organization Rule**: All documentation files MUST reside in the `docs/` directory, with only two exceptions:
-  - `README.md` - Main project documentation at repository root
-  - `CHANGELOG.md` - Version change log at repository root
-  - All other documentation (guides, references, specifications, etc.) must be organized within `docs/` subdirectories
+- **Documentation Organization Rule**: All non-README markdown files MUST reside in the `docs/` directory, with only two exceptions:
+  - `README.md` - Main project documentation files (one per directory)
+  - `CHANGELOG.md` - Version change log at repository root only
+  - All other documentation (guides, references, specifications, tutorials, etc.) must be organized within `docs/` subdirectories
   - Use clear subdirectory structure within `docs/` (e.g., `docs/guides/`, `docs/api/`, `docs/architecture/`)
   - Maintain consistent naming conventions and cross-references between documentation files
+  - **Mandatory README Requirement**: Every directory MUST contain a README.md file that comprehensively documents its contents and purpose
+  - **Validation Enforcement**: A test script runs after every AI prompt cycle to enforce this organization rule
 - Include installation, usage, and contribution guidelines
 - Add inline code documentation for complex logic
 - Create user guides and API documentation when relevant
@@ -283,6 +285,13 @@ When generating code for Azure, running terminal commands for Azure, or performi
 - Use AI feedback loops for continuous improvement
 - Maintain human oversight for critical decisions
 - Document AI tool usage and configurations
+
+### Post-AI Prompt Cycle Validation
+- **Mandatory Validation**: Run `./scripts/post-ai-validation.sh` after every AI prompt cycle
+- **Documentation Organization**: Ensure all non-README markdown files are in `docs/` directory
+- **README Completeness**: Verify every directory contains a comprehensive README.md file
+- **Compliance Enforcement**: Address all validation errors before considering the AI cycle complete
+- **Continuous Improvement**: Use validation feedback to refine future AI interactions
 
 ## File Header Standards
 

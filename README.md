@@ -95,6 +95,32 @@ ls tests/results/
 ls tests/logs/
 ```
 
+### 📋 Documentation Organization & Validation
+
+**NEW in v0.4.1**: Automated documentation organization validation ensures repository consistency and AI-readiness.
+
+#### Organization Rules
+- 📁 **All non-README markdown files** must reside in the `docs/` directory
+- 📄 **README.md required** in every directory for comprehensive documentation
+- 📝 **CHANGELOG.md** allowed only at repository root
+
+#### Validation Workflow
+```bash
+# Run documentation organization validation
+./scripts/validate-docs-organization.sh
+
+# Run post-AI prompt cycle validation (recommended after every AI interaction)
+./scripts/post-ai-validation.sh
+```
+
+#### Benefits
+- **🤖 AI-Optimized**: README files serve as primary context for AI-assisted development
+- **📚 Self-Documenting**: Every directory explains its purpose and contents
+- **🔄 Consistent**: Automated validation maintains organization over time
+- **📈 Scalable**: Clear structure supports repository growth and evolution
+
+See [docs/guides/documentation-organization.md](docs/guides/documentation-organization.md) for complete guidelines.
+
 ### Migration Guide
 See [docs/MODULAR_MIGRATION_GUIDE.md](docs/MODULAR_MIGRATION_GUIDE.md) for complete migration instructions and best practices.
 

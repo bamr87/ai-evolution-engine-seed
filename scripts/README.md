@@ -32,6 +32,8 @@ This directory contains utility scripts, automation tools, and helper programs t
 ### Utility Scripts
 - `ai-debug-helper.sh` - Debugging assistance and troubleshooting tools
 - `analyze-repository-health-simple.sh` - Repository health analysis and validation
+- `validate-docs-organization.sh` - Documentation organization validation and enforcement
+- `post-ai-validation.sh` - Post-AI prompt cycle validation runner
 - Additional automation scripts for various system operations
 
 ## Purpose
@@ -44,6 +46,12 @@ The scripts directory serves as a central location for:
 - **Maintenance Scripts**: Automated maintenance and cleanup operations
 
 ## Script Categories
+
+### Validation and Compliance
+- **Documentation Organization**: `validate-docs-organization.sh` - Ensures all non-README markdown files are in docs/ directory
+- **README Validation**: Verifies every directory contains a comprehensive README.md file
+- **Post-AI Validation**: `post-ai-validation.sh` - Comprehensive validation runner for post-AI prompt cycles
+- **Compliance Enforcement**: Automated checks to maintain repository organization standards
 
 ### Debug and Analysis
 - **Health Checks**: Scripts that validate system integrity
