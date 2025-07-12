@@ -1,0 +1,24 @@
+{
+  "execution_mode": "dry_run",
+  "prompt_name": "doc_harmonization",
+  "timestamp": "2025-07-12T18:58:53Z",
+  "file_changes": [],
+  "test_files": [],
+  "documentation_updates": {
+    "summary": "Dry run - no actual changes made"
+  },
+  "impact_assessment": {
+    "simulated": true,
+    "dry_run_notes": "This is a simulation of the doc_harmonization prompt execution"
+  },
+  "changelog_entry": {
+    "date": "2025-07-12",
+    "version": "dry-run",
+    "type": "simulation",
+    "description": "Dry run execution of doc_harmonization prompt"
+  },
+  "metrics": {
+    "execution_time": "0s",
+    "dry_run": true
+  }
+}
