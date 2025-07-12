@@ -4,8 +4,8 @@ on:
   workflow_dispatch:
     inputs:
       prompt:
-        description: 'Growth instructions for the AI (e.g., "Implement user authentication")'
-        required: true
+        description: 'Growth instructions for the AI (leave empty for changelog/versioning update)'
+        required: false
         type: string
       growth_mode:
         description: 'Growth strategy (conservative, adaptive, experimental)'
@@ -68,6 +68,30 @@ jobs:
           GROWTH_MODE: ${{ github.event.inputs.growth_mode }}
           DRY_RUN: ${{ github.event.inputs.dry_run }}
 
+      - name: 📝 Determine Evolution Prompt
+        id: prompt-selection
+        run: |
+          if [ -z "${{ github.event.inputs.prompt }}" ]; then
+            echo "No custom prompt provided, using changelog versioning prompt"
+            if [ -f "prompts/templates/changelog_versioning.md" ]; then
+              EVOLUTION_PROMPT=$(cat prompts/templates/changelog_versioning.md)
+              echo "prompt_source=changelog_versioning" >> $GITHUB_OUTPUT
+            else
+              EVOLUTION_PROMPT="Analyze recent commits and update CHANGELOG.md with proper semantic versioning. Review git history since the last release, categorize changes (Added, Changed, Fixed, etc.), and recommend appropriate version increment following semantic versioning principles."
+              echo "prompt_source=fallback" >> $GITHUB_OUTPUT
+            fi
+          else
+            EVOLUTION_PROMPT="${{ github.event.inputs.prompt }}"
+            echo "prompt_source=user_input" >> $GITHUB_OUTPUT
+          fi
+          
+          # Store the prompt in environment for later steps
+          echo "EVOLUTION_PROMPT<<EOF" >> $GITHUB_ENV
+          echo "$EVOLUTION_PROMPT" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+          
+          echo "Selected prompt source: $(echo $EVOLUTION_PROMPT | head -c 100)..."
+
       - name: 🔍 Pre-Evolution Validation
         run: |
           chmod +x ./scripts/check-prereqs.sh
@@ -88,7 +112,7 @@ jobs:
           ./scripts/version-tracker.sh start \
             --type "manual" \
             --mode "${{ github.event.inputs.growth_mode }}" \
-            --prompt "${{ github.event.inputs.prompt }}"
+            --prompt "$EVOLUTION_PROMPT"
 
       - name: 🧠 Context Collection & Analysis
         run: |
@@ -106,7 +130,7 @@ jobs:
           # Run context collection with enhanced error handling
           set -e
           ./scripts/collect-context.sh \
-            --prompt "${{ github.event.inputs.prompt }}" \
+            --prompt "$EVOLUTION_PROMPT" \
             --growth-mode "${{ github.event.inputs.growth_mode }}" \
             --include-health \
             --include-tests || {
@@ -130,7 +154,7 @@ jobs:
         run: |
           chmod +x ./scripts/simulate-ai-growth.sh
           ./scripts/simulate-ai-growth.sh \
-            --prompt "${{ github.event.inputs.prompt }}" \
+            --prompt "$EVOLUTION_PROMPT" \
             --growth-mode "${{ github.event.inputs.growth_mode }}" \
             --dry-run "${{ github.event.inputs.dry_run }}"
 
@@ -181,7 +205,7 @@ jobs:
           ./scripts/generate_seed.sh \
             --cycle "$(date +%Y%m%d)" \
             --generation "1" \
-            --prompt "${{ github.event.inputs.prompt }}" \
+            --prompt "$EVOLUTION_PROMPT" \
             --growth-mode "${{ github.event.inputs.growth_mode }}"
 
       - name: 🌿 Plant New Seeds in Repository
@@ -194,7 +218,7 @@ jobs:
         run: |
           chmod +x ./scripts/generate_ai_response.sh
           ./scripts/generate_ai_response.sh \
-            --prompt "${{ github.event.inputs.prompt }}" \
+            --prompt "$EVOLUTION_PROMPT" \
             --mode "${{ github.event.inputs.growth_mode }}" \
             --dry-run "${{ github.event.inputs.dry_run }}"
 
@@ -203,7 +227,7 @@ jobs:
         run: |
           chmod +x ./scripts/create_pr.sh
           ./scripts/create_pr.sh \
-            --prompt "${{ github.event.inputs.prompt }}" \
+            --prompt "$EVOLUTION_PROMPT" \
             --mode "${{ github.event.inputs.growth_mode }}" \
             --type "manual_evolution"
         env:
