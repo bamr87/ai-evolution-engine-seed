@@ -464,3 +464,14 @@ jobs:
           if [[ -f /tmp/repo_context.json ]]; then
             echo "Context file size: $(wc -c < /tmp/repo_context.json) bytes"
           fi
+
+      - name: 📋 Collect Workflow Errors & Warnings
+        if: always()
+        id: error_collection
+        run: |
+          chmod +x ./scripts/collect-workflow-errors.sh
+          ./scripts/collect-workflow-errors.sh \
+            --workflow-type "ai_evolver" \
+            --job-status "${{ job.status }}" \
+            --collect-from-logs \
+            --include-context

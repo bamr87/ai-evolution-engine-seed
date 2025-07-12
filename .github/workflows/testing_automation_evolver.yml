@@ -119,3 +119,14 @@ jobs:
         run: |
           chmod +x ./tests/seed/test-evolved-seed.sh
           ./tests/seed/test-evolved-seed.sh "$GROWTH_MODE"
+
+      - name: 📋 Collect Workflow Errors & Warnings
+        if: always()
+        id: error_collection
+        run: |
+          chmod +x ./scripts/collect-workflow-errors.sh
+          ./scripts/collect-workflow-errors.sh \
+            --workflow-type "testing_automation" \
+            --job-status "${{ job.status }}" \
+            --collect-from-logs \
+            --include-context
