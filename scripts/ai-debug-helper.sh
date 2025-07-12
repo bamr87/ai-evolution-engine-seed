@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # @file scripts/ai-debug-helper.sh
 # @description Comprehensive debugging information collector for AI analysis
