@@ -1,4 +1,4 @@
-name: 🌱 AI Evolution Growth Engine (v0.4.1)
+name: 🌱 AI Evolution Growth Engine (v0.4.2)
 
 on:
   workflow_dispatch:
@@ -39,7 +39,7 @@ permissions:
   issues: write
 
 env:
-  EVOLUTION_VERSION: "0.4.1"
+  EVOLUTION_VERSION: "0.4.2"
   WORKFLOW_TYPE: "manual_evolution"
   # Set environment context for cross-compatibility
   CI_ENVIRONMENT: "true"
@@ -49,7 +49,7 @@ env:
 
 jobs:
   evolve:
-    name: 🌿 Growth Cycle v0.4.1
+    name: 🌿 Growth Cycle v0.4.2
     runs-on: ubuntu-latest
     
     steps:

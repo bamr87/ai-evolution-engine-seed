@@ -6,7 +6,7 @@
 # @author IT-Journey Team <team@it-journey.org>
 # @created 2025-07-05
 # @lastModified 2025-07-12
-# @version 2.1.0
+# @version 2.1.2
 #
 # @relatedIssues 
 #   - #modular-refactor: Migrate to modular architecture
@@ -14,6 +14,8 @@
 #   - #workflow-fix: Fix command line argument parsing for GitHub Actions
 #
 # @relatedEvolutions
+#   - v2.1.2: Simplified health analysis to avoid CI environment hanging
+#   - v2.1.1: Fixed function call signatures for metrics and health analysis
 #   - v2.1.0: Fixed command line argument parsing to support flags
 #   - v2.0.0: Migrated to modular architecture with enhanced context collection
 #   - v0.3.6: Original implementation with basic context collection
@@ -24,6 +26,8 @@
 #   - ../src/lib/analysis/health.sh: Health analysis for context
 #
 # @changelog
+#   - 2025-07-12: Simplified health analysis to avoid hanging in CI environment - ITJ
+#   - 2025-07-12: Fixed function call signatures for metrics and health analysis - ITJ
 #   - 2025-07-12: Fixed command line argument parsing to support --flags - ITJ
 #   - 2025-07-05: Migrated to modular architecture - ITJ
 #   - 2025-07-05: Enhanced context collection with health analysis - ITJ
@@ -40,6 +44,7 @@ PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
 # Bootstrap the modular system
 source "$PROJECT_ROOT/src/lib/core/bootstrap.sh"
+bootstrap_library
 
 # Load required modules
 require_module "core/logger"
@@ -115,8 +120,18 @@ log_info "Growth Mode: $GROWTH_MODE | Context File: $CONTEXT_FILE"
 
 # Initialize context collection with metadata and metrics using modular functions
 log_info "📊 Loading current metrics and health data..."
-METRICS_CONTENT=$(generate_metrics_report "" "json" 2>/dev/null || echo "{}")
-HEALTH_DATA=$(health_analyze_repository "context" "comprehensive" 2>/dev/null || echo "{}")
+
+# Initialize metrics if not already done
+init_metrics "evolution-metrics.json" 2>/dev/null || true
+
+# Try to get metrics, but don't fail if it doesn't work
+METRICS_CONTENT="{}"
+if [[ -f "evolution-metrics.json" ]]; then
+    METRICS_CONTENT=$(generate_metrics_report "evolution-metrics.json" "json" 2>/dev/null || echo "{}")
+fi
+
+# Simplified health data for now - avoid complex analysis that might hang
+HEALTH_DATA='{"status": "basic_check", "timestamp": "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}'
 
 # Collect repository structure using tree command or fallback
 log_info "🌳 Analyzing repository structure..."

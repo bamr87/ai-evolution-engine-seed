@@ -5,8 +5,8 @@
 # @description Analyzes repository health and suggests improvements using modular analysis
 # @author IT-Journey Team <team@it-journey.org>
 # @created 2025-07-05
-# @lastModified 2025-07-09
-# @version 2.1.0
+# @lastModified 2025-07-12
+# @version 2.1.1
 #
 # @relatedIssues 
 #   - #modular-refactor: Migrate to modular architecture
@@ -14,6 +14,7 @@
 #   - #bash-compatibility: Add fallback for bash 3.2 compatibility
 #
 # @relatedEvolutions
+#   - v2.1.1: Fixed health_analyze_repository function call signature
 #   - v2.1.0: Added fallback to simple version for bash 3.2 compatibility
 #   - v2.0.0: Migrated to modular architecture with enhanced analysis
 #   - v1.0.0: Original implementation with basic health checks
@@ -23,6 +24,7 @@
 #   - ../scripts/analyze-repository-health-simple.sh: Fallback for bash 3.2
 #
 # @changelog
+#   - 2025-07-12: Fixed health_analyze_repository function call signature - ITJ
 #   - 2025-07-09: Added bash 3.2 compatibility fallback - ITJ
 #   - 2025-07-05: Migrated to modular architecture - ITJ
 #   - 2025-07-05: Enhanced health analysis capabilities - ITJ
@@ -62,6 +64,7 @@ PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
 # Bootstrap the modular system
 source "$PROJECT_ROOT/src/lib/core/bootstrap.sh"
+bootstrap_library
 
 # Load required modules
 require_module "core/logger"
@@ -91,7 +94,7 @@ fi
 
 # Perform comprehensive repository health analysis
 log_info "Running comprehensive health analysis..."
-HEALTH_REPORT=$(health_analyze_repository "$EVOLUTION_TYPE" "$INTENSITY")
+HEALTH_REPORT=$(health_analyze_repository "json")
 
 if [[ -z "$HEALTH_REPORT" ]]; then
     log_error "Health analysis failed to generate report"

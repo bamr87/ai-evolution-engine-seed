@@ -4,13 +4,14 @@
 # @description Library initialization and dependency management for AI Evolution Engine
 # @author IT-Journey Team <team@it-journey.org>
 # @created 2025-07-05
-# @lastModified 2025-07-05
-# @version 2.0.0
+# @lastModified 2025-07-12
+# @version 2.0.1
 #
 # @relatedIssues 
 #   - Refactor scripts to be modular with well-structured library
 #
 # @relatedEvolutions
+#   - v2.0.1: Fixed bash 3.2 compatibility issue with duplicate function definitions
 #   - v2.0.0: Complete modular refactor with bootstrap system
 #
 # @dependencies
@@ -18,6 +19,7 @@
 #   - find: POSIX compliant
 #
 # @changelog
+#   - 2025-07-12: Fixed duplicate function definition causing bash 3.2 compatibility issue - ITJ
 #   - 2025-07-05: Initial creation of bootstrap system - ITJ
 #
 # @usage source "$PROJECT_ROOT/src/lib/core/bootstrap.sh"; bootstrap_library
@@ -49,7 +51,7 @@ check_bash_version() {
 # Initialize bash version check
 check_bash_version
 
-readonly BOOTSTRAP_VERSION="2.0.0"
+readonly BOOTSTRAP_VERSION="2.0.1"
 readonly MIN_BASH_VERSION="3.2"
 readonly LIBRARY_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 readonly PROJECT_ROOT="$(cd "$LIBRARY_ROOT/../.." && pwd)"
@@ -232,13 +234,6 @@ load_module_directory() {
     bootstrap_info "Loaded ${#modules[@]} modules from $dir_path"
 }
 
-# Get information about loaded modules
-list_loaded_modules() {
-    if [[ ${#LOADED_MODULES[@]} -eq 0 ]]; then
-        echo "No modules loaded"
-        return 0
-    fi
-    
 # List all loaded modules
 list_loaded_modules() {
     bootstrap_info "Listing all loaded modules..."
@@ -261,7 +256,6 @@ list_loaded_modules() {
             echo "  (no modules loaded)"
         fi
     fi
-}
 }
 
 # Check if a module is loaded (this function was already updated above)

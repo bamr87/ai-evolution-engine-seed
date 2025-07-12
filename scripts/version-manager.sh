@@ -37,6 +37,7 @@ PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
 # Bootstrap the modular system
 source "$PROJECT_ROOT/src/lib/core/bootstrap.sh"
+bootstrap_library
 
 # Load required modules
 require_module "core/logger"
