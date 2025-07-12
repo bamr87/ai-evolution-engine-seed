@@ -48,10 +48,33 @@ export PATH="/usr/local/bin:/usr/bin:/bin:$PATH"
 - Verifies script permissions
 - Tests basic functionality of the evolution script
 
+### 6. Test Script Recursion Issue (NEW)
+**Issue**: The test script was trying to test itself, causing infinite recursion and failures.
+**Fix**: Updated `scripts/test.sh` to exclude itself from testing:
+```bash
+local scripts_to_test=(
+    "evolve.sh:Main evolution script"
+    "setup.sh:Setup script"
+    # Removed "test.sh:Test script" to prevent recursion
+)
+```
+
+### 7. Workflow File Name Mismatch (NEW)
+**Issue**: Test script was looking for workflow files that didn't exist (`ai_evolver.yml`, `daily_evolution.yml`).
+**Fix**: Updated test script to use correct workflow file names:
+```bash
+local workflows_to_test=(
+    "evolve.yml:Main evolution workflow"
+    "test.yml:Test workflow"
+)
+```
+
 ## Changes Made
 
 ### Files Modified
-1. `.github/workflows/evolve.yml` - Main workflow file with all fixes
+1. `.github/workflows/evolve.yml` - Enhanced with all fixes
+2. `scripts/test.sh` - Fixed recursion and workflow file name issues
+3. `WORKFLOW_FIXES_SUMMARY.md` - Updated with latest fixes
 
 ### Key Improvements
 1. **Dependency Management**: Automatic installation of GitHub CLI
@@ -59,14 +82,31 @@ export PATH="/usr/local/bin:/usr/bin:/bin:$PATH"
 3. **Environment Setup**: Proper shell configuration and tool verification
 4. **Authentication**: Proper GitHub CLI authentication for PR creation
 5. **Validation**: Environment verification step to catch issues early
+6. **Test Script**: Fixed recursion and file name issues
 
-## Testing
+## Testing Results
 
 The fixes have been tested locally:
 - ✅ Environment setup works correctly
 - ✅ Script execution is functional
 - ✅ Error handling catches failures appropriately
 - ✅ GitHub CLI installation is successful
+- ✅ Test script runs without recursion (18/18 tests pass)
+- ✅ Evolution script works correctly
+- ✅ Context collection functions properly
+
+## Latest Test Results
+
+```
+🧪 Test Summary
+===============
+Total Tests: 18
+Passed: 18
+Failed: 0
+Skipped: 0
+Success Rate: 100%
+[SUCCESS] 🎉 All tests passed!
+```
 
 ## Next Steps
 
@@ -86,5 +126,7 @@ These fixes should resolve:
 - Poor error handling and debugging
 - PR creation failures
 - Environment setup issues
+- Test script recursion failures
+- Workflow file name mismatches
 
 The workflow should now be more robust and provide better feedback when issues occur.

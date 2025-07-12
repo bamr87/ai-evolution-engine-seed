@@ -196,7 +196,6 @@ test_scripts() {
     local scripts_to_test=(
         "evolve.sh:Main evolution script"
         "setup.sh:Setup script"
-        "test.sh:Test script"
     )
     
     for script_info in "${scripts_to_test[@]}"; do
@@ -232,8 +231,8 @@ test_workflows() {
     log_info "Testing workflow execution..."
     
     local workflows_to_test=(
-        "ai_evolver.yml:Main evolution workflow"
-        "daily_evolution.yml:Daily maintenance workflow"
+        "evolve.yml:Main evolution workflow"
+        "test.yml:Test workflow"
     )
     
     for workflow_info in "${workflows_to_test[@]}"; do
