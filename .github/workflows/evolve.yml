@@ -90,9 +90,23 @@ jobs:
         run: |
           echo "🔧 Setting up evolution environment..."
           
+          # Fix shell configuration
+          echo "🔧 Configuring shell environment..."
+          export SHELL=/bin/bash
+          export PATH="/usr/local/bin:/usr/bin:/bin:$PATH"
+          
           # Install dependencies
           sudo apt-get update -qq
           sudo apt-get install -y -qq jq curl git tree
+          
+          # Install GitHub CLI
+          if ! command -v gh >/dev/null 2>&1; then
+            echo "📦 Installing GitHub CLI..."
+            curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq gh
+          fi
           
           # Make scripts executable
           chmod +x scripts/*.sh
@@ -102,6 +116,34 @@ jobs:
             ./scripts/setup.sh --no-deps --no-prereqs
           else
             echo "⚠️ Setup script not found, using basic setup"
+          fi
+
+      - name: 🔍 Verify Environment
+        run: |
+          echo "🔍 Verifying environment setup..."
+          
+          # Check essential tools
+          echo "📦 Checking installed tools..."
+          command -v jq >/dev/null 2>&1 && echo "✅ jq is available" || echo "❌ jq not found"
+          command -v git >/dev/null 2>&1 && echo "✅ git is available" || echo "❌ git not found"
+          command -v gh >/dev/null 2>&1 && echo "✅ gh is available" || echo "❌ gh not found"
+          
+          # Check script permissions
+          echo "📜 Checking script permissions..."
+          if [[ -x "./scripts/evolve.sh" ]]; then
+            echo "✅ evolve.sh is executable"
+          else
+            echo "❌ evolve.sh is not executable"
+            chmod +x ./scripts/evolve.sh
+          fi
+          
+          # Test basic functionality
+          echo "🧪 Testing basic functionality..."
+          if ./scripts/evolve.sh --help >/dev/null 2>&1; then
+            echo "✅ evolve.sh is working"
+          else
+            echo "❌ evolve.sh is not working"
+            exit 1
           fi
 
       - name: 🧪 Run Pre-Evolution Tests
@@ -124,7 +166,12 @@ jobs:
           
           # Run context collection
           if [[ -f "./scripts/evolve.sh" ]]; then
-            ./scripts/evolve.sh context -o evolution-output
+            if ./scripts/evolve.sh context -o evolution-output; then
+              echo "✅ Context collection completed"
+            else
+              echo "❌ Context collection failed"
+              exit 1
+            fi
           else
             echo "❌ Evolution script not found"
             exit 1
@@ -135,7 +182,7 @@ jobs:
             echo "✅ Context collected successfully"
             echo "context_file=evolution-output/repo-context.json" >> $GITHUB_OUTPUT
           else
-            echo "❌ Context collection failed"
+            echo "❌ Context collection failed - no output file created"
             exit 1
           fi
 
@@ -172,7 +219,12 @@ jobs:
           
           # Run simulation
           if [[ -f "./scripts/evolve.sh" ]]; then
-            ./scripts/evolve.sh simulate -p "$EVOLUTION_PROMPT" -m "$GROWTH_MODE" -o evolution-output
+            if ./scripts/evolve.sh simulate -p "$EVOLUTION_PROMPT" -m "$GROWTH_MODE" -o evolution-output; then
+              echo "✅ Evolution simulation completed"
+            else
+              echo "❌ Evolution simulation failed"
+              exit 1
+            fi
           else
             echo "❌ Evolution script not found"
             exit 1
@@ -183,7 +235,7 @@ jobs:
             echo "✅ Evolution simulated successfully"
             echo "response_file=evolution-output/evolution-response.json" >> $GITHUB_OUTPUT
           else
-            echo "❌ Evolution simulation failed"
+            echo "❌ Evolution simulation failed - no response file created"
             exit 1
           fi
 
@@ -228,31 +280,60 @@ jobs:
         run: |
           echo "📊 Creating pull request..."
           
+          # Configure git for GitHub CLI
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
           # Check if there are changes to commit
           if git diff --quiet; then
             echo "ℹ️ No changes to commit"
-          else
-            # Create branch
-            BRANCH_NAME="evolution/$(date +%Y%m%d-%H%M%S)"
-            git checkout -b "$BRANCH_NAME"
+            exit 0
+          fi
+          
+          # Create branch
+          BRANCH_NAME="evolution/$(date +%Y%m%d-%H%M%S)"
+          echo "🌿 Creating branch: $BRANCH_NAME"
+          
+          if ! git checkout -b "$BRANCH_NAME"; then
+            echo "❌ Failed to create branch"
+            exit 1
+          fi
+          
+          # Commit changes
+          echo "📝 Committing changes..."
+          git add .
+          if ! git commit -m "🌱 Evolution: $EVOLUTION_TYPE ($INTENSITY intensity, $GROWTH_MODE mode)"; then
+            echo "❌ Failed to commit changes"
+            exit 1
+          fi
+          
+          # Push branch
+          echo "🚀 Pushing branch..."
+          if ! git push origin "$BRANCH_NAME"; then
+            echo "❌ Failed to push branch"
+            exit 1
+          fi
+          
+          # Create PR using GitHub CLI
+          echo "🔗 Creating pull request..."
+          if command -v gh >/dev/null 2>&1; then
+            # Authenticate with GitHub CLI
+            echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
             
-            # Commit changes
-            git add .
-            git commit -m "🌱 Evolution: $EVOLUTION_TYPE ($INTENSITY intensity, $GROWTH_MODE mode)"
-            
-            # Push branch
-            git push origin "$BRANCH_NAME"
-            
-            # Create PR using GitHub CLI
-            if command -v gh >/dev/null 2>&1; then
-                          gh pr create \
+            if gh pr create \
               --title "🌱 Evolution: $EVOLUTION_TYPE improvements" \
               --body "Automated evolution cycle:\n\n- **Type**: $EVOLUTION_TYPE\n- **Intensity**: $INTENSITY\n- **Mode**: $GROWTH_MODE\n- **Prompt**: $EVOLUTION_PROMPT\n\nThis PR contains improvements generated by the AI Evolution Engine." \
               --base main \
-              --head "$BRANCH_NAME"
+              --head "$BRANCH_NAME"; then
+              echo "✅ Pull request created successfully"
             else
-              echo "⚠️ GitHub CLI not available, manual PR creation required"
+              echo "❌ Failed to create pull request"
+              exit 1
             fi
+          else
+            echo "⚠️ GitHub CLI not available, manual PR creation required"
+            echo "Branch: $BRANCH_NAME"
+            exit 1
           fi
 
       - name: 📋 Generate Report

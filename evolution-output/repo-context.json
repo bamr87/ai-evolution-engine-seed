@@ -1,23 +1,20 @@
 {
-  "metadata": {
-    "version": "3.0.0",
-    "timestamp": "2025-07-12T22:23:24Z",
-    "repository": "ai-evolution-engine-seed",
-    "collection_method": "simplified_core"
+  "collection_timestamp": "2025-07-12T22:51:08Z",
+  "repository_info": {
+    "name": "ai-evolution-engine-seed",
+    "root": "/Users/bamr87/github/ai-evolution-engine-seed",
+    "git_branch": "main",
+    "git_commit": "0d737ce10899d2d274077dd7a43dff564fcbd95a"
   },
-  "repository": {
-    "structure": {},
-    "files": {},
-    "metrics": {
-      "total_files": 0,
-      "script_count": 0,
-      "workflow_count": 0,
-      "documentation_count": 0
-    }
+  "file_structure": {
+    "scripts_count":       38,
+    "docs_count":       48,
+    "src_files":       23
   },
-  "analysis": {
-    "health_score": 85,
-    "issues": [],
-    "suggestions": []
+  "evolution_config": {
+    "type": "consistency",
+    "intensity": "minimal",
+    "growth_mode": "conservative",
+    "prompt": ""
   }
 }
