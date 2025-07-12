@@ -145,6 +145,22 @@ The system implements **progressive structure solidification**:
 ### @azure Rule - Use Azure Best Practices
 When generating code for Azure, running terminal commands for Azure, or performing operations related to Azure, invoke your `azure_development-get_best_practices` tool if available.
 
+### GitHub Models Prompt Format
+- Follow the GitHub Models standard format for all prompt files
+- Use `.prompt.yml` or `.prompt.yaml` file extensions for prompt files
+- Structure prompts according to GitHub Models specification:
+  - `name`: Human-readable prompt name
+  - `description`: Brief description of prompt functionality
+  - `model`: AI model identifier (e.g., gpt-4o-mini)
+  - `modelParameters`: Configuration like temperature, max_tokens
+  - `messages`: Array of role-based messages (system, user, assistant)
+  - `testData`: Sample inputs and expected outputs for validation
+  - `evaluators`: Validation criteria and evaluation methods
+- Use `{{variable}}` syntax for placeholder variables in prompt content
+- Avoid custom header comments in prompt files (GitHub Models uses clean YAML format)
+- Include comprehensive test data and evaluation criteria for quality assurance
+- Reference: [GitHub Models Documentation](https://docs.github.com/en/github-models/use-github-models/storing-prompts-in-github-repositories)
+
 ### Open Source Development
 - Follow open source licensing and contribution guidelines
 - Include appropriate attribution and credits
@@ -254,6 +270,8 @@ When generating code for Azure, running terminal commands for Azure, or performi
 
 ### Universal File Header Requirements
 Every file in the repository MUST begin with a commented header section containing standardized reference information. This applies to all file types including source code, configuration files, documentation, scripts, and templates.
+
+**Exception**: Files with `.prompt.yml` or `.prompt.yaml` extensions follow the GitHub Models standard format and do not use custom headers.
 
 ### Header Template Structure
 The header should follow this standardized format, adapted for the file's comment syntax:

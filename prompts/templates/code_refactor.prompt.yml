@@ -1,31 +1,3 @@
-#
-# @file prompts/templates/code_refactor.yml
-# @description Code quality and refactoring prompt for improving maintainability
-# @author AI Evolution Engine <ai-evolution@engine.dev>
-# @created 2025-07-12
-# @lastModified 2025-07-12
-# @version 2.0.0
-#
-# @relatedIssues 
-#   - #prompt-standardization: Standardize prompt format across repository
-#   - #TBD: Code quality and maintainability improvements
-#
-# @relatedEvolutions
-#   - v2.0.0: Converted to standardized YAML format
-#   - v1.0.0: Initial periodic prompt implementation
-#
-# @dependencies
-#   - AI Evolution Engine: >=0.4.3
-#   - YAML parser for prompt processing
-#
-# @changelog
-#   - 2025-07-12: Converted to standardized YAML format - ITJ
-#   - 2025-07-12: Initial creation of code refactoring prompt - AEE
-#
-# @usage Executed monthly via GitHub Actions workflow for code quality maintenance
-# @notes Part of the periodic AI prompts system for repository evolution
-#
-
 name: Code Quality Refactoring
 description: Improves code readability, maintainability, and adherence to best practices without altering functionality
 model: gpt-4o-mini

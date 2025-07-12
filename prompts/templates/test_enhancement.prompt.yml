@@ -1,31 +1,3 @@
-#
-# @file prompts/templates/test_enhancement.yml
-# @description Test suite enhancement prompt for improving code coverage and reliability
-# @author AI Evolution Engine <ai-evolution@engine.dev>
-# @created 2025-07-12
-# @lastModified 2025-07-12
-# @version 2.0.0
-#
-# @relatedIssues 
-#   - #prompt-standardization: Standardize prompt format across repository
-#   - #TBD: Test coverage and quality improvements
-#
-# @relatedEvolutions
-#   - v2.0.0: Converted to standardized YAML format
-#   - v1.0.0: Initial periodic prompt implementation
-#
-# @dependencies
-#   - AI Evolution Engine: >=0.4.3
-#   - YAML parser for prompt processing
-#
-# @changelog
-#   - 2025-07-12: Converted to standardized YAML format - ITJ
-#   - 2025-07-12: Initial creation of test enhancement prompt - AEE
-#
-# @usage Executed bi-weekly via GitHub Actions workflow for test maintenance
-# @notes Part of the periodic AI prompts system for repository evolution
-#
-
 name: Test Suite Enhancement
 description: Expands and improves test coverage to prevent regressions, ensure robustness, and maintain code quality
 model: gpt-4o-mini

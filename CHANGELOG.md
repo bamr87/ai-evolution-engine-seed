@@ -6,6 +6,32 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.4.6] - 2025-07-12
+
+### 📋 GitHub Models Prompt Format Integration
+
+- **Description**: Integrated GitHub Models standard format into repository guidelines and migrated all prompt files
+- **Changes**:
+  - Added GitHub Models prompt format standards to copilot instructions
+  - Migrated all `.yml` prompt files to `.prompt.yml` extension following GitHub Models convention
+  - Removed custom headers from prompt files to comply with GitHub Models clean YAML format
+  - Added exception clause for prompt files in Universal File Header Requirements
+  - Created comprehensive migration documentation
+
+#### 📁 Files Updated
+
+- `.github/copilot-instructions.md`: Added GitHub Models prompt format guidelines
+- All prompt files in `prompts/` and `prompts/templates/` directories
+- `GITHUB_MODELS_MIGRATION.md`: Created migration summary documentation
+
+#### 🎯 Benefits
+
+- **GitHub Integration**: Direct compatibility with GitHub's AI development tools
+- **Standardization**: Follows industry-standard format for prompt storage
+- **Enhanced Testing**: Built-in test data and evaluation framework
+- **Better Collaboration**: Easier sharing with stakeholders through GitHub's organized UI
+
+
 ## [0.4.5] - 2025-07-12
 
 ### 🔧 Enhanced Context Collection Reliability & Error Handling
