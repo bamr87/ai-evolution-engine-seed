@@ -1,85 +1,48 @@
-<!--
-@file scripts/README.md
-@description Directory index for utility scripts and automation tools
-@author IT-Journey Team <team@it-journey.org>
-@created 2025-07-12
-@lastModified 2025-07-12
-@version 1.0.0
+# 🗃️ AI Evolution Engine - Scripts
 
-@relatedIssues 
-  - #documentation-cleanup: Organize repository documentation structure
+This directory contains the core scripts for the AI Evolution Engine.
 
-@relatedEvolutions
-  - v1.0.0: Initial creation during documentation cleanup
+## 📁 Current Scripts
 
-@dependencies
-  - bash: >=4.0 for script execution
-  - Various tools depending on script functionality
+### 🌱 `evolve.sh`
+- **Purpose:** Main entry point for all evolution operations (context collection, simulation, application, validation)
+- **Usage:**
+  ```bash
+  ./scripts/evolve.sh help
+  ./scripts/evolve.sh context
+  ./scripts/evolve.sh simulate -p "Prompt" -m mode
+  ./scripts/evolve.sh apply response.json
+  ./scripts/evolve.sh validate
+  ```
 
-@changelog
-  - 2025-07-12: Initial creation during repository cleanup - ITJ
+### ⚙️ `setup.sh`
+- **Purpose:** Environment setup and preparation for evolution/testing
+- **Usage:**
+  ```bash
+  ./scripts/setup.sh help
+  ./scripts/setup.sh --no-deps --no-prereqs
+  ```
 
-@usage Contains utility scripts for system operations
-@notes Scripts should be executable and well-documented
--->
+### 🧪 `test.sh`
+- **Purpose:** Unified test runner for the evolution engine
+- **Usage:**
+  ```bash
+  ./scripts/test.sh help
+  ./scripts/test.sh all
+  ./scripts/test.sh scripts
+  ./scripts/test.sh workflows
+  ./scripts/test.sh integration
+  ./scripts/test.sh validation
+  ```
 
-# Scripts Directory
+## 🗄️ Archived Scripts
+All other scripts from the previous architecture have been moved to `scripts/archive/` for reference. These include:
+- Context collection, workflow helpers, version management, notification, legacy modular scripts, and more.
 
-This directory contains utility scripts, automation tools, and helper programs that support the AI Evolution Engine operations and development workflow.
+**Note:**
+- The new system is designed to work with only the three main scripts above.
+- If you need to reference or restore old functionality, see `scripts/archive/`.
 
-## Directory Contents
+---
 
-### Utility Scripts
-- `ai-debug-helper.sh` - Debugging assistance and troubleshooting tools
-- `analyze-repository-health-simple.sh` - Repository health analysis and validation
-- `validate-docs-organization.sh` - Documentation organization validation and enforcement
-- `post-ai-validation.sh` - Post-AI prompt cycle validation runner
-- Additional automation scripts for various system operations
-
-## Purpose
-
-The scripts directory serves as a central location for:
-- **Automation Tools**: Scripts that automate common development tasks
-- **Utility Functions**: Helper scripts for system operations
-- **Analysis Tools**: Scripts for analyzing system health and performance
-- **Debug Helpers**: Tools for troubleshooting and debugging issues
-- **Maintenance Scripts**: Automated maintenance and cleanup operations
-
-## Script Categories
-
-### Validation and Compliance
-- **Documentation Organization**: `validate-docs-organization.sh` - Ensures all non-README markdown files are in docs/ directory
-- **README Validation**: Verifies every directory contains a comprehensive README.md file
-- **Post-AI Validation**: `post-ai-validation.sh` - Comprehensive validation runner for post-AI prompt cycles
-- **Compliance Enforcement**: Automated checks to maintain repository organization standards
-
-### Debug and Analysis
-- **Health Checks**: Scripts that validate system integrity
-- **Performance Analysis**: Tools for measuring and analyzing performance
-- **Debug Helpers**: Utilities for troubleshooting issues
-
-### Automation
-- **Build Automation**: Scripts for automated building and deployment
-- **Test Automation**: Tools for running and managing tests
-- **Maintenance**: Automated cleanup and maintenance operations
-
-### Development Tools
-- **Setup Scripts**: Tools for environment setup and configuration
-- **Utility Functions**: Common operations and helper functions
-- **Integration Tools**: Scripts for integrating with external systems
-
-## Usage Guidelines
-
-1. **Executable**: All scripts should have appropriate execute permissions
-2. **Documentation**: Include proper file headers and usage information
-3. **Error Handling**: Implement robust error handling following DFF principles
-4. **Dependencies**: Clearly document any external dependencies
-5. **Testing**: Validate scripts before deployment
-
-## Best Practices
-
-- **Modular Design**: Keep scripts focused on specific tasks
-- **Reusability**: Design scripts to be reusable across different contexts
-- **Safety**: Include appropriate safeguards and validation
-- **Logging**: Provide appropriate logging and output
-- **Maintenance**: Regularly review and update scripts
+**This minimal script set improves maintainability, clarity, and ease of use for all evolution and testing operations.**

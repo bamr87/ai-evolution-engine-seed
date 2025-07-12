@@ -1,208 +1,175 @@
-# AI Evolution Engine - GitHub Actions Workflows (v0.4.6)
+# 🌱 AI Evolution Engine - Workflows
 
-This directory contains the GitHub Actions workflows that power the AI Evolution Engine, enabling automated and manual evolution of the codebase through AI-driven growth cycles.
+This directory contains the GitHub Actions workflows for the AI Evolution Engine.
 
-## 🧹 Cleaned Workflow Structure
+## 📋 Current Workflows
 
-As of v0.4.6, the workflow structure has been cleaned and optimized:
-
-### ✅ Active Workflows
-- `ai_evolver.yml` - Main manual evolution engine
-- `daily_evolution.yml` - Automated daily maintenance  
-- `periodic_evolution.yml` - Scheduled periodic evolutions
-- `testing_automation_evolver.yml` - Testing and build automation
-
-### 🗑️ Removed Files
-- `ai_evolver_fixed.yml` (duplicate - merged into main)
-- `ai_evolver_v0.4.6.yml` (temporary - merged into main)
-
-## Workflow Overview
-
-### 🌱 Core Evolution Workflows
-
-#### 1. `ai_evolver.yml` - Manual Evolution Engine
-**Purpose**: Primary workflow for manual AI-driven evolution triggered by human prompts
-
-**Triggers**: 
-- Manual dispatch with custom growth instructions
-
-**Key Features**:
-- Custom evolution prompts
-- Multiple growth modes (conservative, adaptive, experimental)
-- Dry run capability for safe testing
-- Automatic seed planting for continuous evolution
-- Pull request generation with detailed changes
-
-**Usage**:
-```bash
-# Trigger manual evolution
-gh workflow run ai_evolver.yml \
-  -f prompt="Implement user authentication system" \
-  -f growth_mode="adaptive" \
-  -f dry_run=false
-```
-
-#### 2. `daily_evolution.yml` - Automated Maintenance
-**Purpose**: Scheduled daily evolution for repository health and maintenance
+### 🌱 `evolve.yml` - Main Evolution Workflow
+**Purpose**: Primary evolution workflow for AI-driven repository improvements
 
 **Triggers**:
-- Daily at 3 AM UTC (scheduled)
-- Manual dispatch for immediate health checks
+- Manual dispatch with customizable parameters
+- Scheduled runs (daily at 3 AM UTC, weekly on Mondays at 2 AM UTC)
 
-**Key Features**:
-- Repository health analysis
-- Automatic issue detection and resolution
-- Multiple evolution types (consistency, error_fixing, documentation, etc.)
-- Intensity levels for controlled growth
-- Smart evolution triggering (only when needed)
+**Features**:
+- Context collection and analysis
+- AI evolution simulation
+- Change application and validation
+- Pull request creation
+- Comprehensive reporting
 
 **Usage**:
 ```bash
-# Force manual daily evolution
-gh workflow run daily_evolution.yml \
-  -f evolution_type="consistency" \
-  -f intensity="moderate" \
-  -f force_run=true
+# Manual trigger via GitHub CLI
+gh workflow run evolve.yml -f evolution_type=consistency -f intensity=minimal
+
+# Or via GitHub web interface
 ```
 
-#### 3. `testing_automation_evolver.yml` - Testing & Build Optimization
-**Purpose**: Specialized evolution focused on testing, build processes, and CI/CD improvements
+### 🧪 `test.yml` - Testing Workflow
+**Purpose**: Comprehensive testing and validation
 
 **Triggers**:
-- Manual dispatch for testing improvements
+- Manual dispatch
+- Push to main branch
+- Pull requests
 
-**Key Features**:
-- Specialized growth modes for testing and builds
-- Integration with zer0-mistakes error resolution patterns
-- Configurable cycle and generation tracking
-- Automated testing validation
+**Features**:
+- Multiple test types (all, scripts, workflows, integration, validation)
+- Multiple output formats (text, JSON, HTML)
+- Automated PR comments with test results
+- Artifact upload for test reports
 
 **Usage**:
 ```bash
-# Trigger testing evolution
-gh workflow run testing_automation_evolver.yml \
-  -f growth_mode="test-automation" \
-  -f cycle="3" \
-  -f generation="1"
+# Manual trigger via GitHub CLI
+gh workflow run test.yml -f test_type=all -f output_format=json
+
+# Or via GitHub web interface
 ```
 
-## Evolution System Architecture
+## 🔄 Workflow Simplification
 
-### 🧬 Growth Cycle Process
+### Before (Complex)
+- `ai_evolver.yml` - Manual evolution (478 lines)
+- `daily_evolution.yml` - Daily maintenance (166 lines)
+- `periodic_evolution.yml` - Periodic prompts (347 lines)
+- `testing_automation_evolver.yml` - Testing automation (133 lines)
 
-1. **Environment Preparation**: Setup repository and dependencies
-2. **Context Collection**: Gather repository DNA and current state
-3. **AI Growth Simulation**: Generate evolution strategy and changes
-4. **Change Application**: Apply modifications to codebase
-5. **Seed Planting**: Generate next evolution seeds
-6. **Validation & Testing**: Ensure changes work correctly
-7. **Pull Request Creation**: Submit changes for review
+### After (Simplified)
+- `evolve.yml` - Main evolution workflow (consolidated functionality)
+- `test.yml` - Testing workflow (comprehensive testing)
 
-### 🌿 Growth Modes
+**Benefits**:
+- **Reduced complexity**: 4 workflows → 2 workflows
+- **Clearer purpose**: Each workflow has a single, well-defined purpose
+- **Easier maintenance**: Fewer files to maintain and update
+- **Better integration**: Uses the new consolidated scripts
 
-| Mode | Description | Risk Level | Use Case |
-|------|-------------|------------|----------|
-| `conservative` | Safe, minimal changes | Low | Production systems, critical fixes |
-| `adaptive` | Balanced improvements | Medium | General development, feature additions |
-| `experimental` | Advanced features | High | Research, prototype development |
-| `test-automation` | Testing focus | Low-Medium | Quality improvements |
-| `build-optimization` | CI/CD focus | Medium | Performance improvements |
-| `error-resilience` | Error handling | Low | Stability improvements |
-| `ci-cd-enhancement` | Pipeline focus | Medium | DevOps improvements |
+## 📊 Workflow Comparison
 
-### 🔧 Supporting Scripts
+| Feature | Old Workflows | New Workflows |
+|---------|---------------|---------------|
+| **Count** | 4 workflows | 2 workflows |
+| **Total Lines** | 1,124 lines | ~400 lines |
+| **Complexity** | High (multiple overlapping features) | Low (clear separation) |
+| **Maintenance** | Difficult (multiple files) | Easy (fewer files) |
+| **Integration** | Complex (multiple scripts) | Simple (consolidated scripts) |
 
-All workflows utilize modular scripts in the `/scripts` directory:
+## 🎯 Key Improvements
 
-- `setup-environment.sh`: Environment preparation and validation
-- `collect-context.sh`: Repository analysis and context gathering
-- `simulate-ai-growth.sh`: AI evolution simulation engine
-- `apply-growth-changes.sh`: Change application and validation
-- `plant-new-seeds.sh`: Next evolution seed generation
-- `create_pr.sh`: Pull request creation and formatting
-- `analyze-repository-health.sh`: Health assessment for daily evolution
-- `test-evolved-seed.sh`: Evolution validation and testing
+### ✅ Simplified Architecture
+- **Single evolution workflow**: Handles all evolution types and modes
+- **Unified testing**: Comprehensive test suite with multiple formats
+- **Clear separation**: Evolution vs testing responsibilities
 
-## Configuration Standards
+### ✅ Enhanced Usability
+- **Intuitive parameters**: Clear, descriptive input options
+- **Flexible scheduling**: Both manual and automated triggers
+- **Comprehensive reporting**: Detailed logs and artifacts
 
-All workflows follow consistent patterns defined in `WORKFLOW_STANDARDS.md`:
+### ✅ Better Integration
+- **Uses consolidated scripts**: Leverages the new `evolve.sh`, `setup.sh`, `test.sh`
+- **Consistent patterns**: Same setup and validation across workflows
+- **Error handling**: Robust fallbacks and validation
 
-- **Permissions**: `contents: write`, `pull-requests: write`, `issues: write`
-- **Token Usage**: Prefer `GITHUB_TOKEN` over custom PAT tokens
-- **Error Handling**: Robust validation and meaningful error messages
-- **Dry Run Support**: Safe testing mode for all evolution operations
-- **Environment Variables**: Consistent naming and scoping
-- **Script Execution**: Proper permissions and error handling
+## 📁 Archive
 
-## Evolution Tracking
+Old workflows have been moved to `.github/workflows/archive/`:
+- `ai_evolver.yml` - Original manual evolution workflow
+- `daily_evolution.yml` - Original daily maintenance workflow
+- `periodic_evolution.yml` - Original periodic prompts workflow
+- `testing_automation_evolver.yml` - Original testing automation workflow
 
-### Version Management
-- Current system version: **v0.4.6**
-- Version consistency across all workflows
-- Enhanced compatibility and error handling
-- Breaking change documentation
+These are preserved for reference but are no longer active.
 
-### Metrics Collection
-- Evolution success rates
-- Change impact analysis
-- Repository health trends
-- Performance metrics
+## 🚀 Usage Examples
 
-## Security Considerations
+### Manual Evolution
+```bash
+# Basic consistency evolution
+gh workflow run evolve.yml
 
-### Token Management
-- Use minimal required permissions
-- Secure handling of sensitive data
-- Audit trail for all changes
+# Custom evolution with specific prompt
+gh workflow run evolve.yml -f evolution_type=custom -f prompt="Add user authentication"
 
-### Change Validation
-- Mandatory dry run testing
-- Pull request review process
-- Automated validation checks
-- Rollback procedures
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Script Not Found**: Ensure all scripts in `/scripts` directory are executable
-2. **Permission Denied**: Check repository permissions and token scope
-3. **Evolution Failed**: Review logs and use dry run mode for debugging
-4. **Missing Dependencies**: Verify setup script execution
-
-### Debug Mode
-Enable verbose logging by setting environment variables in workflow dispatch:
-```yaml
-env:
-  DEBUG: true
-  VERBOSE: true
+# Conservative evolution with dry run
+gh workflow run evolve.yml -f growth_mode=conservative -f dry_run=true
 ```
 
-## Contributing
+### Testing
+```bash
+# Run all tests
+gh workflow run test.yml
 
-### Adding New Workflows
-1. Follow patterns in `WORKFLOW_STANDARDS.md`
-2. Include dry run support
-3. Add comprehensive error handling
-4. Update this README
-5. Test thoroughly before merging
+# Test specific components
+gh workflow run test.yml -f test_type=scripts
 
-### Modifying Existing Workflows
-1. Maintain backward compatibility
-2. Update version numbers
-3. Document breaking changes
-4. Test all evolution modes
+# Generate JSON report
+gh workflow run test.yml -f output_format=json -f verbose=true
+```
 
-## Future Enhancements
+### Scheduled Runs
+The workflows automatically run on schedule:
+- **Daily**: `evolve.yml` runs at 3 AM UTC for maintenance
+- **Weekly**: `evolve.yml` runs on Mondays at 2 AM UTC for consistency checks
+- **On Push/PR**: `test.yml` runs automatically on code changes
 
-- [ ] Multi-repository evolution support
-- [ ] Advanced AI model integration
-- [ ] Real-time evolution monitoring
-- [ ] Custom evolution templates
-- [ ] Integration with external tools
-- [ ] Performance optimization
-- [ ] Enhanced security features
+## 🔧 Configuration
+
+### Environment Variables
+- `EVOLUTION_VERSION`: Current version (3.0.0)
+- `WORKFLOW_TYPE`: Workflow type for logging
+- `CI_ENVIRONMENT`: Set to true for CI/CD detection
+
+### Permissions
+- `contents: write` - For file modifications
+- `pull-requests: write` - For PR creation
+- `issues: write` - For issue management
+
+### Secrets
+- `GITHUB_TOKEN` - For repository access and PR creation
+
+## 📈 Monitoring
+
+### Workflow Status
+Monitor workflow execution in the GitHub Actions tab:
+- Green: All steps completed successfully
+- Yellow: Some steps completed with warnings
+- Red: Steps failed
+
+### Artifacts
+Both workflows generate artifacts:
+- **Evolution artifacts**: Context files, response files, reports
+- **Test artifacts**: Test results, logs, reports
+
+### Logs
+Detailed logs are available for each step:
+- Setup and environment preparation
+- Context collection and analysis
+- AI simulation and change application
+- Validation and testing results
 
 ---
 
-*This AI Evolution Engine enables continuous improvement through intelligent automation while maintaining human oversight and control.*
+**Note**: These workflows are designed to work with the consolidated scripts (`evolve.sh`, `setup.sh`, `test.sh`) and represent a significant simplification of the previous complex workflow structure.

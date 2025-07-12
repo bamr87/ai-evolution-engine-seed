@@ -1,0 +1,180 @@
+{
+  "test_run_id": "ai_evolver_test_20250705-163812",
+  "start_time": "2025-07-05T16:38:12-06:00",
+  "tests": [
+    {
+      "name": "AI Evolver workflow file exists",
+      "result": "PASSED",
+      "error": "",
+      "timestamp": "2025-07-05T16:38:12-06:00"
+    },
+    {
+      "name": "Workflow YAML is valid",
+      "result": "PASSED",
+      "error": "",
+      "timestamp": "2025-07-05T16:38:12-06:00"
+    },
+    {
+      "name": "Workflow has a descriptive name",
+      "result": "PASSED",
+      "error": "",
+      "timestamp": "2025-07-05T16:38:12-06:00"
+    },
+    {
+      "name": "Workflow has proper trigger (workflow_dispatch)",
+      "result": "PASSED",
+      "error": "",
+      "timestamp": "2025-07-05T16:38:12-06:00"
+    },
+    {
+      "name": "Workflow has required permissions",
+      "result": "PASSED",
+      "error": "",
+      "timestamp": "2025-07-05T16:38:12-06:00"
+    },
+    {
+      "name": "Workflow has PR permissions",
+      "result": "PASSED",
+      "error": "",
+      "timestamp": "2025-07-05T16:38:12-06:00"
+    },
+    {
+      "name": "Has prompt input",
+      "result": "PASSED",
+      "error": "",
+      "timestamp": "2025-07-05T16:38:12-06:00"
+    },
+    {
+      "name": "Has growth_mode input",
+      "result": "PASSED",
+      "error": "",
+      "timestamp": "2025-07-05T16:38:12-06:00"
+    },
+    {
+      "name": "Has auto_plant_seeds input",
+      "result": "PASSED",
+      "error": "",
+      "timestamp": "2025-07-05T16:38:12-06:00"
+    },
+    {
+      "name": "Has dry_run input",
+      "result": "PASSED",
+      "error": "",
+      "timestamp": "2025-07-05T16:38:12-06:00"
+    },
+    {
+      "name": "Has use_container input",
+      "result": "PASSED",
+      "error": "",
+      "timestamp": "2025-07-05T16:38:12-06:00"
+    },
+    {
+      "name": "Growth mode has valid default",
+      "result": "PASSED",
+      "error": "",
+      "timestamp": "2025-07-05T16:38:12-06:00"
+    },
+    {
+      "name": "Auto plant seeds has boolean default",
+      "result": "PASSED",
+      "error": "",
+      "timestamp": "2025-07-05T16:38:12-06:00"
+    },
+    {
+      "name": "Has evolve job",
+      "result": "PASSED",
+      "error": "",
+      "timestamp": "2025-07-05T16:38:12-06:00"
+    },
+    {
+      "name": "Job runs on ubuntu-latest",
+      "result": "PASSED",
+      "error": "",
+      "timestamp": "2025-07-05T16:38:12-06:00"
+    },
+    {
+      "name": "Job has environment variables",
+      "result": "PASSED",
+      "error": "",
+      "timestamp": "2025-07-05T16:38:12-06:00"
+    },
+    {
+      "name": "Has checkout step",
+      "result": "PASSED",
+      "error": "",
+      "timestamp": "2025-07-05T16:38:12-06:00"
+    },
+    {
+      "name": "Has context collection step",
+      "result": "PASSED",
+      "error": "",
+      "timestamp": "2025-07-05T16:38:12-06:00"
+    },
+    {
+      "name": "Has AI growth simulation step",
+      "result": "PASSED",
+      "error": "",
+      "timestamp": "2025-07-05T16:38:12-06:00"
+    },
+    {
+      "name": "Has PR creation step",
+      "result": "PASSED",
+      "error": "",
+      "timestamp": "2025-07-05T16:38:12-06:00"
+    },
+    {
+      "name": "Generate seed script exists",
+      "result": "PASSED",
+      "error": "",
+      "timestamp": "2025-07-05T16:38:12-06:00"
+    },
+    {
+      "name": "Generate AI response script exists",
+      "result": "PASSED",
+      "error": "",
+      "timestamp": "2025-07-05T16:38:12-06:00"
+    },
+    {
+      "name": "Create PR script exists",
+      "result": "PASSED",
+      "error": "",
+      "timestamp": "2025-07-05T16:38:12-06:00"
+    },
+    {
+      "name": "Generate seed script is executable",
+      "result": "PASSED",
+      "error": "",
+      "timestamp": "2025-07-05T16:38:12-06:00"
+    },
+    {
+      "name": "Generate AI response script is executable",
+      "result": "PASSED",
+      "error": "",
+      "timestamp": "2025-07-05T16:38:12-06:00"
+    },
+    {
+      "name": "Create PR script is executable",
+      "result": "PASSED",
+      "error": "",
+      "timestamp": "2025-07-05T16:38:12-06:00"
+    },
+    {
+      "name": "Steps have continue-on-error where appropriate",
+      "result": "PASSED",
+      "error": "",
+      "timestamp": "2025-07-05T16:38:12-06:00"
+    },
+    {
+      "name": "Critical steps fail fast",
+      "result": "PASSED",
+      "error": "",
+      "timestamp": "2025-07-05T16:38:12-06:00"
+    },
+    {
+      "name": "GITHUB_TOKEN is configured",
+      "result": "FAILED",
+      "error": "",
+      "timestamp": "2025-07-05T16:38:12-06:00"
+    }
+  ]
+}

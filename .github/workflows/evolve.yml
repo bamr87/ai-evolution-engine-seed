@@ -1,0 +1,313 @@
+name: 🌱 AI Evolution Engine (v3.0.0)
+
+on:
+  # Manual trigger
+  workflow_dispatch:
+    inputs:
+      evolution_type:
+        description: 'Type of evolution to run'
+        required: false
+        default: 'consistency'
+        type: choice
+        options:
+          - consistency
+          - error_fixing
+          - documentation
+          - code_quality
+          - security_updates
+          - custom
+      intensity:
+        description: 'Evolution intensity level'
+        required: false
+        default: 'minimal'
+        type: choice
+        options:
+          - minimal
+          - moderate
+          - comprehensive
+      growth_mode:
+        description: 'Growth strategy'
+        required: false
+        default: 'conservative'
+        type: choice
+        options:
+          - conservative
+          - adaptive
+          - experimental
+      prompt:
+        description: 'Custom evolution prompt (required for custom type)'
+        required: false
+        type: string
+      dry_run:
+        description: 'Run in simulation mode without making actual changes'
+        required: false
+        default: false
+        type: boolean
+      create_pr:
+        description: 'Create pull request for changes'
+        required: false
+        default: true
+        type: boolean
+
+  # Scheduled runs
+  schedule:
+    # Daily maintenance at 3 AM UTC
+    - cron: '0 3 * * *'
+    # Weekly consistency check at 2 AM UTC on Mondays
+    - cron: '0 2 * * 1'
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+env:
+  EVOLUTION_VERSION: "3.0.0"
+  WORKFLOW_TYPE: "evolution"
+  CI_ENVIRONMENT: "true"
+
+jobs:
+  evolve:
+    name: 🌿 Evolution Cycle
+    runs-on: ubuntu-latest
+    
+    env:
+      EVOLUTION_TYPE: ${{ github.event.inputs.evolution_type || 'consistency' }}
+      INTENSITY: ${{ github.event.inputs.intensity || 'minimal' }}
+      GROWTH_MODE: ${{ github.event.inputs.growth_mode || 'conservative' }}
+      PROMPT: ${{ github.event.inputs.prompt || '' }}
+      DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+      CREATE_PR: ${{ github.event.inputs.create_pr || 'true' }}
+    
+    steps:
+      - name: 🌱 Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🛠️ Setup Environment
+        run: |
+          echo "🔧 Setting up evolution environment..."
+          
+          # Install dependencies
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq jq curl git tree
+          
+          # Make scripts executable
+          chmod +x scripts/*.sh
+          
+          # Run setup script
+          if [[ -f "./scripts/setup.sh" ]]; then
+            ./scripts/setup.sh --no-deps --no-prereqs
+          else
+            echo "⚠️ Setup script not found, using basic setup"
+          fi
+
+      - name: 🧪 Run Pre-Evolution Tests
+        run: |
+          echo "🧪 Running pre-evolution validation..."
+          
+          if [[ -f "./scripts/test.sh" ]]; then
+            ./scripts/test.sh validation
+          else
+            echo "⚠️ Test script not found, skipping validation"
+          fi
+
+      - name: 🔍 Collect Repository Context
+        id: context
+        run: |
+          echo "🔍 Collecting repository context..."
+          
+          # Create output directory
+          mkdir -p evolution-output
+          
+          # Run context collection
+          if [[ -f "./scripts/evolve.sh" ]]; then
+            ./scripts/evolve.sh context -o evolution-output
+          else
+            echo "❌ Evolution script not found"
+            exit 1
+          fi
+          
+          # Check if context was created
+          if [[ -f "evolution-output/repo-context.json" ]]; then
+            echo "✅ Context collected successfully"
+            echo "context_file=evolution-output/repo-context.json" >> $GITHUB_OUTPUT
+          else
+            echo "❌ Context collection failed"
+            exit 1
+          fi
+
+      - name: 🤖 Simulate AI Evolution
+        id: simulation
+        run: |
+          echo "🤖 Simulating AI evolution..."
+          
+          # Determine prompt
+          if [[ "$EVOLUTION_TYPE" == "custom" && -n "$PROMPT" ]]; then
+            EVOLUTION_PROMPT="$PROMPT"
+          else
+            case "$EVOLUTION_TYPE" in
+              "consistency")
+                EVOLUTION_PROMPT="Fix formatting, naming, and structural inconsistencies"
+                ;;
+              "error_fixing")
+                EVOLUTION_PROMPT="Address bugs, errors, and improve robustness"
+                ;;
+              "documentation")
+                EVOLUTION_PROMPT="Update and improve documentation quality"
+                ;;
+              "code_quality")
+                EVOLUTION_PROMPT="Enhance code maintainability and readability"
+                ;;
+              "security_updates")
+                EVOLUTION_PROMPT="Apply security improvements and updates"
+                ;;
+              *)
+                EVOLUTION_PROMPT="Perform general improvements and optimizations"
+                ;;
+            esac
+          fi
+          
+          # Run simulation
+          if [[ -f "./scripts/evolve.sh" ]]; then
+            ./scripts/evolve.sh simulate -p "$EVOLUTION_PROMPT" -m "$GROWTH_MODE" -o evolution-output
+          else
+            echo "❌ Evolution script not found"
+            exit 1
+          fi
+          
+          # Check if response was created
+          if [[ -f "evolution-output/evolution-response.json" ]]; then
+            echo "✅ Evolution simulated successfully"
+            echo "response_file=evolution-output/evolution-response.json" >> $GITHUB_OUTPUT
+          else
+            echo "❌ Evolution simulation failed"
+            exit 1
+          fi
+
+      - name: 🔧 Apply Evolution Changes
+        if: env.DRY_RUN != 'true'
+        run: |
+          echo "🔧 Applying evolution changes..."
+          
+          if [[ -f "./scripts/evolve.sh" && -f "evolution-output/evolution-response.json" ]]; then
+            ./scripts/evolve.sh apply evolution-output/evolution-response.json
+          else
+            echo "❌ Cannot apply changes - missing files"
+            exit 1
+          fi
+
+      - name: 🔍 Preview Changes (Dry Run)
+        if: env.DRY_RUN == 'true'
+        run: |
+          echo "🔍 DRY RUN MODE - Changes that would be applied:"
+          
+          if [[ -f "evolution-output/evolution-response.json" ]]; then
+            jq -r '.changes[] | "  - \(.action) \(.file): \(.description)"' evolution-output/evolution-response.json 2>/dev/null || echo "  - Changes would be applied"
+          else
+            echo "  - No changes preview available"
+          fi
+
+      - name: 🧪 Validate Changes
+        if: env.DRY_RUN != 'true'
+        run: |
+          echo "🧪 Validating applied changes..."
+          
+          if [[ -f "./scripts/evolve.sh" ]]; then
+            ./scripts/evolve.sh validate
+          else
+            echo "⚠️ Validation script not found"
+          fi
+
+      - name: 📊 Create Pull Request
+        if: env.DRY_RUN != 'true' && env.CREATE_PR == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "📊 Creating pull request..."
+          
+          # Check if there are changes to commit
+          if git diff --quiet; then
+            echo "ℹ️ No changes to commit"
+          else
+            # Create branch
+            BRANCH_NAME="evolution/$(date +%Y%m%d-%H%M%S)"
+            git checkout -b "$BRANCH_NAME"
+            
+            # Commit changes
+            git add .
+            git commit -m "🌱 Evolution: $EVOLUTION_TYPE ($INTENSITY intensity, $GROWTH_MODE mode)"
+            
+            # Push branch
+            git push origin "$BRANCH_NAME"
+            
+            # Create PR using GitHub CLI
+            if command -v gh >/dev/null 2>&1; then
+              gh pr create \
+                --title "🌱 Evolution: $EVOLUTION_TYPE improvements" \
+                --body "Automated evolution cycle:
+                
+- **Type**: $EVOLUTION_TYPE
+- **Intensity**: $INTENSITY
+- **Mode**: $GROWTH_MODE
+- **Prompt**: $EVOLUTION_PROMPT
+
+This PR contains improvements generated by the AI Evolution Engine." \
+                --base main \
+                --head "$BRANCH_NAME"
+            else
+              echo "⚠️ GitHub CLI not available, manual PR creation required"
+            fi
+          fi
+
+      - name: 📋 Generate Report
+        if: always()
+        run: |
+          echo "📋 Generating evolution report..."
+          
+          # Create report
+          cat > evolution-output/report.md << EOF
+# Evolution Report
+
+**Date**: $(date -u +"%Y-%m-%dT%H:%M:%SZ")
+**Type**: $EVOLUTION_TYPE
+**Intensity**: $INTENSITY
+**Mode**: $GROWTH_MODE
+**Dry Run**: $DRY_RUN
+
+## Summary
+- Context collection: ${{ steps.context.outcome }}
+- AI simulation: ${{ steps.simulation.outcome }}
+- Changes applied: ${{ env.DRY_RUN != 'true' && 'Yes' || 'No (dry run)' }}
+
+## Files Modified
+$(jq -r '.changes[] | "- \(.file): \(.description)"' evolution-output/evolution-response.json 2>/dev/null || echo "- No changes recorded")
+
+## Metrics
+$(jq -r '.metrics | "- Files modified: \(.files_modified // 0)"' evolution-output/evolution-response.json 2>/dev/null || echo "- Metrics not available")
+EOF
+          
+          echo "✅ Report generated: evolution-output/report.md"
+
+      - name: 🧪 Run Post-Evolution Tests
+        if: always()
+        run: |
+          echo "🧪 Running post-evolution tests..."
+          
+          if [[ -f "./scripts/test.sh" ]]; then
+            ./scripts/test.sh validation
+          else
+            echo "⚠️ Test script not found, skipping validation"
+          fi
+
+      - name: 📊 Upload Evolution Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evolution-artifacts
+          path: |
+            evolution-output/
+            logs/
+          retention-days: 30 

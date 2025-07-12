@@ -1,0 +1,180 @@
+name: 🧪 AI Evolution Engine Tests (v3.0.0)
+
+on:
+  # Manual trigger
+  workflow_dispatch:
+    inputs:
+      test_type:
+        description: 'Type of tests to run'
+        required: false
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - scripts
+          - workflows
+          - integration
+          - validation
+      output_format:
+        description: 'Test report format'
+        required: false
+        default: 'text'
+        type: choice
+        options:
+          - text
+          - json
+          - html
+      verbose:
+        description: 'Enable verbose output'
+        required: false
+        default: false
+        type: boolean
+
+  # Run on push to main
+  push:
+    branches: [ main ]
+    paths:
+      - 'scripts/**'
+      - 'src/**'
+      - '.github/workflows/**'
+
+  # Run on pull requests
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'scripts/**'
+      - 'src/**'
+      - '.github/workflows/**'
+
+permissions:
+  contents: read
+  pull-requests: read
+
+env:
+  EVOLUTION_VERSION: "3.0.0"
+  WORKFLOW_TYPE: "testing"
+
+jobs:
+  test:
+    name: 🧪 Run Tests
+    runs-on: ubuntu-latest
+    
+    env:
+      TEST_TYPE: ${{ github.event.inputs.test_type || 'all' }}
+      OUTPUT_FORMAT: ${{ github.event.inputs.output_format || 'text' }}
+      VERBOSE: ${{ github.event.inputs.verbose || 'false' }}
+    
+    steps:
+      - name: 🌱 Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🛠️ Setup Environment
+        run: |
+          echo "🔧 Setting up test environment..."
+          
+          # Install dependencies
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq jq curl git tree
+          
+          # Make scripts executable
+          chmod +x scripts/*.sh
+          
+          # Run setup script
+          if [[ -f "./scripts/setup.sh" ]]; then
+            ./scripts/setup.sh --no-deps --no-prereqs
+          else
+            echo "⚠️ Setup script not found, using basic setup"
+          fi
+
+      - name: 🧪 Run Test Suite
+        id: test_run
+        run: |
+          echo "🧪 Running test suite..."
+          
+          # Set verbose flag
+          VERBOSE_FLAG=""
+          if [[ "$VERBOSE" == "true" ]]; then
+            VERBOSE_FLAG="-v"
+          fi
+          
+          # Run tests
+          if [[ -f "./scripts/test.sh" ]]; then
+            ./scripts/test.sh $VERBOSE_FLAG -f "$OUTPUT_FORMAT" "$TEST_TYPE"
+            TEST_EXIT_CODE=$?
+            
+            # Capture test results
+            if [[ -f "tests/results/test-report-*.txt" ]]; then
+              echo "test_report<<EOF" >> $GITHUB_OUTPUT
+              cat tests/results/test-report-*.txt >> $GITHUB_OUTPUT
+              echo "EOF" >> $GITHUB_OUTPUT
+            fi
+            
+            # Set outcome
+            if [[ $TEST_EXIT_CODE -eq 0 ]]; then
+              echo "test_outcome=success" >> $GITHUB_OUTPUT
+            else
+              echo "test_outcome=failure" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "❌ Test script not found"
+            echo "test_outcome=failure" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+      - name: 📊 Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            tests/results/
+            tests/logs/
+          retention-days: 30
+
+      - name: 📋 Test Summary
+        if: always()
+        run: |
+          echo "📋 Test Summary"
+          echo "=============="
+          echo "Test Type: $TEST_TYPE"
+          echo "Output Format: $OUTPUT_FORMAT"
+          echo "Outcome: ${{ steps.test_run.outputs.test_outcome }}"
+          
+          if [[ "${{ steps.test_run.outputs.test_outcome }}" == "success" ]]; then
+            echo "✅ All tests passed!"
+          else
+            echo "❌ Some tests failed"
+            exit 1
+          fi
+
+      - name: 🚨 Comment on PR
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const testOutcome = '${{ steps.test_run.outputs.test_outcome }}';
+            const testReport = `${{ steps.test_run.outputs.test_report }}`;
+            
+            let comment = '## 🧪 Test Results\n\n';
+            
+            if (testOutcome === 'success') {
+              comment += '✅ **All tests passed!**\n\n';
+            } else {
+              comment += '❌ **Some tests failed**\n\n';
+            }
+            
+            comment += `**Test Type**: ${{ github.event.inputs.test_type || 'all' }}\n`;
+            comment += `**Output Format**: ${{ github.event.inputs.output_format || 'text' }}\n\n`;
+            
+            if (testReport) {
+              comment += '**Test Report**:\n```\n' + testReport + '\n```\n';
+            }
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            }); 
