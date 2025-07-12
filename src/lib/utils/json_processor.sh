@@ -381,7 +381,7 @@ json_save_file() {
 #
 ai_prompts_load_config() {
     local config_file="${1:-ai_prompts_evolution.json}"
-    local project_root="${PROJECT_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../.." && pwd)}"
+    local project_root="${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || cd "$(dirname "${BASH_SOURCE[0]}")/../../../.." && pwd)}"
     local full_path="$project_root/$config_file"
     
     # Debug path resolution
