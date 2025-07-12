@@ -97,16 +97,30 @@ collect_step_errors() {
     if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]] && [[ -f "${GITHUB_STEP_SUMMARY}" ]]; then
         log_colored "$BLUE" "📋 Analyzing step summary..."
         
-        # Look for error patterns in step summary
+        # Create a temporary file with only the original content (before our additions)
+        local temp_summary="/tmp/original_step_summary.$$"
+        
+        # Extract only the original content, stop at our error summary section
+        sed '/## 📋 Workflow Error & Warning Summary/,$d' "${GITHUB_STEP_SUMMARY}" > "$temp_summary" 2>/dev/null || cp "${GITHUB_STEP_SUMMARY}" "$temp_summary"
+        
+        # Look for error patterns in original step summary only
         while IFS= read -r line; do
-            if echo "$line" | grep -qi "ERROR\|FAILED\|❌\|error\|failed"; then
+            # Skip lines that are just reporting counts or headers
+            if echo "$line" | grep -qi "Total Errors\|Total Warnings\|Workflow Error.*Summary"; then
+                continue
+            fi
+            
+            if echo "$line" | grep -qi "\[ERROR\]\|FAILED:\|❌.*ERROR\|Fatal:\|Exception:"; then
                 ERRORS+=("Step Summary: $line")
                 ((ERRORS_COLLECTED++))
-            elif echo "$line" | grep -qi "WARNING\|WARN\|⚠️\|warning"; then
+            elif echo "$line" | grep -qi "\[WARNING\]\|WARN:\|⚠️.*WARNING\|deprecated"; then
                 WARNINGS+=("Step Summary: $line")
                 ((WARNINGS_COLLECTED++))
             fi
-        done < "${GITHUB_STEP_SUMMARY}"
+        done < "$temp_summary"
+        
+        # Clean up temp file
+        rm -f "$temp_summary"
     fi
     
     # Check for errors in recent log files
@@ -119,12 +133,17 @@ collect_step_errors() {
                 # Extract filename for context
                 local filename=$(basename "$logfile")
                 
-                # Scan for error patterns
+                # Scan for error patterns (avoid false positives from metrics)
                 while IFS= read -r line; do
-                    if echo "$line" | grep -qi "ERROR\|FAILED\|Fatal\|Exception\|error\|failed"; then
+                    # Skip lines that are just metrics or count reports
+                    if echo "$line" | grep -qi "total.*errors\|failed.*[0-9]\|errors.*[0-9]"; then
+                        continue
+                    fi
+                    
+                    if echo "$line" | grep -qi "\[ERROR\]\|ERROR:\|Fatal:\|Exception:\|failed to\|error:"; then
                         ERRORS+=("$filename: $line")
                         ((ERRORS_COLLECTED++))
-                    elif echo "$line" | grep -qi "WARNING\|WARN\|deprecated\|warning"; then
+                    elif echo "$line" | grep -qi "\[WARNING\]\|WARNING:\|WARN:\|deprecated"; then
                         WARNINGS+=("$filename: $line")
                         ((WARNINGS_COLLECTED++))
                     fi
