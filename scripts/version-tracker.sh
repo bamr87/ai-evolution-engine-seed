@@ -58,12 +58,15 @@ PROMPT=""
 FORMAT="markdown"
 OUTPUT_FILE=""
 LIMIT=10
+TYPE=""
+MODE=""
+FINAL=""
 
 # Parse command line arguments
 parse_arguments() {
     while [[ $# -gt 0 ]]; do
         case $1 in
-            track-change|correlate-files|generate-report|show-history|update-changelog)
+            start|complete|version-bump|log|track-change|correlate-files|generate-report|show-history|update-changelog)
                 ACTION="$1"
                 shift
                 ;;
@@ -104,6 +107,18 @@ parse_arguments() {
             --limit)
                 LIMIT="$2"
                 shift 2
+                ;;
+            --type)
+                TYPE="$2"
+                shift 2
+                ;;
+            --mode)
+                MODE="$2"
+                shift 2
+                ;;
+            --final)
+                FINAL="true"
+                shift
                 ;;
             *)
                 # Handle positional arguments for backward compatibility
@@ -522,6 +537,46 @@ REMAINING_ARGS=("$@")
 
 # Main action handlers
 case "${ACTION:-help}" in
+    start)
+        # Start evolution cycle tracking
+        log_info "Starting evolution cycle tracking..."
+        if [[ -n "$VERSION" ]]; then
+            handle_track_action "evolution-start" "$VERSION"
+        else
+            # Initialize change tracking for current version
+            initialize_change_tracking
+        fi
+        log_success "Evolution cycle tracking started"
+        ;;
+    complete)
+        # Complete evolution cycle tracking
+        log_info "Completing evolution cycle tracking..."
+        if [[ -n "$VERSION" ]]; then
+            handle_track_action "post-version-update" "$VERSION"
+        fi
+        log_success "Evolution cycle tracking completed"
+        ;;
+    version-bump)
+        # Handle version bump (this would typically be handled by version-integration.sh)
+        log_info "Version bump requested - delegating to version integration system..."
+        if [[ -f "$PROJECT_ROOT/scripts/version-integration.sh" ]]; then
+            # Use evolution command with appropriate description
+            description="${PROMPT:-Evolution cycle version update}"
+            "$PROJECT_ROOT/scripts/version-integration.sh" evolution "$description"
+        else
+            log_warn "Version integration script not found - skipping version bump"
+        fi
+        ;;
+    log)
+        # Log final evolution tracking
+        log_info "Recording final evolution tracking..."
+        if [[ -n "$FINAL" ]]; then
+            log_info "Final evolution cycle completed"
+            # Generate final report
+            generate_correlation_report "markdown" "evolution-final-report.md" 2>/dev/null || true
+        fi
+        show_version_history 5
+        ;;
     track-change)
         if [[ -n "$TRACK_ACTION" && -n "$VERSION" ]]; then
             # Handle new style arguments with sub-actions
@@ -590,6 +645,19 @@ Version Tracker - Advanced Change Correlation System
 
 Usage: $0 [command] [arguments]
 
+Workflow Commands (used by CI/CD):
+  $0 start --type manual --mode adaptive --prompt "description"
+    Start evolution cycle tracking
+    
+  $0 complete --mode adaptive
+    Complete evolution cycle tracking
+    
+  $0 version-bump
+    Trigger version bump (delegates to version-integration.sh)
+    
+  $0 log --final --mode adaptive
+    Log final evolution tracking and generate reports
+
 Modern Usage (with flags):
   $0 track-change --action evolution-start --version 0.3.3
   $0 track-change --action pre-version-update --version 0.3.3
@@ -618,6 +686,7 @@ Legacy Commands:
     Update CHANGELOG.md with file correlations
 
 Examples:
+  $0 start --type manual --mode adaptive --prompt "Update documentation"
   $0 track-change "0.3.2" "0.3.3" "Added version management" "patch" '["README.md"]'
   $0 correlate-files "0.3.3"
   $0 file-history "README.md"

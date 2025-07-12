@@ -5,6 +5,59 @@ All notable changes to the AI Evolution Engine project will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+## [0.3.7] - 2025-07-12
+
+### 🔧 Fixed GitHub Actions Workflow Failure (patch increment)
+- **Description**: Fixed version-tracker.sh script missing workflow commands
+- **Issue**: GitHub Actions workflow was failing with "Unknown command: start" error
+- **Solution**: Added missing workflow commands (start, complete, version-bump, log) to version-tracker.sh
+- **Files Modified**: 1 file updated
+- **Change Tracking**: Full correlation available in `version-changes.json`
+
+#### 📝 Modified Files
+- `scripts/version-tracker.sh` - Added workflow command support
+
+#### 🔍 Details
+- Added `start` command for evolution cycle tracking initialization
+- Added `complete` command for evolution cycle completion
+- Added `version-bump` command that delegates to version-integration.sh
+- Added `log` command for final evolution tracking and reporting
+- Fixed argument parsing to support workflow flags (--type, --mode, --final)
+- Updated help documentation to include new workflow commands
+- Corrected version-integration.sh delegation to use 'evolution' command instead of 'bump'
+
+#### ✅ Verified Commands
+- `./scripts/version-tracker.sh start --type "manual" --mode "adaptive" --prompt "description"`
+- `./scripts/version-tracker.sh complete --mode "adaptive"`
+- `./scripts/version-tracker.sh version-bump --prompt "description"`
+- `./scripts/version-tracker.sh log --final --mode "adaptive"`
+
+## [0.3.6] - 2025-07-11
+
+### 🔄 Version Management (patch increment)
+- **Description**: Automatic version increment
+- **Files Modified**: 5 files updated
+- **Change Tracking**: Full correlation available in `version-changes.json`
+
+#### 📝 Modified Files
+- `README.md`
+- `init_setup.sh`
+- `.github/workflows/ai_evolver.yml`
+- `.seed.md`
+- `seed_prompt.md`
+
+#### 🔗 Quick Links
+- [View all changes for this version](#correlations-v037)
+- [File modification history](version-correlation-report.md)
+
+
+## [0.3.7] - 2025-07-11
+
+### 🔄 Version Management
+- **Version Update**: patch increment (Automatic version increment)
+- **Automatic File Updates**: Updated version references across tracked files
+
 ## [0.4.3] - 2025-07-10
 
 ### 🚀 AI Evolution Workflow v0.4.1 Implementation

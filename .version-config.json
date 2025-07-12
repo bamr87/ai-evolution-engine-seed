@@ -1,5 +1,5 @@
 {
-  "current_version": "0.3.6",
+  "current_version": "0.3.7",
   "version_format": "semantic",
   "seed_suffix": "-seed",
   "auto_increment": {
@@ -42,7 +42,7 @@
             "line_context": "AI-EVOLUTION-MARKER"
           }
         ],
-        "last_modified_version": "0.3.6"
+        "last_modified_version": "0.3.7"
       },
       {
         "path": "init_setup.sh",
@@ -63,7 +63,7 @@
             "line_context": "AI EVOLUTION ENGINE - SEED PLANTER"
           }
         ],
-        "last_modified_version": "0.3.6"
+        "last_modified_version": "0.3.7"
       },
       {
         "path": ".github/workflows/ai_evolver.yml",
@@ -74,7 +74,7 @@
             "line_context": "name: 🌱 AI Evolution Growth Engine"
           }
         ],
-        "last_modified_version": "0.3.6"
+        "last_modified_version": "0.3.7"
       },
       {
         "path": ".seed.md",
@@ -90,7 +90,7 @@
             "line_context": "## 🌿"
           }
         ],
-        "last_modified_version": "0.3.6"
+        "last_modified_version": "0.3.7"
       },
       {
         "path": "seed_prompt.md",
@@ -101,7 +101,7 @@
             "line_context": "# 🌱 AI Evolution Engine"
           }
         ],
-        "last_modified_version": "0.3.6"
+        "last_modified_version": "0.3.7"
       }
     ],
     "documentation_files": [
@@ -114,7 +114,7 @@
             "line_context": "- v"
           }
         ],
-        "last_modified_version": "0.3.6"
+        "last_modified_version": "0.3.7"
       }
     ],
     "script_files": [
@@ -128,7 +128,7 @@
           }
         ],
         "scan_directory": true,
-        "last_modified_version": "0.3.6"
+        "last_modified_version": "0.3.7"
       }
     ]
   },
@@ -160,6 +160,12 @@
     {
       "version": "0.3.6",
       "date": "2025-07-05",
+      "type": "patch",
+      "description": "Automatic version increment"
+    },
+    {
+      "version": "0.3.7",
+      "date": "2025-07-11",
       "type": "patch",
       "description": "Automatic version increment"
     }
