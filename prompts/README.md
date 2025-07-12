@@ -29,25 +29,95 @@ This directory contains evolution prompts, growth instructions, and AI guidance 
 ## Directory Contents
 
 ### Prompt Files
-- `first_growth.md` - Initial growth prompt for starting evolution cycles
-- `next_prompt.md` - Template for subsequent evolution prompts
+
+#### Core Growth Prompts (YAML Format)
+
+- `first_growth.yml` - Initial growth prompt for starting evolution cycles with Idea Incubator feature
+- `next_evolution.yml` - Template for subsequent evolution prompts based on current state
+
+#### Legacy Files (Markdown Format - Deprecated)
+
+- `first_growth.md` - Original markdown format (superseded by YAML version)
+- `next_prompt.md` - Empty template file (superseded by next_evolution.yml)
+
+### Template Directory (`templates/`)
+
+#### YAML Format Templates (Current Standard)
+
+- `text_summarizer.yml` - Example text summarization prompt with testing framework
+- `doc_harmonization.yml` - Documentation standardization and consistency
+- `security_scan.yml` - Security vulnerability scanning and remediation
+- `test_enhancement.yml` - Test coverage and quality improvements
+- `code_refactor.yml` - Code quality and maintainability improvements
+
+#### Legacy Markdown Templates (Deprecated)
+
+- Various `.md` files - Original markdown format templates
 
 ## Purpose
 
 The prompts directory serves as a repository for:
+
 - **Evolution Instructions**: Specific prompts that guide AI evolution behavior
 - **Growth Templates**: Reusable prompt templates for different evolution types
 - **AI Guidance**: Instructions that define how the AI should approach different tasks
 - **Evolution Strategies**: Prompts that implement specific evolution methodologies
+- **Testing Framework**: Embedded testing and validation for prompt reliability
+
+## Prompt Format Standards
+
+### YAML Format (Current Standard)
+
+The repository has migrated to a standardized YAML format for all prompts, providing:
+
+- **Structured Configuration**: Clear separation of metadata, model parameters, and content
+- **Embedded Testing**: Built-in test data and evaluators for prompt validation
+- **Model Parameters**: Explicit temperature, token limits, and model specifications
+- **Evaluators**: Automated validation of prompt outputs for quality assurance
+
+#### Standard YAML Structure
+
+```yaml
+name: Prompt Name
+description: Brief description of the prompt's purpose
+model: gpt-4o-mini
+modelParameters:
+  temperature: 0.3
+  max_tokens: 4000
+messages:
+  - role: system
+    content: System instructions and context
+  - role: user
+    content: User prompt with placeholder variables {{variable}}
+testData:
+  - input: |
+      variable: "example input"
+    expected: "expected output format"
+evaluators:
+  - name: Validation rule description
+    json:
+      validJson: true
+```
+
+### Template Variables
+
+Prompts use double-brace syntax for variable substitution:
+
+- `{{repository_files}}` - List of repository files to analyze
+- `{{current_state}}` - Current repository state and metrics
+- `{{growth_objectives}}` - Specific evolution goals and targets
+- `{{source_files}}` - Source code files for analysis
 
 ## Prompt Types
 
 ### Growth Prompts
+
 - **Initial Growth**: Starting prompts for new evolution cycles
 - **Incremental Growth**: Prompts for ongoing development and improvement
 - **Specialized Growth**: Targeted prompts for specific areas (testing, documentation, etc.)
 
 ### Instruction Templates
+
 - **Reusable Templates**: Standard prompt formats for common operations
 - **Customizable Prompts**: Templates that can be adapted for specific needs
 - **Context-Specific**: Prompts tailored for particular development contexts

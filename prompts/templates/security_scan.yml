@@ -1,0 +1,134 @@
+#
+# @file prompts/templates/security_scan.yml
+# @description Security vulnerability scan and fix prompt for repository hardening
+# @author AI Evolution Engine <ai-evolution@engine.dev>
+# @created 2025-07-12
+# @lastModified 2025-07-12
+# @version 2.0.0
+#
+# @relatedIssues 
+#   - #prompt-standardization: Standardize prompt format across repository
+#   - #TBD: Security vulnerability assessment and remediation
+#
+# @relatedEvolutions
+#   - v2.0.0: Converted to standardized YAML format
+#   - v1.0.0: Initial periodic prompt implementation
+#
+# @dependencies
+#   - AI Evolution Engine: >=0.4.3
+#   - YAML parser for prompt processing
+#
+# @changelog
+#   - 2025-07-12: Converted to standardized YAML format - ITJ
+#   - 2025-07-12: Initial creation of security scan prompt - AEE
+#
+# @usage Executed weekly via GitHub Actions workflow for security maintenance
+# @notes Part of the periodic AI prompts system for repository evolution
+#
+
+name: Security Vulnerability Scanner
+description: Identifies and fixes security vulnerabilities in code, workflows, and configurations across the repository
+model: gpt-4o-mini
+modelParameters:
+  temperature: 0.2
+  max_tokens: 4000
+messages:
+  - role: system
+    content: |
+      You are a cybersecurity expert specializing in application security and DevOps security practices. Your task is to perform a comprehensive security assessment of this repository and implement fixes for identified vulnerabilities.
+      
+      Focus on these priority levels:
+      
+      **High Priority Vulnerabilities:**
+      - Remote code execution (RCE)
+      - SQL injection and NoSQL injection
+      - Cross-site scripting (XSS)
+      - Authentication bypass
+      - Privilege escalation
+      - Exposed secrets and credentials
+      
+      **Medium Priority Issues:**
+      - Insecure direct object references
+      - Security misconfiguration
+      - Insecure deserialization
+      - Insufficient logging and monitoring
+      - Cross-site request forgery (CSRF)
+      
+      **Low Priority Concerns:**
+      - Information disclosure
+      - Weak cryptographic implementations
+      - Insecure dependencies
+      - Code quality issues with security implications
+  - role: user
+    content: |
+      Perform a comprehensive security assessment of the repository contents:
+      
+      **Repository Files to Analyze:**
+      {{repository_files}}
+      
+      **Security Assessment Areas:**
+      
+      1. **Code Security Analysis**
+         - Source Code Files: All programming language files (*.py, *.js, *.sh, etc.)
+         - Input Validation: Check for proper input sanitization and validation
+         - Authentication/Authorization: Review access control implementations
+         - Cryptographic Usage: Assess encryption and hashing implementations
+         - SQL Injection: Check for SQL injection vulnerabilities
+         - XSS Protection: Cross-site scripting prevention measures
+      
+      2. **Configuration Security**
+         - GitHub Actions Workflows: (.github/workflows/*.yml)
+         - Docker Configurations: Dockerfile and docker-compose files
+         - Environment Variables: Check for exposed secrets and sensitive data
+         - File Permissions: Review file and directory permissions
+         - CI/CD Security: Pipeline security configurations
+      
+      3. **Infrastructure Security**
+         - Dependency Vulnerabilities: Third-party package security issues
+         - Container Security: Docker image and runtime security
+         - Network Security: Port exposure and network configurations
+         - Access Controls: Repository and workflow permissions
+      
+      4. **Secret Management**
+         - Hardcoded Secrets: Search for exposed API keys, passwords, tokens
+         - Environment Variables: Proper secret management practices
+         - Configuration Files: Secure handling of sensitive configuration data
+         - Git History: Check for accidentally committed secrets
+      
+      Provide your findings in a structured JSON format with vulnerabilities categorized by severity and recommended fixes.
+testData:
+  - input: |
+      repository_files: "src/app.py, .github/workflows/ci.yml, Dockerfile, requirements.txt"
+    expected: |
+      {
+        "scan_summary": {
+          "files_scanned": 4,
+          "vulnerabilities_found": 2,
+          "high_priority": 1,
+          "medium_priority": 1,
+          "low_priority": 0
+        },
+        "vulnerabilities": [
+          {
+            "file": "src/app.py",
+            "severity": "high",
+            "type": "hardcoded_secret",
+            "description": "API key hardcoded in source code",
+            "recommendation": "Move to environment variables"
+          }
+        ]
+      }
+evaluators:
+  - name: Output should be valid JSON
+    json:
+      validJson: true
+  - name: Should include scan summary
+    json:
+      hasKey: "scan_summary"
+  - name: Should categorize vulnerabilities
+    json:
+      hasKey: "vulnerabilities"
+  - name: Should count files scanned
+    json:
+      path: "scan_summary.files_scanned"
+      type: "number"

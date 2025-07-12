@@ -10,39 +10,46 @@ The periodic AI evolution system automatically performs various maintenance task
 - **Bi-weekly**: Test suite enhancement
 - **Monthly**: Code refactoring, dependency updates, performance optimization, workflow improvements
 
-## Prompt Templates
+## Prompt Format Migration
 
-### Weekly Prompts
+**IMPORTANT**: This directory is migrating from Markdown (`.md`) to YAML (`.yml`) format for all prompts.
 
-#### 1. Documentation Harmonization (`doc_harmonization.md`)
+### Current YAML Templates (Active)
+
+These templates use the standardized YAML format with embedded testing and validation:
+
+#### 1. Text Summarizer (`text_summarizer.yml`)
+- **Purpose**: Example template demonstrating the standardized YAML prompt format
+- **Model**: gpt-4o-mini
+- **Features**: Input validation, output testing, structured evaluators
+
+#### 2. Documentation Harmonization (`doc_harmonization.yml`)
 - **Schedule**: Mondays at 2 AM UTC
 - **Purpose**: Standardize documentation styling, syntax, and frontmatter
 - **Focus**: Consistency, readability, and SEO optimization
 - **Safe Mode**: ✅ Enabled (low-risk changes)
 
-#### 2. Security Scan (`security_scan.md`)
+#### 3. Security Scan (`security_scan.yml`)
 - **Schedule**: Wednesdays at 3 AM UTC
 - **Purpose**: Identify and fix security vulnerabilities
 - **Focus**: Code security, configuration hardening, secret management
 - **Safe Mode**: ✅ Enabled (critical security fixes only)
 
-#### 3. Changelog and Versioning (`changelog_versioning.md`)
-- **Schedule**: Fridays at 4 AM UTC
-- **Purpose**: Update changelog and manage semantic versioning
-- **Focus**: Release management, version tracking
-- **Safe Mode**: ✅ Enabled (documentation updates)
-
-### Bi-weekly Prompts
-
-#### 4. Test Enhancement (`test_enhancement.md`)
+#### 4. Test Enhancement (`test_enhancement.yml`)
 - **Schedule**: Tuesdays at 2 AM UTC (every other week)
 - **Purpose**: Expand test coverage and improve test quality
 - **Focus**: Unit tests, integration tests, edge cases
 - **Safe Mode**: ❌ Disabled (can modify code)
 
-### Monthly Prompts
+#### 5. Code Refactoring (`code_refactor.yml`)
+- **Schedule**: 1st of month at 1 AM UTC
+- **Purpose**: Improve code quality and maintainability
+- **Focus**: Readability, best practices, DRY principles
+- **Safe Mode**: ❌ Disabled (code modifications)
 
-#### 5. Code Refactoring (`code_refactor.md`)
+### Legacy Markdown Templates (Deprecated)
+
+The following `.md` files are deprecated and will be removed in future versions:
 - **Schedule**: 1st of month at 1 AM UTC
 - **Purpose**: Improve code quality and maintainability
 - **Focus**: Readability, best practices, DRY principles

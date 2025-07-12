@@ -1,0 +1,137 @@
+#
+# @file prompts/templates/test_enhancement.yml
+# @description Test suite enhancement prompt for improving code coverage and reliability
+# @author AI Evolution Engine <ai-evolution@engine.dev>
+# @created 2025-07-12
+# @lastModified 2025-07-12
+# @version 2.0.0
+#
+# @relatedIssues 
+#   - #prompt-standardization: Standardize prompt format across repository
+#   - #TBD: Test coverage and quality improvements
+#
+# @relatedEvolutions
+#   - v2.0.0: Converted to standardized YAML format
+#   - v1.0.0: Initial periodic prompt implementation
+#
+# @dependencies
+#   - AI Evolution Engine: >=0.4.3
+#   - YAML parser for prompt processing
+#
+# @changelog
+#   - 2025-07-12: Converted to standardized YAML format - ITJ
+#   - 2025-07-12: Initial creation of test enhancement prompt - AEE
+#
+# @usage Executed bi-weekly via GitHub Actions workflow for test maintenance
+# @notes Part of the periodic AI prompts system for repository evolution
+#
+
+name: Test Suite Enhancement
+description: Expands and improves test coverage to prevent regressions, ensure robustness, and maintain code quality
+model: gpt-4o-mini
+modelParameters:
+  temperature: 0.3
+  max_tokens: 4000
+messages:
+  - role: system
+    content: |
+      You are a test automation expert specializing in comprehensive test coverage, quality assurance, and test-driven development practices. Your task is to analyze the existing test suite and source code to identify gaps and implement comprehensive testing improvements.
+      
+      Follow these testing best practices:
+      - **Comprehensive Coverage**: Aim for high code coverage with meaningful tests
+      - **Test Pyramid**: Focus on unit tests, supported by integration and E2E tests
+      - **Fast Feedback**: Prioritize quick-running, reliable tests
+      - **Maintainable Tests**: Write clear, maintainable test code
+      - **Effective Assertions**: Use precise assertions that clearly indicate failures
+      - **Test Independence**: Ensure tests can run independently and in any order
+  - role: user
+    content: |
+      Analyze the current test suite and source code to identify testing improvements:
+      
+      **Source Code to Analyze:**
+      {{source_files}}
+      
+      **Existing Tests:**
+      {{test_files}}
+      
+      **Test Enhancement Areas:**
+      
+      1. **Test Coverage Assessment**
+         - Unit Test Coverage: Function and method level testing
+         - Integration Test Coverage: Component interaction testing
+         - End-to-End Test Coverage: Full workflow testing
+         - Edge Case Coverage: Boundary conditions and error scenarios
+         - Regression Test Coverage: Prevention of previously fixed bugs
+      
+      2. **Code Analysis for Testing**
+         - Untested Functions: Identify functions without test coverage
+         - Complex Logic: Focus on complex algorithms and business logic
+         - Error Handling: Test error conditions and exception handling
+         - API Endpoints: Test all API interfaces and contracts
+         - Configuration Logic: Test configuration handling and validation
+      
+      3. **Test Quality Assessment**
+         - Test Maintainability: Ensure tests are easy to maintain and understand
+         - Test Reliability: Eliminate flaky and non-deterministic tests
+         - Test Performance: Optimize slow-running tests
+         - Test Documentation: Ensure tests are well-documented and clear
+      
+      **Enhancement Strategy:**
+      
+      1. **Coverage Expansion**
+         - Missing Unit Tests: Add unit tests for untested functions and methods
+         - Integration Scenarios: Test component interactions and data flow
+         - Error Path Testing: Test all error conditions and edge cases
+         - Performance Testing: Add performance benchmarks and load tests
+         - Security Testing: Include security-focused test scenarios
+      
+      2. **Test Quality Improvements**
+         - Test Organization: Organize tests into logical groupings and suites
+         - Test Data Management: Implement proper test data setup and teardown
+         - Mocking and Stubbing: Use appropriate mocks for external dependencies
+         - Parameterized Tests: Use data-driven testing for multiple scenarios
+         - Assertion Quality: Improve test assertions for better failure diagnosis
+      
+      Provide a comprehensive test improvement plan with specific recommendations and new test implementations.
+testData:
+  - input: |
+      source_files: "src/calculator.py, src/api.py, src/utils.py"
+      test_files: "tests/test_calculator.py"
+    expected: |
+      {
+        "analysis": {
+          "current_coverage": "33%",
+          "untested_files": ["src/api.py", "src/utils.py"],
+          "missing_test_types": ["integration", "edge_cases"]
+        },
+        "recommendations": [
+          {
+            "file": "tests/test_api.py",
+            "type": "new_test_file",
+            "priority": "high",
+            "description": "Add comprehensive API endpoint testing"
+          }
+        ],
+        "test_plan": {
+          "unit_tests": 5,
+          "integration_tests": 3,
+          "edge_case_tests": 4
+        }
+      }
+evaluators:
+  - name: Output should be valid JSON
+    json:
+      validJson: true
+  - name: Should include analysis section
+    json:
+      hasKey: "analysis"
+  - name: Should provide recommendations
+    json:
+      hasKey: "recommendations"
+  - name: Should include test plan
+    json:
+      hasKey: "test_plan"
+  - name: Coverage should be percentage
+    json:
+      path: "analysis.current_coverage"
+      pattern: "\\d+%"

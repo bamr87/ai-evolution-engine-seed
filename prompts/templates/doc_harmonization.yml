@@ -1,0 +1,104 @@
+#
+# @file prompts/templates/doc_harmonization.yml
+# @description Documentation harmonization prompt for consistent styling and formatting
+# @author AI Evolution Engine <ai-evolution@engine.dev>
+# @created 2025-07-12
+# @lastModified 2025-07-12
+# @version 2.0.0
+#
+# @relatedIssues 
+#   - #prompt-standardization: Standardize prompt format across repository
+#   - #TBD: Documentation consistency improvements
+#
+# @relatedEvolutions
+#   - v2.0.0: Converted to standardized YAML format
+#   - v1.0.0: Initial periodic prompt implementation
+#
+# @dependencies
+#   - AI Evolution Engine: >=0.4.3
+#   - YAML parser for prompt processing
+#
+# @changelog
+#   - 2025-07-12: Converted to standardized YAML format - ITJ
+#   - 2025-07-12: Initial creation of documentation harmonization prompt - AEE
+#
+# @usage Executed weekly via GitHub Actions workflow for documentation maintenance
+# @notes Part of the periodic AI prompts system for repository evolution
+#
+
+name: Documentation Harmonization
+description: Reviews and standardizes all documentation for consistent styling, syntax, keywords, and frontmatter across the repository
+model: gpt-4o-mini
+modelParameters:
+  temperature: 0.3
+  max_tokens: 4000
+messages:
+  - role: system
+    content: |
+      You are an expert technical writer specializing in documentation consistency. Your task is to review all Markdown files in this repository and harmonize them for consistency while preserving their original meaning and content value.
+      
+      You must maintain the following principles:
+      - Preserve Content Meaning: Do not alter the core information or intent
+      - DRY Principle: Eliminate duplicate information across files
+      - KISS Principle: Maintain simplicity and clarity
+      - Accessibility: Ensure documentation is accessible to diverse audiences
+      - SEO Optimization: Use appropriate headers and metadata for discoverability
+  - role: user
+    content: |
+      Review and harmonize all documentation files in the repository. Focus on:
+      
+      **Scope of Review:**
+      {{files_to_review}}
+      
+      **Harmonization Tasks:**
+      
+      1. **Styling Consistency**
+         - Heading Levels: Ensure consistent heading hierarchy and formatting
+         - List Formatting: Standardize bullet points, numbered lists, and indentation
+         - Code Blocks: Consistent syntax highlighting and formatting
+         - Tables: Uniform table formatting and alignment
+         - Links: Consistent link formatting (inline vs. reference style)
+      
+      2. **Syntax Standardization**
+         - Verb Tense: Maintain consistent tense throughout documentation
+         - Sentence Structure: Ensure clear, readable sentence construction
+         - Terminology: Standardize technical terms and project-specific vocabulary
+         - Voice: Maintain consistent voice (active vs. passive)
+      
+      3. **Keyword Standardization**
+         - Standardize terms like 'evolution' vs. 'update', 'seed' vs. 'template'
+         - Ensure consistent capitalization of project names and technical terms
+         - Maintain unified glossary of terms across all documentation
+      
+      4. **Frontmatter Enhancement**
+         - Add YAML frontmatter to files that lack it
+         - Standardize frontmatter fields: title, description, date, version, tags
+         - Ensure consistent date formatting and version numbering
+         - Add appropriate metadata for better organization
+      
+      Provide your response as a structured JSON with file changes and improvements made.
+testData:
+  - input: |
+      files_to_review: "README.md, docs/installation.md, prompts/README.md"
+    expected: |
+      {
+        "files_processed": 3,
+        "changes_made": [
+          {
+            "file": "README.md",
+            "changes": ["Updated heading hierarchy", "Standardized terminology"],
+            "frontmatter_added": true
+          }
+        ],
+        "summary": "Documentation harmonized for consistency"
+      }
+evaluators:
+  - name: Output should be valid JSON
+    json:
+      validJson: true
+  - name: Should process all input files
+    json:
+      hasKey: "files_processed"
+  - name: Should include change summary
+    json:
+      hasKey: "summary"
