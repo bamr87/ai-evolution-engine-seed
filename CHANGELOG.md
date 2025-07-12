@@ -1,4 +1,15 @@
-# Changelog
+---
+title: "AI Evolution Engine - Changelog"
+description: "Complete version history and release notes for the AI Evolution Engine project"
+author: "AI Evolution Engine Team"
+date: "2025-07-12"
+lastModified: "2025-07-12"
+version: "0.4.8"
+tags: ["changelog", "version-history", "releases"]
+category: "project-documentation"
+---
+
+## Changelog
 
 All notable changes to the AI Evolution Engine project will be documented in this file.
 

@@ -1,10 +1,20 @@
-# 🌱 AI Evolution Engine: The Self-Growing Repository 🌱
+---
+title: "AI Evolution Engine: The Self-Growing Repository"
+description: "A sophisticated AI-powered development workflow engine that creates self-evolving, self-improving repositories through automated evolution cycles and intelligent growth patterns."
+author: "AI Evolution Engine Team"
+date: "2025-07-12"
+lastModified: "2025-07-12"
+version: "0.4.8"
+tags: ["ai-evolution", "automation", "self-improving", "workflow", "seed"]
+category: "core-documentation"
+---
 
 ## 🌟 NEW: Enhanced AI Evolution Workflow (v0.4.1)
 
 **Latest Update**: The AI Evolution Engine has been upgraded with a completely modernized workflow system!
 
 ### ✨ Revolutionary Workflow Improvements
+
 - **🔧 Enhanced Growth Modes**: Added `test-automation` mode for dedicated testing workflows
 - **🔄 Periodic AI Evolution**: NEW! Automated repository maintenance with scheduled AI prompts
 - **🛡️ Advanced Security Scanning**: Automated security vulnerability detection and fixes
@@ -17,6 +27,7 @@
 - **🔧 Self-Improvement**: AI prompts that improve themselves through evolutionary feedback loops
 
 ### 🎯 Growth Mode Options
+
 - **`conservative`**: Safe, minimal changes with thorough validation
 - **`adaptive`**: Balanced approach with moderate changes (default)
 - **`experimental`**: Advanced features and experimental changes
@@ -26,7 +37,7 @@
 
 The repository features a sophisticated modular architecture that serves as the foundation for AI-powered development workflows:
 
-```
+```text
 src/lib/
 ├── core/                   # Core infrastructure modules
 │   ├── bootstrap.sh        # Library initialization and dependency management
@@ -635,5 +646,3 @@ You can manually trigger any periodic prompt via GitHub Actions:
 4. Choose dry-run mode for testing
 
 **See the [Periodic Prompts Documentation](prompts/templates/README.md) for detailed information.**
-
----
