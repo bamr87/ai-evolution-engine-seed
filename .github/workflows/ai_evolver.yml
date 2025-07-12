@@ -1,4 +1,4 @@
-name: 🌱 AI Evolution Growth Engine (v0.4.3)
+name: 🌱 AI Evolution Growth Engine (v0.4.4)
 
 on:
   workflow_dispatch:
@@ -39,7 +39,7 @@ permissions:
   issues: write
 
 env:
-  EVOLUTION_VERSION: "0.4.3"
+  EVOLUTION_VERSION: "0.4.4"
   WORKFLOW_TYPE: "manual_evolution"
   # Set environment context for cross-compatibility
   CI_ENVIRONMENT: "true"
@@ -49,7 +49,7 @@ env:
 
 jobs:
   evolve:
-    name: 🌿 Growth Cycle v0.4.3
+    name: 🌿 Growth Cycle v0.4.4
     runs-on: ubuntu-latest
     
     steps:
@@ -100,12 +100,31 @@ jobs:
             echo "No .gptignore file found"
           fi
           echo "🔍 Debug: Starting context collection..."
+          echo "🔍 Debug: Current working directory: $(pwd)"
+          echo "🔍 Debug: Available files: $(find . -name "*.md" -o -name "*.sh" | head -5)"
+          
+          # Run context collection with enhanced error handling
+          set -e
           ./scripts/collect-context.sh \
             --prompt "${{ github.event.inputs.prompt }}" \
             --growth-mode "${{ github.event.inputs.growth_mode }}" \
             --include-health \
-            --include-tests
-        continue-on-error: false
+            --include-tests || {
+              echo "❌ Context collection failed with exit code $?"
+              echo "🔍 Debug: Checking if context file was partially created..."
+              if [[ -f /tmp/repo_context.json ]]; then
+                echo "📁 Partial context file exists, size: $(wc -c < /tmp/repo_context.json) bytes"
+                echo "📋 Context file structure:"
+                jq 'keys' /tmp/repo_context.json 2>/dev/null || echo "Invalid JSON in context file"
+              fi
+              exit 1
+            }
+          
+          echo "✅ Context collection completed successfully"
+          if [[ -f /tmp/repo_context.json ]]; then
+            echo "📊 Context file size: $(wc -c < /tmp/repo_context.json) bytes"
+            echo "📊 Files collected: $(jq '.metadata.collection_summary.files_collected // 0' /tmp/repo_context.json)"
+          fi
 
       - name: 🚀 AI Growth Simulation
         run: |

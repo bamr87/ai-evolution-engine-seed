@@ -73,6 +73,80 @@ sustainability:
   track_growth_metrics: true
   optimize_for_maintainability: true
   share_seed_improvements: true
+
+# Periodic AI Prompts Configuration
+periodic_prompts:
+  enabled: true
+  base_path: "prompts/templates"
+  
+  # Weekly prompts
+  weekly:
+    - name: doc_harmonization
+      schedule: "0 2 * * 1"  # Mondays at 2 AM UTC
+      template: "doc_harmonization.md"
+      priority: high
+      safe_mode: true
+    - name: security_scan
+      schedule: "0 3 * * 3"  # Wednesdays at 3 AM UTC
+      template: "security_scan.md"
+      priority: critical
+      safe_mode: true
+    - name: changelog_versioning
+      schedule: "0 4 * * 5"  # Fridays at 4 AM UTC
+      template: "changelog_versioning.md"
+      priority: medium
+      safe_mode: true
+
+  # Bi-weekly prompts
+  biweekly:
+    - name: test_enhancement
+      schedule: "0 2 * * 2"  # Tuesdays at 2 AM UTC (every other week)
+      template: "test_enhancement.md"
+      priority: high
+      safe_mode: false
+      frequency: "*/2"  # Every 2 weeks
+
+  # Monthly prompts
+  monthly:
+    - name: code_refactor
+      schedule: "0 1 1 * *"  # 1st day of month at 1 AM UTC
+      template: "code_refactor.md"
+      priority: medium
+      safe_mode: false
+    - name: dependency_updates
+      schedule: "0 2 15 * *"  # 15th day of month at 2 AM UTC
+      template: "dependency_updates.md"
+      priority: high
+      safe_mode: true
+    - name: performance_optimization
+      schedule: "0 3 8 * *"  # 8th day of month at 3 AM UTC
+      template: "performance_optimization.md"
+      priority: medium
+      safe_mode: false
+    - name: workflow_optimization
+      schedule: "0 4 22 * *"  # 22nd day of month at 4 AM UTC
+      template: "workflow_optimization.md"
+      priority: medium
+      safe_mode: true
+    - name: community_guidelines
+      schedule: "0 5 28 * *"  # 28th day of month at 5 AM UTC
+      template: "community_guidelines.md"
+      priority: low
+      safe_mode: false
+    - name: prompt_refinement
+      schedule: "0 6 30 * *"  # 30th day of month at 6 AM UTC
+      template: "prompt_refinement.md"
+      priority: high
+      safe_mode: false
+
+  # Configuration for periodic prompt execution
+  execution:
+    dry_run_first: true
+    create_pr_for_changes: true
+    auto_merge_safe_changes: false
+    max_execution_time: "45m"
+    failure_notification: true
+    success_metrics_tracking: true
   
 # Quality gates
 quality_gates:

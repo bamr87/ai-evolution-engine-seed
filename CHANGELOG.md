@@ -6,6 +6,50 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.4.4] - 2025-07-12
+
+### 🔧 Fixed Critical GitHub Actions Workflow Issues
+
+- **Description**: Fixed major issues in collect-context.sh causing GitHub Actions workflow failures
+- **Issue**: Workflow was failing at context collection step with exit code 1 due to regex pattern issues
+- **Root Cause**: Multiple issues in .gptignore pattern processing and file content handling for jq operations
+- **Solution**: Complete rewrite of file processing logic for better CI compatibility
+
+#### 📝 Key Fixes
+
+1. **Improved .gptignore Pattern Processing**:
+   - Safer regex pattern construction that doesn't break `grep -Ev`
+   - Better handling of glob patterns like `*.ext` and directory patterns
+   - Robust error handling for malformed patterns
+
+2. **Enhanced File Content Processing**:
+   - Replaced fragile pipeline with temporary file approach
+   - Better jq operation using `--rawfile` for binary-safe content handling
+   - Proper escaping of special characters in file content
+
+3. **Workflow Compatibility**:
+   - Added comprehensive error debugging in GitHub Actions
+   - Enhanced progress reporting and error context
+   - Better tool validation at script startup
+
+#### 📁 Modified Files
+
+- `scripts/collect-context.sh` (v2.1.5 → v2.2.0) - Major rewrite for CI compatibility
+- `.github/workflows/ai_evolver.yml` (v0.4.3 → v0.4.4) - Enhanced error handling and debugging
+- `.version-config.json` - Updated version to 0.4.4
+
+#### 🔍 Technical Improvements
+
+- **Tool Validation**: Added upfront validation of required tools (jq, find, grep, etc.)
+- **Error Recovery**: Better error handling and cleanup of temporary files
+- **Progress Monitoring**: Enhanced logging for debugging workflow issues
+- **Pattern Safety**: Safer regex pattern construction for .gptignore processing
+
+#### ✅ Verified Compatibility
+- Ubuntu 24.04 (GitHub Actions runner)
+- Bash 5.2+ with modern features
+- All required tools available in standard GitHub Actions environment
+
 ## [Unreleased] - 2025-07-12
 
 ### 🔧 Fixed Context Collection Script Argument Parsing

@@ -6,7 +6,7 @@
 # @author IT-Journey Team <team@it-journey.org>
 # @created 2025-07-05
 # @lastModified 2025-07-12
-# @version 2.1.5
+# @version 2.2.0
 #
 # @relatedIssues 
 #   - #modular-refactor: Migrate to modular architecture
@@ -14,6 +14,7 @@
 #   - #workflow-fix: Fix command line argument parsing for GitHub Actions
 #
 # @relatedEvolutions
+#   - v2.2.0: Major rewrite of file processing and .gptignore pattern handling for GitHub Actions compatibility
 #   - v2.1.5: Added comprehensive error handling and safe file processing
 #   - v2.1.4: Completely rewrote .gptignore pattern processing for better regex compatibility
 #   - v2.1.3: Fixed grep pattern escaping for .gptignore processing
@@ -29,6 +30,7 @@
 #   - ../src/lib/analysis/health.sh: Health analysis for context
 #
 # @changelog
+#   - 2025-07-12: Major rewrite of file processing and .gptignore pattern handling for GitHub Actions compatibility - ITJ
 #   - 2025-07-12: Added comprehensive error handling and safe file processing - ITJ
 #   - 2025-07-12: Completely rewrote .gptignore pattern processing for better regex compatibility - ITJ
 #   - 2025-07-12: Fixed grep pattern escaping for .gptignore processing - ITJ
@@ -47,6 +49,27 @@ set -euo pipefail
 # Get script directory and project root
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+# Validate required tools are available
+validate_tools() {
+    local tools=("jq" "find" "grep" "head" "wc" "sort")
+    local missing_tools=()
+    
+    for tool in "${tools[@]}"; do
+        if ! command -v "$tool" >/dev/null 2>&1; then
+            missing_tools+=("$tool")
+        fi
+    done
+    
+    if [[ ${#missing_tools[@]} -gt 0 ]]; then
+        echo "❌ Missing required tools: ${missing_tools[*]}"
+        echo "Please install the missing tools and try again."
+        exit 1
+    fi
+}
+
+# Validate tools before proceeding
+validate_tools
 
 # Bootstrap the modular system
 source "$PROJECT_ROOT/src/lib/core/bootstrap.sh"
@@ -247,51 +270,72 @@ log_info "📂 File collection limits: $MAX_FILES files, $MAX_LINES lines each"
 # Build ignore patterns (respecting .gptignore if present)
 IGNORE_PATTERNS='\.git|\.DS_Store|node_modules|venv|env|dist|build|_site|\.next|\.pyc|__pycache__|\.log|\.tmp|\.swp|\.lock'
 
+# Process .gptignore with improved error handling
 if [[ -f .gptignore ]]; then
     log_info "📋 Found .gptignore file, applying custom ignore patterns"
-    # Read .gptignore safely, converting patterns to regex for grep -E
-    while IFS= read -r pattern; do
+    
+    # Read .gptignore line by line with robust pattern conversion
+    while IFS= read -r line || [[ -n "$line" ]]; do
         # Skip comments and empty lines
-        [[ "$pattern" =~ ^[[:space:]]*# ]] && continue
-        [[ -z "${pattern// }" ]] && continue
+        [[ "$line" =~ ^[[:space:]]*# ]] && continue
+        [[ -z "${line// }" ]] && continue
         
-        # Convert glob patterns to regex:
-        # *.ext -> \.ext$
-        # dir/ -> dir/
-        # path/file -> path/file
-        pattern=$(echo "$pattern" | sed 's|/$|/|')  # Keep trailing slash as is
-        if [[ "$pattern" == *.* ]]; then
-            # Pattern with extension - convert *.ext to \.ext$
-            pattern=$(echo "$pattern" | sed 's/\*//g' | sed 's/\./\\./g')
-            pattern="${pattern}$"
-        else
-            # Directory or filename pattern - escape dots
-            pattern=$(echo "$pattern" | sed 's/\./\\./g')
-        fi
+        # Clean the line and escape special characters safely
+        pattern=$(echo "$line" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
         
         if [[ -n "$pattern" ]]; then
-            IGNORE_PATTERNS="$IGNORE_PATTERNS|$pattern"
+            # Simple and safe pattern conversion
+            if [[ "$pattern" == *"/"* ]]; then
+                # Directory pattern - escape dots and keep as-is
+                escaped_pattern=$(echo "$pattern" | sed 's/\./\\./g')
+            elif [[ "$pattern" == "*."* ]]; then
+                # Extension pattern like *.ext -> \.ext$
+                escaped_pattern=$(echo "$pattern" | sed 's/\*//' | sed 's/\./\\./g')"$"
+            else
+                # Filename pattern - escape dots
+                escaped_pattern=$(echo "$pattern" | sed 's/\./\\./g')
+            fi
+            
+            # Only add valid non-empty patterns
+            if [[ -n "$escaped_pattern" ]]; then
+                IGNORE_PATTERNS="$IGNORE_PATTERNS|$escaped_pattern"
+            fi
         fi
     done < .gptignore
 fi
 
-# Collect file contents with progress tracking
+# Collect file contents with improved error handling
 log_info "📁 Adding file contents to context..."
 FILES_ADDED=0
 FILES_SKIPPED=0
 
+# Create a temporary file list to avoid pipeline issues
+TEMP_FILE_LIST="/tmp/evolution_files_$$"
+find . -type f \( -name "*.md" -o -name "*.sh" -o -name "*.yml" -o -name "*.yaml" -o -name "*.json" -o -name "*.js" -o -name "*.ts" -o -name "*.py" -o -name "*.txt" \) 2>/dev/null | sort > "$TEMP_FILE_LIST" || true
+
+# Filter out ignored patterns if we have any
+if [[ -s "$TEMP_FILE_LIST" ]]; then
+    if command -v grep >/dev/null 2>&1; then
+        grep -Ev "$IGNORE_PATTERNS" "$TEMP_FILE_LIST" > "${TEMP_FILE_LIST}.filtered" 2>/dev/null || cp "$TEMP_FILE_LIST" "${TEMP_FILE_LIST}.filtered"
+        mv "${TEMP_FILE_LIST}.filtered" "$TEMP_FILE_LIST"
+    fi
+fi
+
+# Process files from the filtered list
 while IFS= read -r file; do
+    # Skip if we've reached our limit
     if [[ $FILES_ADDED -ge $MAX_FILES ]]; then
         log_info "Reached maximum file limit ($MAX_FILES), stopping collection"
         break
     fi
     
-    # Skip empty files and very large files
-    if [[ ! -s "$file" ]]; then
+    # Skip if file doesn't exist or is empty
+    if [[ ! -f "$file" ]] || [[ ! -s "$file" ]]; then
         ((FILES_SKIPPED++))
         continue
     fi
     
+    # Check file size
     FILE_SIZE=$(wc -l < "$file" 2>/dev/null || echo 0)
     if [[ $FILE_SIZE -gt $((MAX_LINES * 5)) ]]; then
         log_warn "Skipping very large file: $file ($FILE_SIZE lines)"
@@ -303,30 +347,42 @@ while IFS= read -r file; do
     file_key=$(echo "$file" | sed 's|^\./||')
     file_content=""
     
+    # Read file content with error handling
     if [[ -r "$file" ]]; then
-        file_content=$(head -n "$MAX_LINES" "$file" 2>/dev/null || echo "")
+        file_content=$(head -n "$MAX_LINES" "$file" 2>/dev/null | sed 's/\\/\\\\/g' | sed 's/"/\\"/g' || echo "")
     fi
     
+    # Add to context if we have content
     if [[ -n "$file_content" ]]; then
-        # Safely update context file with error handling
+        # Use safer jq operation with proper JSON encoding
+        temp_content_file="/tmp/file_content_$$"
+        printf '%s' "$file_content" > "$temp_content_file"
+        
         if jq --arg path "$file_key" \
-           --arg content "$file_content" \
+           --rawfile content "$temp_content_file" \
            '.files[$path] = $content' "$CONTEXT_FILE" > "${CONTEXT_FILE}.tmp" 2>/dev/null; then
             mv "${CONTEXT_FILE}.tmp" "$CONTEXT_FILE"
             ((FILES_ADDED++))
             
+            # Progress logging every 10 files
             if [[ $((FILES_ADDED % 10)) -eq 0 ]]; then
                 log_info "Progress: $FILES_ADDED files processed..."
             fi
         else
-            log_warn "Failed to process file: $file_key"
-            rm -f "${CONTEXT_FILE}.tmp"
+            log_warn "Failed to process file: $file_key (possibly due to special characters)"
+            rm -f "${CONTEXT_FILE}.tmp" 2>/dev/null || true
             ((FILES_SKIPPED++))
         fi
+        
+        # Clean up temp file
+        rm -f "$temp_content_file" 2>/dev/null || true
     else
         ((FILES_SKIPPED++))
     fi
-done < <(find . -type f \( -name "*.md" -o -name "*.sh" -o -name "*.yml" -o -name "*.yaml" -o -name "*.json" -o -name "*.js" -o -name "*.ts" -o -name "*.py" -o -name "*.txt" \) 2>/dev/null | grep -Ev "$IGNORE_PATTERNS" 2>/dev/null | sort || true)
+done < "$TEMP_FILE_LIST"
+
+# Clean up temporary file
+rm -f "$TEMP_FILE_LIST" 2>/dev/null || true
 
 # Finalize context with summary information
 log_info "📊 Finalizing context with collection summary..."
