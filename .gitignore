@@ -28,6 +28,10 @@ test-reports/
 test-logs/
 debug-output/
 
+# Temporary test logs from prompt execution
+logs/periodic_evolution_*
+logs/context_*
+
 # Temporary cleanup files
 temp_cleanup/
 

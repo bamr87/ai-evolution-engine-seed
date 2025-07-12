@@ -572,7 +572,7 @@ ai_prompts_get_global_setting() {
         fi
     fi
     
-    echo "$config_json" | jq -r ".global_settings.$setting_path // null"
+    echo "$config_json" | jq -r ".global_settings.$setting_path // \"null\""
 }
 
 # Export AI prompt functions

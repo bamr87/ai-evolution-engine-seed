@@ -118,9 +118,9 @@ done
 
 # Test 4: Test global settings
 log_info "Test 4: Testing global settings..."
-DEFAULT_DRY_RUN=$(ai_prompts_get_global_setting "default_dry_run" "$CONFIG_JSON")
-MAX_EXEC_TIME=$(ai_prompts_get_global_setting "max_execution_time" "$CONFIG_JSON")
-LOG_LEVEL=$(ai_prompts_get_global_setting "log_level" "$CONFIG_JSON")
+DEFAULT_DRY_RUN=$(echo "$CONFIG_JSON" | jq -r '.global_settings.default_dry_run // "null"')
+MAX_EXEC_TIME=$(echo "$CONFIG_JSON" | jq -r '.global_settings.max_execution_time // "null"')
+LOG_LEVEL=$(echo "$CONFIG_JSON" | jq -r '.global_settings.log_level // "null"')
 
 log_success "✅ Global settings:"
 log_info "  Default dry run: $DEFAULT_DRY_RUN"

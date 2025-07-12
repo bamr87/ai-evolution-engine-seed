@@ -212,9 +212,10 @@ For detailed structure information, see [`docs/ORGANIZATION.md`](docs/ORGANIZATI
 3. **`.github/workflows/ai_evolver.yml`**: The heart of the growth engine. v0.3.6-seed includes container support, enhanced authentication, and cross-platform compatibility.
 4. **`.seed.md`**: The blueprint for the *next* generation. The v0.3.6-seed workflow generates advanced evolution strategies.
 5. **`evolution-metrics.json`**: Tracks quantitative and qualitative aspects of growth with environment awareness.
-6. **`docker/`**: Complete containerization support with Dockerfile, docker-compose, and documentation.
-7. **`scripts/local-evolution.sh`**: Cross-platform local development runner with comprehensive CLI interface.
-8. **Enhanced Scripts**: All scripts now support multiple platforms and execution environments.
+6. **`ai_prompts_evolution.json`**: **NEW!** Centralized AI prompts configuration with comprehensive evolution strategies, prompt definitions, execution rules, and monitoring settings.
+7. **`docker/`**: Complete containerization support with Dockerfile, docker-compose, and documentation.
+8. **`scripts/local-evolution.sh`**: Cross-platform local development runner with comprehensive CLI interface.
+9. **Enhanced Scripts**: All scripts now support multiple platforms and execution environments.
 
 ## 🤖 Automated Daily Evolution (New in v0.3.6-seed!)
 
@@ -247,6 +248,57 @@ The repository now includes an intelligent daily evolution system that automatic
 **On-Demand**: Use `./scripts/evolve.sh` anytime for immediate improvements
 
 ➡️ **[Complete Daily Evolution Guide](docs/DAILY_EVOLUTION.md)**
+
+## 🎯 AI Prompts Evolution Configuration (New!)
+
+The AI Evolution Engine now includes a comprehensive configuration system for managing AI-driven evolution prompts through the `ai_prompts_evolution.json` file.
+
+### 🌟 Key Features
+
+- **10 Predefined Prompts**: Complete set of evolution prompts for maintenance, enhancement, infrastructure, and community improvements
+- **4 Evolution Strategies**: Conservative, adaptive, experimental, and test-automation approaches with different safety levels
+- **Automated Scheduling**: Cron-based scheduling for periodic execution (weekly/monthly cycles)
+- **Execution Rules**: Smart skip conditions and validation gates for safe operation
+- **Comprehensive Monitoring**: Success tracking, metrics collection, and reporting
+
+### 🔧 Available Evolution Prompts
+
+#### Maintenance (Weekly)
+- **doc_harmonization** - Documentation consistency and formatting
+- **security_scan** - Security vulnerability detection and fixes  
+- **changelog_versioning** - Version tracking and changelog maintenance
+
+#### Enhancement (Monthly)
+- **code_refactor** - Code quality and maintainability improvements
+- **test_enhancement** - Test coverage and quality improvements
+- **performance_optimization** - Performance improvements and optimization
+
+#### Infrastructure (Monthly)
+- **dependency_updates** - Dependency management and updates
+- **workflow_optimization** - CI/CD and workflow improvements
+
+#### Community (Monthly)
+- **community_guidelines** - Community documentation and standards
+- **prompt_refinement** - AI prompt template self-improvement
+
+### 🚀 Quick Usage
+
+```bash
+# Test configuration and list all prompts
+./scripts/test-ai-prompts-config.sh
+
+# Execute specific prompts with dry-run
+./scripts/execute-periodic-prompt.sh --prompt-name doc_harmonization --dry-run true
+./scripts/execute-periodic-prompt.sh --prompt-name security_scan --dry-run true
+
+# Execute with custom settings
+./scripts/execute-periodic-prompt.sh \
+  --prompt-name code_refactor \
+  --execution-mode manual \
+  --dry-run false
+```
+
+➡️ **[Complete AI Prompts Configuration Guide](docs/guides/ai-prompts-configuration.md)**
 
 ## 🚀 Quick Germination & Growth
 
