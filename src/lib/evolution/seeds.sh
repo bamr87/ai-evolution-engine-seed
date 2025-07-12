@@ -310,7 +310,7 @@ readonly NC='\033[0m' # No Color
 SKIP_DEPENDENCIES=false
 CONFIG_ONLY=false
 VERBOSE=false
-DRY_RUN=false
+DRY_RUN=${DRY_RUN:-false}
 
 # Show banner
 show_banner() {

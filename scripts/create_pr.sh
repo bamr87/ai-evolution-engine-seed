@@ -44,15 +44,42 @@ require_module "evolution/git"
 # Initialize logging
 init_logger "logs" "create-pr"
 
-# Validate input parameters
-if [[ $# -lt 3 ]]; then
-    log_error "Usage: $0 <response_file> <prompt> <growth_mode>"
-    exit 1
-fi
+# Parse command line arguments
+RESPONSE_FILE=""
+PROMPT=""
+GROWTH_MODE=""
 
-RESPONSE_FILE="$1"
-PROMPT="$2"
-GROWTH_MODE="$3"
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --prompt)
+            PROMPT="$2"
+            shift 2
+            ;;
+        --mode)
+            GROWTH_MODE="$2" 
+            shift 2
+            ;;
+        --response-file)
+            RESPONSE_FILE="$2"
+            shift 2
+            ;;
+        *)
+            if [[ -z "$RESPONSE_FILE" ]]; then
+                RESPONSE_FILE="$1"
+            elif [[ -z "$PROMPT" ]]; then
+                PROMPT="$1"
+            elif [[ -z "$GROWTH_MODE" ]]; then
+                GROWTH_MODE="$1"
+            fi
+            shift
+            ;;
+    esac
+done
+
+# Set defaults if not provided
+RESPONSE_FILE="${RESPONSE_FILE:-/tmp/evolution_response.json}"
+PROMPT="${PROMPT:-}"
+GROWTH_MODE="${GROWTH_MODE:-adaptive}"
 
 log_info "Creating pull request for evolution changes"
 log_info "Response file: $RESPONSE_FILE"

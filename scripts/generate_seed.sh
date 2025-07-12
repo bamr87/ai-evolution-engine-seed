@@ -43,16 +43,51 @@ require_module "template/engine"
 # Initialize logging
 init_logger "logs" "generate-seed"
 
-# Validate input parameters
-if [[ $# -lt 4 ]]; then
-    log_error "Usage: $0 <new_cycle> <new_generation> <prompt> <growth_mode>"
-    exit 1
-fi
+# Parse command line arguments
+NEW_CYCLE=""
+NEW_GENERATION=""
+PROMPT=""
+GROWTH_MODE=""
 
-NEW_CYCLE="$1"
-NEW_GENERATION="$2"
-PROMPT="$3"
-GROWTH_MODE="$4"
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --cycle)
+            NEW_CYCLE="$2"
+            shift 2
+            ;;
+        --generation)
+            NEW_GENERATION="$2"
+            shift 2
+            ;;
+        --prompt)
+            PROMPT="$2"
+            shift 2
+            ;;
+        --growth-mode)
+            GROWTH_MODE="$2"
+            shift 2
+            ;;
+        *)
+            # Handle positional arguments for backward compatibility
+            if [[ -z "$NEW_CYCLE" ]]; then
+                NEW_CYCLE="$1"
+            elif [[ -z "$NEW_GENERATION" ]]; then
+                NEW_GENERATION="$1"
+            elif [[ -z "$PROMPT" ]]; then
+                PROMPT="$1"
+            elif [[ -z "$GROWTH_MODE" ]]; then
+                GROWTH_MODE="$1"
+            fi
+            shift
+            ;;
+    esac
+done
+
+# Set defaults
+NEW_CYCLE="${NEW_CYCLE:-$(date +%Y%m%d)}"
+NEW_GENERATION="${NEW_GENERATION:-1}"
+PROMPT="${PROMPT:-Standard evolution cycle}"
+GROWTH_MODE="${GROWTH_MODE:-adaptive}"
 
 log_info "Generating seed for cycle $NEW_CYCLE, generation $NEW_GENERATION"
 log_info "Growth mode: $GROWTH_MODE"

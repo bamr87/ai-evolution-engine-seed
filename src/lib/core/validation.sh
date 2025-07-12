@@ -783,6 +783,52 @@ validate_boolean() {
     esac
 }
 
+# Additional utility validation functions for backward compatibility
+validate_required() {
+    local var_name="$1"
+    local var_value="$2"
+    
+    if [[ -z "$var_value" ]]; then
+        validation_error "Required variable '$var_name' is empty or not set"
+        return 1
+    fi
+    return 0
+}
+
+validate_file_exists() {
+    local file_path="$1"
+    
+    if ! file_exists "$file_path"; then
+        validation_error "File does not exist: $file_path"
+        return 1
+    fi
+    return 0
+}
+
+validate_file_readable() {
+    local file_path="$1"
+    
+    if ! validate_file_exists "$file_path"; then
+        return 1
+    fi
+    
+    if ! is_readable "$file_path"; then
+        validation_error "File is not readable: $file_path"
+        return 1
+    fi
+    return 0
+}
+
+validate_directory_exists() {
+    local dir_path="$1"
+    
+    if ! directory_exists "$dir_path"; then
+        validation_error "Directory does not exist: $dir_path"
+        return 1
+    fi
+    return 0
+}
+
 # Show validation module information
 show_validation_info() {
     cat << EOF

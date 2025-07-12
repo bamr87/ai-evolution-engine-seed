@@ -6,6 +6,55 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.4.8] - 2025-07-12
+
+### 🔧 Critical GitHub Actions and Script Compatibility Fixes
+
+- **Description**: Comprehensive fix for multiple GitHub Actions workflow failures and script compatibility issues
+- **Root Cause**: Missing validation functions, corrupted color variables, unbound variables, and parameter parsing issues
+- **Changes**:
+  - **Fixed:** Missing validation functions (`validate_file_readable`, `validate_file_exists`, `validate_required`)
+  - **Fixed:** DRY_RUN unbound variable error in seeds.sh (line 793)
+  - **Fixed:** Parameter parsing in scripts to support both positional and flag-based arguments
+  - **Added:** Missing workflow scripts (`validate-evolution.sh`, `collect-evolution-metrics.sh`, `send-evolution-notification.sh`)
+  - **Enhanced:** Script robustness with proper error handling and fallback mechanisms
+  - **Updated:** Workflow version from v0.4.7 to v0.4.8 across all references
+
+#### 🔧 Technical Details
+
+- **Validation System**: Added missing validation utility functions for backward compatibility
+- **Variable Initialization**: Fixed DRY_RUN variable scope and initialization issues
+- **Parameter Handling**: Enhanced all scripts to accept both `--flag value` and positional arguments
+- **Missing Scripts**: Created three missing workflow scripts that were causing periodic evolution failures
+- **Error Prevention**: Added proper variable defaults and error checking throughout
+
+#### 📁 Files Modified in v0.4.8
+
+- `src/lib/core/validation.sh`: Added missing validation utility functions
+- `src/lib/evolution/seeds.sh`: Fixed DRY_RUN variable initialization
+- `scripts/create_pr.sh`: Enhanced parameter parsing for flag-based arguments
+- `scripts/apply-growth-changes.sh`: Added support for `--growth-mode` flag
+- `scripts/generate_seed.sh`: Fixed parameter parsing for `--cycle` and `--prompt` flags
+- `scripts/validate-evolution.sh`: Created missing validation script
+- `scripts/collect-evolution-metrics.sh`: Created missing metrics collection script
+- `scripts/send-evolution-notification.sh`: Created missing notification script
+- `.github/workflows/ai_evolver.yml`: Updated version to v0.4.8
+
+#### 🧪 Validation
+
+- **Script Syntax**: All scripts pass bash syntax validation
+- **GitHub Actions**: Workflow should now handle all script calls correctly
+- **Parameter Compatibility**: Scripts support both old positional and new flag-based parameter passing
+- **Missing Dependencies**: All workflow script dependencies are now satisfied
+
+#### 🎯 Impact
+
+- **Workflow Reliability**: Eliminates "script not found" and "command not found" errors
+- **Testing Coverage**: Comprehensive workflow testing should now pass without missing script warnings
+- **Maintenance**: Improved script maintainability with consistent parameter handling
+
+---
+
 ## [0.4.7] - 2025-07-12
 
 ### 🛠️ GitHub Actions Ubuntu 24.04 Compatibility Fix

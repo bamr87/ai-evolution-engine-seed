@@ -50,8 +50,32 @@ require_module "utils/file_operations"
 # Initialize logging
 init_logger "logs" "apply-growth-changes"
 
-# Parse and validate arguments
-RESPONSE_FILE="${1:-/tmp/evolution_response.json}"
+# Parse command line arguments
+RESPONSE_FILE=""
+GROWTH_MODE=""
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --growth-mode)
+            GROWTH_MODE="$2"
+            shift 2
+            ;;
+        --response-file)
+            RESPONSE_FILE="$2"
+            shift 2
+            ;;
+        *)
+            if [[ -z "$RESPONSE_FILE" ]]; then
+                RESPONSE_FILE="$1"
+            fi
+            shift
+            ;;
+    esac
+done
+
+# Set defaults
+RESPONSE_FILE="${RESPONSE_FILE:-/tmp/evolution_response.json}"
+GROWTH_MODE="${GROWTH_MODE:-adaptive}"
 
 validate_required "RESPONSE_FILE" "$RESPONSE_FILE"
 validate_file_readable "$RESPONSE_FILE"
