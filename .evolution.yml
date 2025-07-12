@@ -1,3 +1,29 @@
+# @file .evolution.yml
+# @description Evolution configuration for AI Evolution Engine
+# @author IT-Journey Team <team@it-journey.org>
+# @created 2025-07-05
+# @lastModified 2025-07-12
+# @version 1.1
+#
+# @relatedIssues 
+#   - #evolution-configuration: Core evolution settings and automation
+#
+# @relatedEvolutions
+#   - v1.1: Daily automation settings and mature stage
+#   - v1.0: Initial evolution configuration
+#
+# @dependencies
+#   - YAML: configuration format
+#   - AI Evolution Engine: configuration consumer
+#
+# @changelog
+#   - 2025-07-12: Added standardized file header - ITJ
+#   - Previous: Evolution configuration updates
+#
+# @usage Loaded by evolution engine for configuration settings
+# @notes Central configuration for evolution behavior and automation
+#
+
 # 🌱 Evolution Configuration
 version: 1.1
 growth:

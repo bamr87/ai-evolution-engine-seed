@@ -1,4 +1,34 @@
 #!/bin/bash
+#
+# @file src/evolution-engine.sh
+# @description AI-powered repository evolution engine with modular architecture
+# @author IT-Journey Team <team@it-journey.org>
+# @created 2025-07-05
+# @lastModified 2025-07-12
+# @version 2.0.0-modular
+#
+# @relatedIssues 
+#   - #modular-architecture: Implementation of modular evolution engine
+#   - #evolution-automation: AI-powered evolution cycle automation
+#
+# @relatedEvolutions
+#   - v2.0.0: Modular architecture implementation
+#   - v0.3.6: Initial seed evolution engine
+#
+# @dependencies
+#   - bash: >=4.0
+#   - src/lib/core/*: Core library modules
+#   - src/lib/evolution/*: Evolution-specific modules
+#
+# @changelog
+#   - 2025-07-12: Added standardized file header - ITJ
+#   - 2025-07-05: Modular architecture refactoring - ITJ
+#   - Previous: Initial evolution engine implementation
+#
+# @usage ./src/evolution-engine.sh [options]
+# @notes Main entry point for AI evolution cycles with comprehensive error handling
+#
+
 # Refactored AI Evolution Engine - Main Evolution Script
 # Uses modular architecture for better maintainability and testing
 # Version: 0.3.6-seed-modular

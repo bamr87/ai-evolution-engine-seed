@@ -28,6 +28,9 @@ test-reports/
 test-logs/
 debug-output/
 
+# Temporary cleanup files
+temp_cleanup/
+
 # IDE specific
 .vscode/
 .idea/

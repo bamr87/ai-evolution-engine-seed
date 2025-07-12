@@ -1,5 +1,30 @@
-#!/bin/bash
-# scripts/ai-debug-helper.sh
+#!/usr/bin/env bash
+#
+# @file scripts/ai-debug-helper.sh
+# @description Comprehensive debugging information collector for AI analysis
+# @author IT-Journey Team <team@it-journey.org>
+# @created 2025-07-05
+# @lastModified 2025-07-12
+# @version 1.0.0
+#
+# @relatedIssues 
+#   - #debugging-automation: AI-assisted debugging and troubleshooting
+#
+# @relatedEvolutions
+#   - v1.0.0: Initial AI debug helper implementation
+#
+# @dependencies
+#   - bash: >=4.0
+#   - standard Unix tools: find, grep, cat
+#
+# @changelog
+#   - 2025-07-12: Added standardized file header - ITJ
+#   - 2025-07-05: Initial implementation of debug information collector - ITJ
+#
+# @usage ./scripts/ai-debug-helper.sh
+# @notes Collects logs, context, and environment details for AI troubleshooting
+#
+
 # Prepares comprehensive debugging information for AI analysis
 # Collects logs, context, and environment details for AI troubleshooting
 
