@@ -96,15 +96,27 @@ done
 
 # Validate arguments using modular validation
 validate_argument "growth_mode" "$GROWTH_MODE" "adaptive|conservative|aggressive|experimental"
-validate_file_path "context_file" "$CONTEXT_FILE" "writable"
+
+# Validate context file is writable (create directory if needed)
+CONTEXT_DIR="$(dirname "$CONTEXT_FILE")"
+if [[ ! -d "$CONTEXT_DIR" ]]; then
+    log_info "Creating context directory: $CONTEXT_DIR"
+    mkdir -p "$CONTEXT_DIR"
+fi
+
+# Test if we can write to the context file
+if ! touch "$CONTEXT_FILE" 2>/dev/null; then
+    log_error "Cannot write to context file: $CONTEXT_FILE"
+    exit 1
+fi
 
 log_info "🧬 Analyzing repository genome and collecting comprehensive context..."
 log_info "Growth Mode: $GROWTH_MODE | Context File: $CONTEXT_FILE"
 
 # Initialize context collection with metadata and metrics using modular functions
 log_info "📊 Loading current metrics and health data..."
-METRICS_CONTENT=$(metrics_get_current)
-HEALTH_DATA=$(health_analyze_repository "context" "comprehensive")
+METRICS_CONTENT=$(generate_metrics_report "" "json" 2>/dev/null || echo "{}")
+HEALTH_DATA=$(health_analyze_repository "context" "comprehensive" 2>/dev/null || echo "{}")
 
 # Collect repository structure using tree command or fallback
 log_info "🌳 Analyzing repository structure..."
@@ -143,12 +155,36 @@ jq -n \
 
 # Collect git context information
 log_info "📝 Collecting git context and history..."
-GIT_CONTEXT=$(environment_collect_git_context)
+GIT_CONTEXT=$(cat <<EOF
+{
+  "branch": "$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo 'unknown')",
+  "commit": "$(git rev-parse HEAD 2>/dev/null || echo 'unknown')",
+  "status": "$(git status --porcelain 2>/dev/null | wc -l | tr -d ' ')",
+  "remote": "$(git remote get-url origin 2>/dev/null || echo 'unknown')",
+  "last_commit": {
+    "message": "$(git log -1 --pretty=format:'%s' 2>/dev/null || echo 'unknown')",
+    "author": "$(git log -1 --pretty=format:'%an' 2>/dev/null || echo 'unknown')",
+    "date": "$(git log -1 --pretty=format:'%ci' 2>/dev/null || echo 'unknown')"
+  }
+}
+EOF
+)
 jq --argjson git_context "$GIT_CONTEXT" '.git_context = $git_context' "$CONTEXT_FILE" > "${CONTEXT_FILE}.tmp" && mv "${CONTEXT_FILE}.tmp" "$CONTEXT_FILE"
 
 # Collect environment information
 log_info "🖥️ Collecting environment information..."
-ENV_CONTEXT=$(environment_collect_system_info)
+ENV_CONTEXT=$(cat <<EOF
+{
+  "os": "$(uname -s 2>/dev/null || echo 'unknown')",
+  "arch": "$(uname -m 2>/dev/null || echo 'unknown')",
+  "shell": "${SHELL:-unknown}",
+  "user": "${USER:-unknown}",
+  "pwd": "$(pwd)",
+  "date": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+  "ci_environment": "${CI_ENVIRONMENT:-false}"
+}
+EOF
+)
 jq --argjson env_context "$ENV_CONTEXT" '.environment = $env_context' "$CONTEXT_FILE" > "${CONTEXT_FILE}.tmp" && mv "${CONTEXT_FILE}.tmp" "$CONTEXT_FILE"
 
 # Determine file collection strategy based on growth mode and repository size
@@ -261,7 +297,7 @@ CONTEXT_SUMMARY=$(jq -n \
 jq --argjson summary "$CONTEXT_SUMMARY" '.metadata.collection_summary = $summary' "$CONTEXT_FILE" > "${CONTEXT_FILE}.tmp" && mv "${CONTEXT_FILE}.tmp" "$CONTEXT_FILE"
 
 # Display comprehensive results
-log_header "🧬 Context Collection Complete"
+log_info "🧬 Context Collection Complete"
 log_success "Context successfully collected in: $CONTEXT_FILE"
 
 TOTAL_FILES=$(jq '.files | length' "$CONTEXT_FILE")
