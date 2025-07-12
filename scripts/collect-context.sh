@@ -6,7 +6,7 @@
 # @author IT-Journey Team <team@it-journey.org>
 # @created 2025-07-05
 # @lastModified 2025-07-12
-# @version 2.1.2
+# @version 2.1.5
 #
 # @relatedIssues 
 #   - #modular-refactor: Migrate to modular architecture
@@ -14,6 +14,9 @@
 #   - #workflow-fix: Fix command line argument parsing for GitHub Actions
 #
 # @relatedEvolutions
+#   - v2.1.5: Added comprehensive error handling and safe file processing
+#   - v2.1.4: Completely rewrote .gptignore pattern processing for better regex compatibility
+#   - v2.1.3: Fixed grep pattern escaping for .gptignore processing
 #   - v2.1.2: Simplified health analysis to avoid CI environment hanging
 #   - v2.1.1: Fixed function call signatures for metrics and health analysis
 #   - v2.1.0: Fixed command line argument parsing to support flags
@@ -26,6 +29,9 @@
 #   - ../src/lib/analysis/health.sh: Health analysis for context
 #
 # @changelog
+#   - 2025-07-12: Added comprehensive error handling and safe file processing - ITJ
+#   - 2025-07-12: Completely rewrote .gptignore pattern processing for better regex compatibility - ITJ
+#   - 2025-07-12: Fixed grep pattern escaping for .gptignore processing - ITJ
 #   - 2025-07-12: Simplified health analysis to avoid hanging in CI environment - ITJ
 #   - 2025-07-12: Fixed function call signatures for metrics and health analysis - ITJ
 #   - 2025-07-12: Fixed command line argument parsing to support --flags - ITJ
@@ -239,14 +245,34 @@ fi
 log_info "📂 File collection limits: $MAX_FILES files, $MAX_LINES lines each"
 
 # Build ignore patterns (respecting .gptignore if present)
-IGNORE_PATTERNS='\.git|\.DS_Store|node_modules|venv|env|dist|build|_site|\.next|\*.pyc|__pycache__|\*.log|\*.tmp|\*.swp|\*.lock'
+IGNORE_PATTERNS='\.git|\.DS_Store|node_modules|venv|env|dist|build|_site|\.next|\.pyc|__pycache__|\.log|\.tmp|\.swp|\.lock'
 
 if [[ -f .gptignore ]]; then
     log_info "📋 Found .gptignore file, applying custom ignore patterns"
-    GPTIGNORE_PATTERNS=$(grep -v '^#' .gptignore | grep -v '^[[:space:]]*$' | sed 's|/$|/.*|' | paste -sd '|' || echo "")
-    if [[ -n "$GPTIGNORE_PATTERNS" ]]; then
-        IGNORE_PATTERNS="$IGNORE_PATTERNS|$GPTIGNORE_PATTERNS"
-    fi
+    # Read .gptignore safely, converting patterns to regex for grep -E
+    while IFS= read -r pattern; do
+        # Skip comments and empty lines
+        [[ "$pattern" =~ ^[[:space:]]*# ]] && continue
+        [[ -z "${pattern// }" ]] && continue
+        
+        # Convert glob patterns to regex:
+        # *.ext -> \.ext$
+        # dir/ -> dir/
+        # path/file -> path/file
+        pattern=$(echo "$pattern" | sed 's|/$|/|')  # Keep trailing slash as is
+        if [[ "$pattern" == *.* ]]; then
+            # Pattern with extension - convert *.ext to \.ext$
+            pattern=$(echo "$pattern" | sed 's/\*//g' | sed 's/\./\\./g')
+            pattern="${pattern}$"
+        else
+            # Directory or filename pattern - escape dots
+            pattern=$(echo "$pattern" | sed 's/\./\\./g')
+        fi
+        
+        if [[ -n "$pattern" ]]; then
+            IGNORE_PATTERNS="$IGNORE_PATTERNS|$pattern"
+        fi
+    done < .gptignore
 fi
 
 # Collect file contents with progress tracking
@@ -273,23 +299,34 @@ while IFS= read -r file; do
         continue
     fi
     
-    # Process file content
+    # Process file content safely
     file_key=$(echo "$file" | sed 's|^\./||')
-    file_content=$(head -n "$MAX_LINES" "$file" 2>/dev/null || echo "")
+    file_content=""
+    
+    if [[ -r "$file" ]]; then
+        file_content=$(head -n "$MAX_LINES" "$file" 2>/dev/null || echo "")
+    fi
     
     if [[ -n "$file_content" ]]; then
-        jq --arg path "$file_key" \
+        # Safely update context file with error handling
+        if jq --arg path "$file_key" \
            --arg content "$file_content" \
-           '.files[$path] = $content' "$CONTEXT_FILE" > "${CONTEXT_FILE}.tmp" && mv "${CONTEXT_FILE}.tmp" "$CONTEXT_FILE"
-        ((FILES_ADDED++))
-        
-        if [[ $((FILES_ADDED % 10)) -eq 0 ]]; then
-            log_info "Progress: $FILES_ADDED files processed..."
+           '.files[$path] = $content' "$CONTEXT_FILE" > "${CONTEXT_FILE}.tmp" 2>/dev/null; then
+            mv "${CONTEXT_FILE}.tmp" "$CONTEXT_FILE"
+            ((FILES_ADDED++))
+            
+            if [[ $((FILES_ADDED % 10)) -eq 0 ]]; then
+                log_info "Progress: $FILES_ADDED files processed..."
+            fi
+        else
+            log_warn "Failed to process file: $file_key"
+            rm -f "${CONTEXT_FILE}.tmp"
+            ((FILES_SKIPPED++))
         fi
     else
         ((FILES_SKIPPED++))
     fi
-done < <(find . -type f -name "*.md" -o -name "*.sh" -o -name "*.yml" -o -name "*.yaml" -o -name "*.json" -o -name "*.js" -o -name "*.ts" -o -name "*.py" -o -name "*.txt" | grep -Ev "$IGNORE_PATTERNS" | sort)
+done < <(find . -type f \( -name "*.md" -o -name "*.sh" -o -name "*.yml" -o -name "*.yaml" -o -name "*.json" -o -name "*.js" -o -name "*.ts" -o -name "*.py" -o -name "*.txt" \) 2>/dev/null | grep -Ev "$IGNORE_PATTERNS" 2>/dev/null | sort || true)
 
 # Finalize context with summary information
 log_info "📊 Finalizing context with collection summary..."
