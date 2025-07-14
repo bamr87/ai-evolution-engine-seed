@@ -1,3 +1,35 @@
+<!--
+@file prompts/templates/README.md
+@description AI prompt templates for periodic evolution and automation
+@author AI Evolution Engine Team <team@ai-evolution-engine.org>
+@created 2025-07-01
+@lastModified 2025-07-12
+@version 2.0.0
+
+@relatedIssues 
+  - #periodic-evolution: Automated repository maintenance through AI prompts
+  - #prompt-standardization: Migration from Markdown to YAML format
+
+@relatedEvolutions
+  - v2.0.0: Migration to standardized YAML format with embedded testing
+  - v1.5.0: Enhanced prompt templates with safety features
+  - v1.0.0: Initial periodic evolution prompt system
+
+@dependencies
+  - GitHub Actions: for automated prompt execution
+  - YAML processors: for prompt template parsing
+  - AI models: gpt-4o-mini for prompt processing
+
+@changelog
+  - 2025-07-12: Added comprehensive file header and enhanced documentation - AEE
+  - 2025-07-08: Completed migration to YAML format with embedded testing - AEE
+  - 2025-07-01: Enhanced safety features and validation systems - AEE
+  - 2025-06-15: Initial periodic evolution prompt implementation - AEE
+
+@usage AI prompt templates for automated repository maintenance and evolution
+@notes Contains both active YAML templates and deprecated Markdown templates
+-->
+
 # Periodic AI Evolution Prompts
 
 This directory contains AI prompt templates for automated repository maintenance and evolution. These prompts are designed to be executed periodically via GitHub Actions to keep the repository healthy, secure, and up-to-date.

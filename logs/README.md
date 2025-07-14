@@ -60,9 +60,74 @@ The logs directory serves as a central location for:
 3. **Temporary Nature**: Some logs may be rotated or cleaned up automatically
 4. **Analysis Tools**: Use appropriate tools for JSON processing and log analysis
 
+## Analysis and Monitoring
+
+### JSON Metrics Analysis
+
+**Query evolution metrics:**
+```bash
+# View latest evolution metrics
+jq '.latest_metrics' logs/evolution-metrics.json
+
+# Calculate average execution time
+jq '.execution_times[] | .duration' logs/evolution-metrics.json | awk '{sum+=$1; count++} END {print sum/count}'
+
+# Find failed evolution cycles
+jq '.evolution_cycles[] | select(.status == "failed")' logs/evolution-metrics.json
+```
+
+**Test metrics analysis:**
+```bash
+# View test success rates
+jq '.test_suites[].success_rate' logs/test-metrics.json
+
+# Find slowest tests
+jq '.test_executions[] | select(.duration > 30)' logs/test-metrics.json
+```
+
+### Log Monitoring
+
+**Real-time monitoring:**
+```bash
+# Monitor active logs
+tail -f logs/*.log
+
+# Watch for errors
+grep -i "error\|fail" logs/*.log | tail -f
+
+# Monitor JSON metrics changes
+watch -n 5 'jq ".last_updated" logs/evolution-metrics.json'
+```
+
 ## Maintenance
 
 - **Automatic Cleanup**: Some logs may be automatically rotated
 - **Size Management**: Large log files may need periodic cleanup
 - **Backup Considerations**: Important metrics should be backed up
 - **Privacy**: Ensure logs don't contain sensitive information
+
+## Future Enhancements
+
+- [ ] **Real-time Dashboard**: Web-based monitoring interface for live metrics
+- [ ] **Log Aggregation**: Centralized logging with advanced search capabilities
+- [ ] **Alerting System**: Automated alerts for error conditions and threshold breaches
+- [ ] **Performance Analytics**: Advanced analytics for performance trend analysis
+- [ ] **Log Compression**: Automatic compression of older log files
+- [ ] **Export Capabilities**: Export metrics to external monitoring systems
+- [ ] **Anomaly Detection**: AI-powered detection of unusual patterns in logs
+- [ ] **Historical Analysis**: Long-term trend analysis and reporting
+
+## Integration with Evolution Engine
+
+The logs directory integrates with:
+- [Evolution Metrics System](../scripts/update/update-evolution-metrics.sh) - Automated metrics collection
+- [Testing Framework](../tests/README.md) - Test execution logging and metrics
+- [Monitoring Scripts](../scripts/analysis/) - Health analysis and reporting
+- [Documentation System](../docs/README.md) - Evolution tracking and documentation
+
+## Related Documentation
+
+- [Main Repository README](../README.md) - Project overview and monitoring features
+- [Evolution Metrics Guide](../docs/evolution/metrics.md) - Detailed metrics documentation
+- [Testing Documentation](../tests/README.md) - Test logging and artifact management
+- [Troubleshooting Guide](../docs/guides/troubleshooting.md) - Log-based debugging techniques

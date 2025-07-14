@@ -62,3 +62,77 @@ When moving content to legacy:
 - Update references in current documentation
 - Provide pointers to current equivalent content
 - Maintain file headers for tracking purposes
+
+## Content Organization
+
+### Archive Categories
+
+**Historical Seeds:**
+- Previous evolution seeds and prompt templates
+- Deprecated growth strategies and evolution patterns
+- Original project seeds from early versions
+
+**Deprecated Documentation:**
+- Superseded user guides and tutorials
+- Old API documentation and references
+- Previous architecture documents
+
+**Legacy Configurations:**
+- Old workflow configurations and scripts
+- Deprecated environment setup files
+- Previous version configuration templates
+
+### Access Guidelines
+
+**When to Consult Legacy Content:**
+- Research historical evolution patterns
+- Understand design decision rationale
+- Reference deprecated features for migration
+- Academic study of project evolution
+
+**When NOT to Use Legacy Content:**
+- Current development and implementation
+- New feature development
+- Production deployment guidance
+- Current best practices reference
+
+## Archival Process
+
+### Moving Content to Legacy
+
+1. **Assessment**: Determine if content is truly deprecated
+2. **Documentation**: Update file headers with archival reason
+3. **References**: Update all current documentation links
+4. **Notification**: Add deprecation notices to old content
+5. **Replacement**: Ensure current equivalent exists
+
+### Content Lifecycle
+
+```
+Active Documentation → Deprecation Notice → Legacy Archive → Periodic Review
+```
+
+## Future Enhancements
+
+- [ ] **Automated Archival**: Scripts to automatically detect and archive outdated content
+- [ ] **Version Mapping**: Clear mapping between legacy and current content versions
+- [ ] **Search Integration**: Enhanced search capabilities across archived content
+- [ ] **Migration Assistance**: Tools to help migrate from legacy patterns to current approaches
+- [ ] **Historical Analytics**: Analysis of documentation evolution patterns
+- [ ] **Content Validation**: Regular validation of legacy content relevance
+- [ ] **Interactive Timeline**: Visual timeline of project evolution and content changes
+
+## Integration with Evolution Engine
+
+The legacy directory supports:
+- [Documentation Organization](../README.md) - Maintains clean current documentation structure
+- [Version Management](../../scripts/version/) - Tracks content evolution and archival
+- [Evolution Tracking](../evolution/) - Preserves historical evolution context
+- [Migration Scripts](../../scripts/migration/) - Automated content lifecycle management
+
+## Related Documentation
+
+- [Main Documentation Index](../README.md) - Current active documentation structure
+- [Evolution History](../evolution/EVOLUTION_SUMMARY.md) - Comprehensive evolution timeline
+- [Documentation Organization Guide](../guides/documentation-organization.md) - Current documentation standards
+- [Migration Guidelines](../guides/migration.md) - Best practices for content migration and archival
