@@ -140,7 +140,8 @@ EOF
 # Extract metadata from file headers
 extract_file_metadata() {
     local file="$1"
-    local temp_file="/tmp/metadata_raw_$(basename "$file")"
+    local temp_file
+    temp_file=$(mktemp /tmp/metadata_raw_XXXXXX)
     
     # Extract just the header section (lines starting with # until first non-comment line)
     awk '/^#!/ { next } /^#/ { print } /^[^#]/ && NF > 0 { exit }' "$file" > "$temp_file"
