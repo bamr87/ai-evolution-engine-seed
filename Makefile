@@ -8,11 +8,14 @@ help:
 	@echo "AI Evolution Engine - Available Commands:"
 	@echo ""
 	@echo "Testing:"
-	@echo "  make test              - Run all tests (unit + integration + workflow)"
+	@echo "  make test              - Run comprehensive test suite with AI analysis"
+	@echo "  make test-original     - Run tests with original test runner"
 	@echo "  make test-unit         - Run only unit tests"
 	@echo "  make test-integration  - Run only integration tests"
 	@echo "  make test-workflow     - Run only GitHub Actions workflow tests"
-	@echo "  make test-verbose      - Run all tests with verbose output"
+	@echo "  make test-verbose      - Run comprehensive tests with verbose output"
+	@echo "  make test-with-reports - Run tests with human-readable reports"
+	@echo "  make test-ai-analysis  - Run tests with full AI analysis and issue creation"
 	@echo ""
 	@echo "Setup:"
 	@echo "  make init              - Initialize the repository"
@@ -33,24 +36,36 @@ help:
 
 # Testing commands
 test:
-	@echo "🧪 Running all tests..."
-	@./tests/test_runner.sh
+	@echo "🧪 Running comprehensive test suite..."
+	@./tests/comprehensive_test_runner.sh
+
+test-original:
+	@echo "🧪 Running tests with original runner..."
+	@./tests/run_tests.sh
 
 test-unit:
 	@echo "🔬 Running unit tests..."
-	@./tests/test_runner.sh --type unit
+	@./tests/run_tests.sh run unit
 
 test-integration:
 	@echo "🔗 Running integration tests..."
-	@./tests/test_runner.sh --type integration
+	@./tests/run_tests.sh run integration
 
 test-workflow:
 	@echo "⚙️ Running GitHub Actions workflow tests..."
-	@./tests/test_runner.sh --type workflow
+	@./tests/run_tests.sh run workflow
 
 test-verbose:
-	@echo "🔊 Running all tests with verbose output..."
-	@./tests/test_runner.sh --verbose
+	@echo "🔊 Running comprehensive tests with verbose output..."
+	@./tests/comprehensive_test_runner.sh --verbose
+
+test-with-reports:
+	@echo "📊 Running tests with human-readable reports..."
+	@./tests/comprehensive_test_runner.sh --human-reports
+
+test-ai-analysis:
+	@echo "🤖 Running tests with AI analysis and issue creation..."
+	@./tests/comprehensive_test_runner.sh --verbose --human-reports --create-issues
 
 # Setup commands
 init:
