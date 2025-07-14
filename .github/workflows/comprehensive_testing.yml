@@ -1,0 +1,234 @@
+name: Comprehensive Test Automation with AI Analysis
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run tests daily at 6 AM UTC
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+    inputs:
+      create_issues:
+        description: 'Create GitHub issues for test failures'
+        required: false
+        default: 'false'
+        type: boolean
+      generate_reports:
+        description: 'Generate human-readable reports'
+        required: false
+        default: 'true'
+        type: boolean
+
+jobs:
+  comprehensive-testing:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup test environment
+      run: |
+        # Install required dependencies
+        sudo apt-get update
+        sudo apt-get install -y jq bc curl
+        
+        # Make test scripts executable
+        find tests -name "*.sh" -type f -exec chmod +x {} \;
+        
+        # Create output directories
+        mkdir -p tests/results tests/ai_analysis/{reports,artifacts}
+        
+    - name: Run comprehensive test suite
+      id: test_execution
+      run: |
+        cd tests
+        
+        # Set options based on inputs
+        TEST_OPTIONS=""
+        if [[ "${{ github.event.inputs.create_issues }}" == "true" ]]; then
+          TEST_OPTIONS+=" --create-issues"
+        fi
+        if [[ "${{ github.event.inputs.generate_reports }}" == "true" ]]; then
+          TEST_OPTIONS+=" --human-reports"
+        fi
+        
+        # Run comprehensive tests with verbose output for CI
+        ./comprehensive_test_runner.sh --verbose $TEST_OPTIONS
+        
+        # Store results for later steps
+        echo "test_results_file=$(ls -t results/comprehensive_results_*.json | head -1)" >> $GITHUB_OUTPUT
+        
+    - name: Parse test results
+      id: test_results
+      run: |
+        RESULTS_FILE="${{ steps.test_execution.outputs.test_results_file }}"
+        
+        if [[ -f "$RESULTS_FILE" ]]; then
+          TOTAL_TESTS=$(jq -r '.summary.total_tests' "$RESULTS_FILE")
+          PASSED_TESTS=$(jq -r '.summary.passed_tests' "$RESULTS_FILE")
+          FAILED_TESTS=$(jq -r '.summary.failed_tests' "$RESULTS_FILE")
+          SUCCESS_RATE=$(jq -r '.summary.success_rate' "$RESULTS_FILE")
+          
+          echo "total_tests=$TOTAL_TESTS" >> $GITHUB_OUTPUT
+          echo "passed_tests=$PASSED_TESTS" >> $GITHUB_OUTPUT
+          echo "failed_tests=$FAILED_TESTS" >> $GITHUB_OUTPUT
+          echo "success_rate=$SUCCESS_RATE" >> $GITHUB_OUTPUT
+          echo "has_failures=$(if [[ $FAILED_TESTS -gt 0 ]]; then echo 'true'; else echo 'false'; fi)" >> $GITHUB_OUTPUT
+        else
+          echo "has_failures=true" >> $GITHUB_OUTPUT
+          echo "total_tests=0" >> $GITHUB_OUTPUT
+          echo "passed_tests=0" >> $GITHUB_OUTPUT
+          echo "failed_tests=1" >> $GITHUB_OUTPUT
+          echo "success_rate=0" >> $GITHUB_OUTPUT
+        fi
+        
+    - name: Upload test artifacts
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results-${{ github.run_number }}
+        path: |
+          tests/results/
+          tests/ai_analysis/
+        retention-days: 30
+        
+    - name: Create GitHub issue for test failures
+      if: steps.test_results.outputs.has_failures == 'true' && (github.event_name == 'schedule' || github.event.inputs.create_issues == 'true')
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const resultsFile = '${{ steps.test_execution.outputs.test_results_file }}';
+          
+          if (!fs.existsSync(resultsFile)) {
+            console.log('Results file not found, creating basic issue');
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Test Execution Failed - Run #${{ github.run_number }}`,
+              body: `## Test Execution Failure\n\nThe comprehensive test suite failed to execute properly.\n\n**Run Details:**\n- Run Number: ${{ github.run_number }}\n- Commit: ${{ github.sha }}\n- Branch: ${{ github.ref_name }}\n- Trigger: ${{ github.event_name }}\n\n**Recommended Actions:**\n- Check the workflow logs for detailed error information\n- Verify test environment setup\n- Review recent code changes for potential impact\n\n*This issue was automatically created by the Comprehensive Test Automation workflow*`,
+              labels: ['bug', 'testing', 'automated', 'ci-failure']
+            });
+            return;
+          }
+          
+          const results = JSON.parse(fs.readFileSync(resultsFile, 'utf8'));
+          const failedTests = results.test_results.filter(test => test.status === 'failed');
+          
+          let failedTestsList = '';
+          if (failedTests.length > 0) {
+            failedTestsList = failedTests.map(test => 
+              `- **${test.test_name}** (${test.category})\n  \`\`\`\n  ${test.error.slice(0, 200)}${test.error.length > 200 ? '...' : ''}\n  \`\`\``
+            ).join('\n\n');
+          } else {
+            failedTestsList = '- No detailed failure information available';
+          }
+          
+          const issueBody = `## Test Failure Report
+          
+**Automated test run detected ${{ steps.test_results.outputs.failed_tests }} failing test(s).**
+
+### Summary
+- **Total Tests:** ${{ steps.test_results.outputs.total_tests }}
+- **Passed:** ${{ steps.test_results.outputs.passed_tests }}
+- **Failed:** ${{ steps.test_results.outputs.failed_tests }}
+- **Success Rate:** ${{ steps.test_results.outputs.success_rate }}%
+
+### Run Details
+- **Run Number:** #${{ github.run_number }}
+- **Commit:** ${{ github.sha }}
+- **Branch:** ${{ github.ref_name }}
+- **Trigger:** ${{ github.event_name }}
+- **Workflow:** [View Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
+### Failed Tests
+${failedTestsList}
+
+### Test Categories Breakdown
+${Object.entries(results.categories).map(([category, stats]) => 
+  `- **${category}:** ${stats.passed}/${stats.total} passed (${stats.failed} failed)`
+).join('\n')}
+
+### Recommended Actions
+- Review test logs for detailed error information
+- Check test environment and dependencies  
+- Verify recent code changes for potential impact
+- Consider running tests locally to reproduce issues
+
+### Artifacts
+Test results and detailed logs are available in the [workflow artifacts](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).
+
+*This issue was automatically generated by the Comprehensive Test Automation framework v1.0.0*`;
+
+          const issue = await github.rest.issues.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: `Test Failures Detected - ${{ steps.test_results.outputs.failed_tests }} test(s) failed (Run #${{ github.run_number }})`,
+            body: issueBody,
+            labels: ['bug', 'testing', 'automated', `priority-${results.summary.failed_tests > 5 ? 'high' : 'medium'}`]
+          });
+          
+          console.log(`Created issue #${issue.data.number}: ${issue.data.title}`);
+          
+    - name: Update PR with test results
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const resultsFile = '${{ steps.test_execution.outputs.test_results_file }}';
+          
+          let commentBody = `## 🧪 Test Results Summary\n\n`;
+          
+          if (!fs.existsSync(resultsFile)) {
+            commentBody += `❌ **Test execution failed**\n\nThe comprehensive test suite failed to execute. Please check the workflow logs for details.`;
+          } else {
+            const statusIcon = ${{ steps.test_results.outputs.failed_tests }} === 0 ? '✅' : '❌';
+            
+            commentBody += `${statusIcon} **Test Results**
+            
+| Metric | Value |
+|--------|-------|
+| Total Tests | ${{ steps.test_results.outputs.total_tests }} |
+| Passed | ${{ steps.test_results.outputs.passed_tests }} |
+| Failed | ${{ steps.test_results.outputs.failed_tests }} |
+| Success Rate | ${{ steps.test_results.outputs.success_rate }}% |
+
+`;
+            
+            if (${{ steps.test_results.outputs.failed_tests }} > 0) {
+              commentBody += `\n⚠️ **${{ steps.test_results.outputs.failed_tests }} test(s) failed.** Please review the detailed results in the workflow artifacts.\n\n`;
+            } else {
+              commentBody += `\n🎉 **All tests passed!** Great job!\n\n`;
+            }
+          }
+          
+          commentBody += `**Workflow:** [View Details](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+**Artifacts:** [Download Results](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
+*Automated comment by Comprehensive Test Automation framework*`;
+          
+          await github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: commentBody
+          });
+          
+    - name: Set job status
+      if: always()
+      run: |
+        if [[ "${{ steps.test_results.outputs.has_failures }}" == "true" ]]; then
+          echo "Tests failed - exiting with error"
+          exit 1
+        else
+          echo "All tests passed successfully"
+          exit 0
+        fi

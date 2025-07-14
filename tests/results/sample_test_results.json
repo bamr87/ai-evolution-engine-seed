@@ -1,0 +1,58 @@
+{
+  "metadata": {
+    "framework_version": "1.0.0",
+    "execution_id": "test_run_demo",
+    "start_time": "2025-07-14T05:00:00Z",
+    "end_time": "2025-07-14T05:05:00Z",
+    "duration_seconds": 300,
+    "hostname": "test-host",
+    "working_directory": "/home/runner/work/ai-evolution-engine-seed/ai-evolution-engine-seed"
+  },
+  "summary": {
+    "total_tests": 10,
+    "passed_tests": 7,
+    "failed_tests": 3,
+    "skipped_tests": 0,
+    "success_rate": 70.0
+  },
+  "test_results": [
+    {
+      "test_name": "test_project_structure.sh",
+      "category": "unit",
+      "status": "passed",
+      "duration": 5,
+      "output": "All project structure tests passed",
+      "error": "",
+      "timestamp": "2025-07-14T05:01:00Z"
+    },
+    {
+      "test_name": "test_ai_evolver.sh", 
+      "category": "unit",
+      "status": "failed",
+      "duration": 15,
+      "output": "Testing workflow configuration",
+      "error": "Workflow job validation failed",
+      "timestamp": "2025-07-14T05:02:00Z"
+    },
+    {
+      "test_name": "test_full_workflow.sh",
+      "category": "integration", 
+      "status": "passed",
+      "duration": 45,
+      "output": "Integration test completed successfully",
+      "error": "",
+      "timestamp": "2025-07-14T05:03:00Z"
+    }
+  ],
+  "categories": {
+    "unit": {"total": 5, "passed": 3, "failed": 2},
+    "integration": {"total": 3, "passed": 3, "failed": 0},
+    "workflow": {"total": 2, "passed": 1, "failed": 1}
+  },
+  "environment": {
+    "shell": "/bin/bash",
+    "bash_version": "5.1.16",
+    "path": "/usr/local/bin:/usr/bin:/bin",
+    "test_framework": "comprehensive_test_runner.sh v1.0.0"
+  }
+}
