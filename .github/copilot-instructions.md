@@ -223,6 +223,15 @@ When generating code for Azure, running terminal commands for Azure, or performi
   - **Technical Accuracy**: Ensure all examples, commands, and references are current and functional
   - **Regular Synchronization**: Update README files whenever directory contents change to maintain accuracy
 
+### Automatic Documentation Generation
+- Integrate documentation generation tools (such as shdoc for shell scripts, JSDoc for JavaScript, or similar tools appropriate for the language) to automatically create .md files from source code comments and snippets.
+- Ensure all functions, modules, utilities, APIs, and other components are thoroughly commented in the source code to enable accurate documentation generation.
+- Implement bidirectional synchronization: Generate documentation from code, and where possible, ensure changes in documentation can inform code updates (e.g., through literate programming practices or automated syncing scripts).
+- Run documentation generation as part of the build or CI/CD process to keep generated docs up-to-date.
+- Store generated documentation in appropriate subdirectories under `docs/`, such as `docs/api/` or `docs/reference/`.
+- Validate generated documentation for completeness and accuracy during evolution cycles.
+- Evolve the documentation generation process itself through recursive improvements, adding support for new languages or better extraction methods as needed.
+
 ### Testing Approaches
 - Include unit tests for core functionality
 - Suggest integration tests for system interactions
