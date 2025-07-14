@@ -195,7 +195,7 @@ run_unit_tests() {
         if [[ -d "$test_dir" ]]; then
             while IFS= read -r -d '' test_file; do
                 test_files+=("$test_file")
-            done < <(find "$test_dir" -name "*.sh" -perm +111 -print0)
+            done < <(find "$test_dir" -name "*.sh" -executable -print0)
         fi
     done
     
@@ -220,7 +220,7 @@ run_integration_tests() {
         if [[ -d "$test_dir" ]]; then
             while IFS= read -r -d '' test_file; do
                 test_files+=("$test_file")
-            done < <(find "$test_dir" -name "*.sh" -perm +111 -print0)
+            done < <(find "$test_dir" -name "*.sh" -executable -print0)
         fi
     done
     
@@ -382,14 +382,14 @@ list_tests() {
     
     echo "Unit Tests:"
     if [[ -d "$SCRIPT_DIR/unit" ]]; then
-        find "$SCRIPT_DIR/unit" -name "*.sh" -perm +111 | sort | while read -r test; do
+        find "$SCRIPT_DIR/unit" -name "*.sh" -executable | sort | while read -r test; do
             echo "  - $(basename "$test")"
         done
     fi
     
     echo -e "\nIntegration Tests:"
     if [[ -d "$SCRIPT_DIR/integration" ]]; then
-        find "$SCRIPT_DIR/integration" -name "*.sh" -perm +111 | sort | while read -r test; do
+        find "$SCRIPT_DIR/integration" -name "*.sh" -executable | sort | while read -r test; do
             echo "  - $(basename "$test")"
         done
     fi
