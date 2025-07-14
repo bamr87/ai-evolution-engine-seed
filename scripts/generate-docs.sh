@@ -162,11 +162,11 @@ extract_file_metadata() {
     notes="${notes:-No additional notes}"
     
     # Clean up any shell-unsafe characters
-    description=$(echo "$description" | sed 's/[`$"\\]/\\&/g')
-    author=$(echo "$author" | sed 's/[`$"\\]/\\&/g')
-    version=$(echo "$version" | sed 's/[`$"\\]/\\&/g')
-    usage=$(echo "$usage" | sed 's/[`$"\\]/\\&/g')
-    notes=$(echo "$notes" | sed 's/[`$"\\]/\\&/g')
+    description=$(sanitize_metadata_value "$description")
+    author=$(sanitize_metadata_value "$author")
+    version=$(sanitize_metadata_value "$version")
+    usage=$(sanitize_metadata_value "$usage")
+    notes=$(sanitize_metadata_value "$notes")
     
     # Return variables in a safer format
     printf 'DOC_DESCRIPTION="%s"\n' "$description"
