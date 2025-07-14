@@ -7,7 +7,7 @@ set -euo pipefail
 
 # Source modular libraries
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 
 # Source logger
 source "$PROJECT_ROOT/src/lib/core/logger.sh"

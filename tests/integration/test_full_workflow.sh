@@ -67,7 +67,7 @@ echo "{\"test_run_id\": \"full_workflow_test_${TEST_RUN_TIMESTAMP}\", \"start_ti
 # Test 1: Verify main test runner works
 echo -e "${YELLOW}Testing main test runner...${NC}"
 
-if "$PROJECT_ROOT/tests/test_runner.sh" --type unit; then
+if "$PROJECT_ROOT/tests/run_tests.sh" run unit; then
     echo -e "${GREEN}✓${NC} Main test runner works correctly"
 else
     echo -e "${RED}✗${NC} Main test runner failed"

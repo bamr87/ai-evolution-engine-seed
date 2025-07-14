@@ -180,7 +180,7 @@ test_script_integration() {
     
     # Check if workflow references expected helper scripts
     run_test "Workflow mentions setup-environment.sh" "grep -q 'setup-environment.sh' '$WORKFLOW_FILE'"
-    run_test "Workflow mentions analyze-repository-health.sh" "grep -q 'analyze-repository-health.sh' '$WORKFLOW_FILE'"
+    run_test "Workflow mentions analyze-repository-health-simple.sh" "grep -q 'analyze-repository-health-simple.sh' '$WORKFLOW_FILE'"
     run_test "Workflow mentions generate-evolution-prompt.sh" "grep -q 'generate-evolution-prompt.sh' '$WORKFLOW_FILE'"
     run_test "Workflow mentions trigger-evolution-workflow.sh" "grep -q 'trigger-evolution-workflow.sh' '$WORKFLOW_FILE'"
 }

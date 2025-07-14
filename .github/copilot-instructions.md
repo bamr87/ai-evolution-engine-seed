@@ -149,6 +149,12 @@ The system implements **progressive structure solidification**:
 - Maintain README accuracy through regular synchronization with actual implementation
 - Structure README content to optimize AI comprehension and development guidance
 
+### Script-Centric Development (SCD)
+- Treat scripts in the `scripts/` directory as the cornerstone for the creation and generation of all other files within the repository
+- Use these scripts as the primary entry points for all workflows and interactions with the core library
+- Ensure scripts rely on the `src/` directory for all common functions and tools
+- Maintain scripts to be easy to read, fully documented, and primarily focused on orchestrating calls to major functions in `src/`
+
 ## Technology-Specific Guidelines
 
 ### @azure Rule - Use Azure Best Practices

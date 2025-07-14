@@ -90,9 +90,9 @@ if [[ -d "$scripts_dir" ]]; then
 fi
 
 # Test specific critical scripts
-run_test "check-prereqs.sh syntax" "bash -n '$PROJECT_ROOT/scripts/check-prereqs.sh'"
-run_test "test-workflow.sh syntax" "bash -n '$PROJECT_ROOT/scripts/test-workflow.sh'"
-run_test "evolve.sh syntax" "bash -n '$PROJECT_ROOT/scripts/evolve.sh'"
+run_test "check-prereqs.sh syntax" "bash -n '$PROJECT_ROOT/scripts/analysis/check-prereqs.sh'"
+run_test "test-workflow.sh syntax" "bash -n '$PROJECT_ROOT/tests/workflows/test-workflow.sh'"
+run_test "evolve.sh syntax" "bash -n '$PROJECT_ROOT/scripts/core/evolve.sh'"
 
 end_test_suite
 
@@ -147,8 +147,8 @@ end_test_suite
 start_test_suite "backward_compatibility" "Testing backward compatibility with existing workflows"
 
 # Test that existing test runner still works
-run_test "Original test runner exists" "test -f '$PROJECT_ROOT/tests/test_runner.sh'"
-run_test "Original test runner syntax" "bash -n '$PROJECT_ROOT/tests/test_runner.sh'"
+run_test "Unified test runner exists" "test -f '$PROJECT_ROOT/tests/run_tests.sh'"
+run_test "Unified test runner syntax" "bash -n '$PROJECT_ROOT/tests/run_tests.sh'"
 
 # Test workflow integration
 workflows_dir="$PROJECT_ROOT/.github/workflows"
