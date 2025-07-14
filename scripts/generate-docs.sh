@@ -34,8 +34,10 @@ readonly PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 readonly DOCS_DIR="$PROJECT_ROOT/docs"
 readonly SRC_DIR="$PROJECT_ROOT/src"
 readonly GENERATED_DOCS_DIR="$DOCS_DIR/generated"
-readonly SHDOC_PATH="/tmp/shdoc"
+readonly SHDOC_PATH="$HOME/.local/bin/shdoc"
 
+# Ensure the directory exists
+mkdir -p "$(dirname "$SHDOC_PATH")"
 # Documentation generation state
 readonly TIMESTAMP="$(date '+%Y-%m-%d %H:%M:%S')"
 readonly VERSION="1.0.0"
