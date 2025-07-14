@@ -26,7 +26,7 @@
 # @notes Runs all tests and generates comprehensive reports for AI analysis
 #
 
-set -euo pipefail
+set -eo pipefail
 
 # Script configuration
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -56,6 +56,8 @@ FAILED_TESTS=0
 SKIPPED_TESTS=0
 START_TIME=""
 END_TIME=""
+START_TIME_EPOCH=""
+END_TIME_EPOCH=""
 
 # Test results array
 TEST_RESULTS=()
@@ -86,6 +88,7 @@ EOF
 init_output() {
     mkdir -p "$OUTPUT_DIR"
     START_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+    START_TIME_EPOCH=$(date +%s)
 }
 
 # Add test result to tracking
@@ -97,18 +100,8 @@ add_test_result() {
     local test_output="$5"
     local test_error="${6:-}"
     
-    local test_result=$(cat << EOF
-{
-  "test_name": "$test_name",
-  "category": "$test_category", 
-  "status": "$test_status",
-  "duration": $test_duration,
-  "output": $(echo "$test_output" | jq -Rs .),
-  "error": $(echo "$test_error" | jq -Rs .),
-  "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-}
-EOF
-)
+    # Create minimal JSON structure
+    local test_result="{\"test_name\": \"$test_name\", \"category\": \"$test_category\", \"status\": \"$test_status\", \"duration\": $test_duration, \"output\": \"test_output\", \"error\": \"test_error\", \"timestamp\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}"
     
     TEST_RESULTS+=("$test_result")
     
@@ -172,11 +165,11 @@ execute_test() {
     if [[ "$VERBOSE" == "true" ]] || [[ "$test_status" == "failed" ]]; then
         if [[ -n "$test_output" ]]; then
             echo "Output:"
-            echo "$test_output" | head -20
+            echo "$test_output"
         fi
         if [[ -n "$test_error" ]]; then
             echo "Errors:"
-            echo "$test_error" | head -10
+            echo "$test_error"
         fi
     fi
     
@@ -337,6 +330,7 @@ run_seed_tests() {
 # Generate comprehensive test results
 generate_results() {
     END_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+    END_TIME_EPOCH=$(date +%s)
     
     local success_rate=0
     if [[ $TOTAL_TESTS -gt 0 ]]; then
@@ -358,6 +352,31 @@ generate_results() {
     done
     test_results_json+="]"
     
+    # Pre-calculate category stats to avoid complex command substitution
+    local unit_total=$(echo "$test_results_json" | jq '[.[] | select(.category == "unit")] | length')
+    local unit_passed=$(echo "$test_results_json" | jq '[.[] | select(.category == "unit" and .status == "passed")] | length')
+    local unit_failed=$(echo "$test_results_json" | jq '[.[] | select(.category == "unit" and .status == "failed")] | length')
+    
+    local integration_total=$(echo "$test_results_json" | jq '[.[] | select(.category == "integration")] | length')
+    local integration_passed=$(echo "$test_results_json" | jq '[.[] | select(.category == "integration" and .status == "passed")] | length')
+    local integration_failed=$(echo "$test_results_json" | jq '[.[] | select(.category == "integration" and .status == "failed")] | length')
+    
+    local workflow_total=$(echo "$test_results_json" | jq '[.[] | select(.category == "workflow")] | length')
+    local workflow_passed=$(echo "$test_results_json" | jq '[.[] | select(.category == "workflow" and .status == "passed")] | length')
+    local workflow_failed=$(echo "$test_results_json" | jq '[.[] | select(.category == "workflow" and .status == "failed")] | length')
+    
+    local modular_total=$(echo "$test_results_json" | jq '[.[] | select(.category == "modular")] | length')
+    local modular_passed=$(echo "$test_results_json" | jq '[.[] | select(.category == "modular" and .status == "passed")] | length')
+    local modular_failed=$(echo "$test_results_json" | jq '[.[] | select(.category == "modular" and .status == "failed")] | length')
+    
+    local library_total=$(echo "$test_results_json" | jq '[.[] | select(.category == "library")] | length')
+    local library_passed=$(echo "$test_results_json" | jq '[.[] | select(.category == "library" and .status == "passed")] | length')
+    local library_failed=$(echo "$test_results_json" | jq '[.[] | select(.category == "library" and .status == "failed")] | length')
+    
+    local seed_total=$(echo "$test_results_json" | jq '[.[] | select(.category == "seed")] | length')
+    local seed_passed=$(echo "$test_results_json" | jq '[.[] | select(.category == "seed" and .status == "passed")] | length')
+    local seed_failed=$(echo "$test_results_json" | jq '[.[] | select(.category == "seed" and .status == "failed")] | length')
+    
     # Generate complete results file
     cat > "$RESULTS_FILE" << EOF
 {
@@ -366,7 +385,7 @@ generate_results() {
     "execution_id": "test_run_${TIMESTAMP}",
     "start_time": "$START_TIME",
     "end_time": "$END_TIME",
-    "duration_seconds": $(( $(date -d "$END_TIME" +%s) - $(date -d "$START_TIME" +%s) )),
+    "duration_seconds": $(( END_TIME_EPOCH - START_TIME_EPOCH )),
     "hostname": "$(hostname)",
     "working_directory": "$PROJECT_ROOT"
   },
@@ -380,34 +399,34 @@ generate_results() {
   "test_results": $test_results_json,
   "categories": {
     "unit": {
-      "total": $(echo "$test_results_json" | jq '[.[] | select(.category == "unit")] | length'),
-      "passed": $(echo "$test_results_json" | jq '[.[] | select(.category == "unit" and .status == "passed")] | length'),
-      "failed": $(echo "$test_results_json" | jq '[.[] | select(.category == "unit" and .status == "failed")] | length')
+      "total": $unit_total,
+      "passed": $unit_passed,
+      "failed": $unit_failed
     },
     "integration": {
-      "total": $(echo "$test_results_json" | jq '[.[] | select(.category == "integration")] | length'),
-      "passed": $(echo "$test_results_json" | jq '[.[] | select(.category == "integration" and .status == "passed")] | length'),
-      "failed": $(echo "$test_results_json" | jq '[.[] | select(.category == "integration" and .status == "failed")] | length')
+      "total": $integration_total,
+      "passed": $integration_passed,
+      "failed": $integration_failed
     },
     "workflow": {
-      "total": $(echo "$test_results_json" | jq '[.[] | select(.category == "workflow")] | length'),
-      "passed": $(echo "$test_results_json" | jq '[.[] | select(.category == "workflow" and .status == "passed")] | length'),
-      "failed": $(echo "$test_results_json" | jq '[.[] | select(.category == "workflow" and .status == "failed")] | length')
+      "total": $workflow_total,
+      "passed": $workflow_passed,
+      "failed": $workflow_failed
     },
     "modular": {
-      "total": $(echo "$test_results_json" | jq '[.[] | select(.category == "modular")] | length'),
-      "passed": $(echo "$test_results_json" | jq '[.[] | select(.category == "modular" and .status == "passed")] | length'),
-      "failed": $(echo "$test_results_json" | jq '[.[] | select(.category == "modular" and .status == "failed")] | length')
+      "total": $modular_total,
+      "passed": $modular_passed,
+      "failed": $modular_failed
     },
     "library": {
-      "total": $(echo "$test_results_json" | jq '[.[] | select(.category == "library")] | length'),
-      "passed": $(echo "$test_results_json" | jq '[.[] | select(.category == "library" and .status == "passed")] | length'),
-      "failed": $(echo "$test_results_json" | jq '[.[] | select(.category == "library" and .status == "failed")] | length')
+      "total": $library_total,
+      "passed": $library_passed,
+      "failed": $library_failed
     },
     "seed": {
-      "total": $(echo "$test_results_json" | jq '[.[] | select(.category == "seed")] | length'),
-      "passed": $(echo "$test_results_json" | jq '[.[] | select(.category == "seed" and .status == "passed")] | length'),
-      "failed": $(echo "$test_results_json" | jq '[.[] | select(.category == "seed" and .status == "failed")] | length')
+      "total": $seed_total,
+      "passed": $seed_passed,
+      "failed": $seed_failed
     }
   },
   "environment": {
@@ -459,7 +478,7 @@ show_summary() {
     echo "Success Rate: ${success_rate}%"
     echo ""
     echo "Results File: $RESULTS_FILE"
-    echo "Execution Time: $(( $(date -d "$END_TIME" +%s) - $(date -d "$START_TIME" +%s) )) seconds"
+    echo "Execution Time: $(( END_TIME_EPOCH - START_TIME_EPOCH )) seconds"
     
     if [[ $FAILED_TESTS -eq 0 ]]; then
         echo ""
@@ -526,7 +545,7 @@ main() {
     info "Results will be saved to: $RESULTS_FILE"
     echo ""
     
-    # Run all test categories
+    # Run all test categories  
     run_unit_tests
     run_integration_tests  
     run_workflow_tests

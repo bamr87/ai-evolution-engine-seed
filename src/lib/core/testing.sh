@@ -270,7 +270,7 @@ discover_tests() {
     local test_dir="$1"
     local test_pattern="${2:-test_*.sh}"
     
-    find "$test_dir" -name "$test_pattern" -type f -executable 2>/dev/null | sort
+    find "$test_dir" -name "$test_pattern" -type f -perm +111 2>/dev/null | sort
 }
 
 run_test_file() {

@@ -1,0 +1,89 @@
+{
+  "metadata": {
+    "framework_version": "1.0.0",
+    "execution_id": "test_run_20250714_002746",
+    "start_time": "2025-07-14T06:27:46Z",
+    "end_time": "2025-07-14T06:27:47Z",
+    "duration_seconds": 1,
+    "hostname": "mac.lan",
+    "working_directory": "/Users/bamr87/github/ai-evolution-engine-seed"
+  },
+  "summary": {
+    "total_tests": 4,
+    "passed_tests": 3,
+    "failed_tests": 1,
+    "skipped_tests": 0,
+    "success_rate": 75.00
+  },
+  "test_results": [{
+  "test_name": "test_framework_validation.sh",
+  "category": "unit", 
+  "status": "passed",
+  "duration": 0,
+  "output": "Starting Framework Validation Tests\n===================================\nTesting: Basic shell operations\n\u001b[0;32m✓\u001b[0m Basic shell operations passed\nTesting: File system access\n\u001b[0;32m✓\u001b[0m File system access passed\nTesting: Environment variables\n\u001b[0;32m✓\u001b[0m Environment variables passed\nTesting: jq availability\n\u001b[0;32m✓\u001b[0m jq availability passed\nTesting: bc availability\n\u001b[0;32m✓\u001b[0m bc availability passed\nTesting: JSON creation\n\u001b[0;32m✓\u001b[0m JSON creation passed\nTesting: Math calculations\n\u001b[0;32m✓\u001b[0m Math calculations passed\nTesting: Project root exists\n\u001b[0;32m✓\u001b[0m Project root exists passed\nTesting: Tests directory exists\n\u001b[0;32m✓\u001b[0m Tests directory exists passed\nTesting: Source directory exists\n\u001b[0;32m✓\u001b[0m Source directory exists passed\nTesting: File creation\n\u001b[0;32m✓\u001b[0m File creation passed\nTesting: File deletion\n\u001b[0;32m✓\u001b[0m File deletion passed\n\nFramework Validation Summary\n============================\nTests Run: 12\nTests Passed: 12\nTests Failed: 0\n\u001b[0;32mAll framework validation tests passed!\u001b[0m\n",
+  "error": "\n",
+  "timestamp": "2025-07-14T06:27:46Z"
+},{
+  "test_name": "test_daily_evolution.sh",
+  "category": "unit", 
+  "status": "passed",
+  "duration": 1,
+  "output": "\u001b[0;34m[INFO]\u001b[0m Starting Daily Evolution Workflow Tests...\n\u001b[0;34m[INFO]\u001b[0m Testing file: /Users/bamr87/github/ai-evolution-engine-seed/.github/workflows/daily_evolution.yml\n\u001b[0;34m[INFO]\u001b[0m Artifacts will be saved to: /Users/bamr87/github/ai-evolution-engine-seed/tests/unit/workflows/{logs,results,reports}/\n\u001b[0;34m[INFO]\u001b[0m Testing workflow file existence and structure...\n\u001b[0;32m✓\u001b[0m Daily Evolution workflow file exists\n\u001b[0;32m✓\u001b[0m Workflow YAML is valid\n\u001b[0;34m[INFO]\u001b[0m Testing workflow metadata...\n\u001b[0;32m✓\u001b[0m Workflow has a descriptive name\n\u001b[0;32m✓\u001b[0m Workflow has proper trigger (workflow_dispatch)\n\u001b[0;32m✓\u001b[0m Workflow has required permissions\n\u001b[0;32m✓\u001b[0m Workflow has PR permissions\n\u001b[0;34m[INFO]\u001b[0m Testing workflow inputs...\n\u001b[0;32m✓\u001b[0m Has required 'evolution_type' input\n\u001b[0;32m✓\u001b[0m Has 'intensity' input with choices\n\u001b[0;32m✓\u001b[0m Has 'force_run' boolean input\n\u001b[0;32m✓\u001b[0m Has 'dry_run' boolean input\n\u001b[0;32m✓\u001b[0m Intensity includes 'minimal'\n\u001b[0;32m✓\u001b[0m Intensity includes 'moderate'\n\u001b[0;32m✓\u001b[0m Intensity includes 'comprehensive'\n\u001b[0;34m[INFO]\u001b[0m Testing job configuration...\n\u001b[0;32m✓\u001b[0m Job uses ubuntu-latest runner\n\u001b[0;32m✓\u001b[0m Job has descriptive name\n\u001b[0;34m[INFO]\u001b[0m Testing workflow steps...\n\u001b[0;32m✓\u001b[0m Workflow has multiple steps\n\u001b[0;32m✓\u001b[0m Has checkout step with full history\n\u001b[0;32m✓\u001b[0m Has repository health analysis step\n\u001b[0;32m✓\u001b[0m Has evolution prompt generation step\n\u001b[0;32m✓\u001b[0m Has evolution trigger step\n\u001b[0;34m[INFO]\u001b[0m Testing script integration...\n\u001b[0;32m✓\u001b[0m Workflow mentions setup-environment.sh\n\u001b[0;32m✓\u001b[0m Workflow mentions analyze-repository-health-simple.sh\n\u001b[0;32m✓\u001b[0m Workflow mentions generate-evolution-prompt.sh\n\u001b[0;32m✓\u001b[0m Workflow mentions trigger-evolution-workflow.sh\n\u001b[0;34m[INFO]\u001b[0m Testing error handling patterns...\n\u001b[0;32m✓\u001b[0m Has conditional step execution\n\u001b[0;32m✓\u001b[0m Has dry run handling\n\u001b[0;32m✓\u001b[0m Checks for setup script existence\n\u001b[0;32m✓\u001b[0m Handles script permissions\n\u001b[0;34m[INFO]\u001b[0m Testing environment variable usage...\n\u001b[0;32m✓\u001b[0m Uses github.event.inputs properly\n\u001b[0;32m✓\u001b[0m Uses github.token for authentication\n\u001b[0;32m✓\u001b[0m Sets EVOLUTION_TYPE variable\n\u001b[0;32m✓\u001b[0m Sets INTENSITY variable\n\u001b[0;34m[INFO]\u001b[0m Testing version management...\n\u001b[0;32m✓\u001b[0m Workflow has version identifier\n\u001b[0;32m✓\u001b[0m Version appears in workflow name\n\u001b[0;32m✓\u001b[0m Version appears in environment variables\n\u001b[0;34m[INFO]\u001b[0m Testing security considerations...\n\u001b[0;32m✓\u001b[0m Has appropriate permissions scope\n\u001b[0;32m✓\u001b[0m No hardcoded secrets\n\u001b[0;32m✓\u001b[0m Uses secure checkout\n\u001b[0;34m[INFO]\u001b[0m Testing dependency requirements...\n\u001b[0;32m✓\u001b[0m Workflow uses git operations\n\u001b[0;32m✓\u001b[0m Workflow mentions bash scripts\n\u001b[0;32m✓\u001b[0m Workflow uses environment variables\n\n\u001b[0;34m[INFO]\u001b[0m Test execution completed\n\u001b[0;34m[INFO]\u001b[0m Results summary:\n  Total tests: 41\n  Passed: 41\n  Failed: 0\n\n\u001b[0;34m[INFO]\u001b[0m Artifacts saved:\n  Log: /Users/bamr87/github/ai-evolution-engine-seed/tests/unit/workflows/logs/daily_evolution_test_20250714-002746.log\n  Results: /Users/bamr87/github/ai-evolution-engine-seed/tests/unit/workflows/results/daily_evolution_results_20250714-002746.json\n  Report: /Users/bamr87/github/ai-evolution-engine-seed/tests/unit/workflows/reports/daily_evolution_report_20250714-002746.md\n",
+  "error": "\n",
+  "timestamp": "2025-07-14T06:27:47Z"
+},{
+  "test_name": "test_ai_evolver.sh",
+  "category": "unit", 
+  "status": "failed",
+  "duration": 0,
+  "output": "\u001b[0;34m[INFO]\u001b[0m Starting AI Evolver workflow validation tests\n\u001b[0;34m[INFO]\u001b[0m Workflow file: /Users/bamr87/github/ai-evolution-engine-seed/.github/workflows/ai_evolver.yml\n\u001b[0;34m[INFO]\u001b[0m Artifacts will be saved to: /Users/bamr87/github/ai-evolution-engine-seed/tests/unit/workflows/{logs,results,reports}/\n\u001b[0;34m[INFO]\u001b[0m Testing workflow file existence and structure...\n\u001b[0;32m✓\u001b[0m AI Evolver workflow file exists\n\u001b[0;32m✓\u001b[0m Workflow YAML is valid\n\u001b[0;34m[INFO]\u001b[0m Testing workflow metadata...\n\u001b[0;32m✓\u001b[0m Workflow has a descriptive name\n\u001b[0;32m✓\u001b[0m Workflow has proper trigger (workflow_dispatch)\n\u001b[0;32m✓\u001b[0m Workflow has required permissions\n\u001b[0;32m✓\u001b[0m Workflow has PR permissions\n\u001b[0;34m[INFO]\u001b[0m Testing workflow inputs...\n\u001b[0;32m✓\u001b[0m Has prompt input\n\u001b[0;32m✓\u001b[0m Has growth_mode input\n\u001b[0;32m✓\u001b[0m Has auto_plant_seeds input\n\u001b[0;32m✓\u001b[0m Has dry_run input\n\u001b[0;32m✓\u001b[0m Has use_container input\n\u001b[0;32m✓\u001b[0m Growth mode has valid default\n\u001b[0;32m✓\u001b[0m Auto plant seeds has boolean default\n\u001b[0;34m[INFO]\u001b[0m Testing job configuration...\n\u001b[0;31m✗\u001b[0m Has evolve job\n",
+  "error": "\n",
+  "timestamp": "2025-07-14T06:27:47Z"
+},{
+  "test_name": "test_project_structure.sh",
+  "category": "unit", 
+  "status": "passed",
+  "duration": 0,
+  "output": "Running project structure unit tests...\n\u001b[0;32m✓\u001b[0m README.md exists and is not empty\n\u001b[0;32m✓\u001b[0m LICENSE file exists\n\u001b[0;32m✓\u001b[0m Evolution metrics exists\n\u001b[0;32m✓\u001b[0m Scripts directory exists\n\u001b[0;32m✓\u001b[0m Tests directory exists\n\u001b[0;32m✓\u001b[0m Source directory exists\n\u001b[0;32m✓\u001b[0m Documentation directory exists\n\u001b[0;32m✓\u001b[0m .gitignore exists\n\u001b[0;32m✓\u001b[0m .gptignore exists\n\u001b[0;32m✓\u001b[0m GitHub Actions directory exists\n\u001b[0;32m✓\u001b[0m Seed documentation exists\n\nUnit Test Results:\n  Tests run: 11\n  Passed: 11\n  Failed: 0\n\u001b[0;32mAll unit tests passed!\u001b[0m\n",
+  "error": "\n",
+  "timestamp": "2025-07-14T06:27:47Z"
+}],
+  "categories": {
+    "unit": {
+      "total": 4,
+      "passed": 3,
+      "failed": 1
+    },
+    "integration": {
+      "total": 0,
+      "passed": 0,
+      "failed": 0
+    },
+    "workflow": {
+      "total": 0,
+      "passed": 0,
+      "failed": 0
+    },
+    "modular": {
+      "total": 0,
+      "passed": 0,
+      "failed": 0
+    },
+    "library": {
+      "total": 0,
+      "passed": 0,
+      "failed": 0
+    },
+    "seed": {
+      "total": 0,
+      "passed": 0,
+      "failed": 0
+    }
+  },
+  "environment": {
+    "shell": "/bin/zsh",
+    "bash_version": "3.2.57(1)-release",
+    "path": "/opt/homebrew/opt/mysql-client/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/Library/TeX/texbin:/opt/homebrew/opt/mysql-client/bin",
+    "test_framework": "comprehensive_test_runner.sh v1.0.0"
+  }
+}
