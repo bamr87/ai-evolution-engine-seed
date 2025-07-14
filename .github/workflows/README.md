@@ -1,3 +1,35 @@
+<!--
+@file .github/workflows/README.md
+@description GitHub Actions workflows documentation for AI Evolution Engine
+@author AI Evolution Engine Team <team@ai-evolution-engine.org>
+@created 2025-07-05
+@lastModified 2025-07-12
+@version 0.4.6
+
+@relatedIssues 
+  - #workflow-optimization: Continuous improvement of CI/CD workflows
+  - #evolution-automation: Automated evolution cycle management
+
+@relatedEvolutions
+  - v0.4.6: Cleaned workflow structure and optimized core evolution workflows
+  - v0.4.1: Enhanced evolution workflow system with multiple growth modes
+  - v0.3.6: Cross-platform compatibility and containerization support
+
+@dependencies
+  - GitHub Actions: workflow execution platform
+  - bash: >=4.0 for script execution
+  - gh CLI: for workflow management and authentication
+
+@changelog
+  - 2025-07-12: Added comprehensive file header and enhanced documentation - AEE
+  - 2025-07-05: Cleaned workflow structure and removed duplicate files - AEE
+  - 2025-07-04: Enhanced workflow system with multiple growth modes - AEE
+  - 2025-07-01: Initial creation of comprehensive workflow documentation - AEE
+
+@usage Reference documentation for GitHub Actions workflows and CI/CD automation
+@notes Contains documentation for core evolution workflows and automation systems
+-->
+
 # AI Evolution Engine - GitHub Actions Workflows (v0.4.6)
 
 This directory contains the GitHub Actions workflows that power the AI Evolution Engine, enabling automated and manual evolution of the codebase through AI-driven growth cycles.
@@ -195,13 +227,129 @@ env:
 
 ## Future Enhancements
 
-- [ ] Multi-repository evolution support
-- [ ] Advanced AI model integration
-- [ ] Real-time evolution monitoring
-- [ ] Custom evolution templates
-- [ ] Integration with external tools
-- [ ] Performance optimization
-- [ ] Enhanced security features
+- [ ] **Multi-repository evolution support**
+- [ ] **Advanced AI model integration**
+- [ ] **Real-time evolution monitoring**
+- [ ] **Custom evolution templates**
+- [ ] **Integration with external tools**
+- [ ] **Performance optimization**
+- [ ] **Enhanced security features**
+- [ ] **Workflow Analytics Dashboard**: Real-time monitoring and metrics visualization
+- [ ] **Smart Scheduling**: AI-powered workflow scheduling based on repository activity
+- [ ] **Rollback Automation**: Automated rollback capabilities for failed evolution cycles
+- [ ] **Cross-Repository Coordination**: Coordinated evolution across multiple repositories
+- [ ] **Custom Validation Gates**: Configurable quality gates for evolution approval
+
+## Workflow Examples
+
+### Common Evolution Scenarios
+
+**Feature Development:**
+```bash
+# Add new feature with comprehensive testing
+gh workflow run ai_evolver.yml \
+  -f prompt="Add user authentication with JWT tokens, including unit tests and documentation" \
+  -f growth_mode="adaptive" \
+  -f dry_run=false
+```
+
+**Bug Fixes:**
+```bash
+# Conservative bug fix approach
+gh workflow run ai_evolver.yml \
+  -f prompt="Fix memory leak in data processing module" \
+  -f growth_mode="conservative" \
+  -f dry_run=true
+```
+
+**Performance Optimization:**
+```bash
+# Experimental performance improvements
+gh workflow run daily_evolution.yml \
+  -f evolution_type="performance_optimization" \
+  -f intensity="moderate" \
+  -f force_run=true
+```
+
+### Advanced Workflow Management
+
+**Workflow Status Monitoring:**
+```bash
+# Check workflow status
+gh run list --workflow=ai_evolver.yml --limit=5
+
+# View detailed workflow logs
+gh run view <run-id> --log
+
+# Download workflow artifacts
+gh run download <run-id>
+```
+
+**Workflow Debugging:**
+```bash
+# Enable debug mode
+gh workflow run ai_evolver.yml \
+  -f prompt="Debug test failures" \
+  -f growth_mode="conservative" \
+  -f debug_mode=true
+```
+
+## Integration Points
+
+### External System Integration
+
+**Monitoring Systems:**
+- **GitHub Actions**: Native integration with GitHub's workflow system
+- **Slack/Teams**: Notification webhooks for evolution completion
+- **Email Alerts**: Automated notifications for critical evolution events
+- **External APIs**: Integration with project management and monitoring tools
+
+**Quality Gates:**
+- **Code Quality**: SonarQube, CodeClimate integration
+- **Security Scanning**: Snyk, GitHub Security integration
+- **Performance Testing**: Integration with performance monitoring tools
+- **Compliance**: Automated compliance checking and reporting
+
+## Workflow Architecture
+
+### Evolution Workflow Lifecycle
+
+```mermaid
+graph TD
+    A[Trigger Event] --> B[Environment Setup]
+    B --> C[Context Collection]
+    C --> D[AI Growth Simulation]
+    D --> E[Change Validation]
+    E --> F[Testing & Quality Checks]
+    F --> G[Pull Request Creation]
+    G --> H[Review & Merge]
+    H --> I[Metrics Collection]
+    I --> J[Seed Generation]
+```
+
+### Workflow Dependencies
+
+**Required Services:**
+- GitHub Actions runner environment
+- AI simulation engine
+- Git version control system
+- Pull request management
+- Artifact storage system
+
+**Optional Integrations:**
+- Container runtime for isolated execution
+- External AI services for enhanced capabilities
+- Monitoring and alerting systems
+- Quality gate integrations
+
+## Related Documentation
+
+- [Main Repository README](../../README.md) - Project overview and workflow quick start
+- [Evolution Engine Documentation](../../docs/evolution/) - Detailed evolution cycle information
+- [Daily Evolution Guide](../../docs/evolution/DAILY_EVOLUTION.md) - Automated maintenance workflows
+- [Cross-Platform Setup](../../docs/evolution/CROSS_PLATFORM_UPDATE.md) - Platform compatibility guide
+- [Testing Framework](../../tests/README.md) - Quality assurance and validation
+- [Troubleshooting Guide](../../docs/guides/troubleshooting.md) - Common workflow issues and solutions
 
 ---
 

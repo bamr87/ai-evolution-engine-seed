@@ -1,3 +1,33 @@
+<!--
+@file docker/README.md
+@description Docker containerization documentation for AI Evolution Engine
+@author AI Evolution Engine Team <team@ai-evolution-engine.org>
+@created 2025-07-04
+@lastModified 2025-07-12
+@version 1.0.0
+
+@relatedIssues 
+  - #cross-platform-support: Docker containerization for universal compatibility
+  - #ci-cd-enhancement: Container-based CI/CD workflows
+
+@relatedEvolutions
+  - v1.0.0: Complete Docker integration with cross-platform support
+  - v0.3.6: Initial containerization implementation
+
+@dependencies
+  - Docker Engine: >=20.10 for container runtime
+  - Docker Compose: >=2.0 for orchestration
+  - GitHub CLI: for authentication and workflow integration
+
+@changelog
+  - 2025-07-12: Added comprehensive file header and enhanced documentation structure - AEE
+  - 2025-07-04: Complete Docker integration with authentication and volume mounting - AEE
+  - 2025-07-01: Initial containerization implementation - AEE
+
+@usage Complete Docker setup and usage guide for containerized development
+@notes Provides cross-platform compatibility and isolated execution environment
+-->
+
 # AI Evolution Engine - Docker Environment
 
 This directory contains Docker configuration for running the AI Evolution Engine in a containerized environment, providing cross-platform compatibility and isolated execution.
@@ -253,11 +283,66 @@ The container setup complements local development:
 
 Planned container features:
 
-- **Multi-arch support**: ARM64 and AMD64 builds
-- **Caching layers**: Redis integration for evolution state
-- **Plugin system**: Extensible container with custom tools
-- **Monitoring**: Health checks and metrics collection
+- [ ] **Multi-arch support**: ARM64 and AMD64 builds for broader compatibility
+- [ ] **Caching layers**: Redis integration for evolution state and performance optimization
+- [ ] **Plugin system**: Extensible container with custom tools and integrations
+- [ ] **Monitoring**: Health checks and metrics collection for container performance
+- [ ] **Auto-scaling**: Dynamic resource allocation based on workload
+- [ ] **GPU Support**: CUDA-enabled containers for AI workload acceleration
+- [ ] **Development Tools**: Integrated development environment with debugging support
+- [ ] **Backup Integration**: Automated backup and restore capabilities
 
----
+## Integration with Evolution Engine
 
-For more information about the AI Evolution Engine, see the main [README.md](../README.md) file.
+The Docker environment seamlessly integrates with:
+- [Local Development Scripts](../scripts/README.md) - Native and containerized execution
+- [GitHub Actions Workflows](../.github/workflows/README.md) - CI/CD container support
+- [Testing Framework](../tests/README.md) - Isolated testing environments
+- [Core Library System](../src/lib/README.md) - Modular architecture compatibility
+
+## Troubleshooting Guide
+
+### Common Container Issues
+
+**Build Failures:**
+- Check Docker daemon is running: `docker info`
+- Clear build cache: `docker builder prune`
+- Update base images: `docker pull ubuntu:22.04`
+
+**Permission Issues:**
+- Check file ownership: `ls -la`
+- Fix permissions: `chmod +x scripts/*.sh`
+- Verify user mapping: `docker-compose run evolution-engine id`
+
+**Network Problems:**
+- Check connectivity: `docker network ls`
+- Reset network: `docker network prune`
+- Verify DNS: `docker run --rm evolution-engine nslookup github.com`
+
+### Performance Optimization
+
+**Resource Allocation:**
+```yaml
+# docker-compose.yml
+services:
+  evolution-engine:
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+```
+
+**Volume Performance:**
+```yaml
+# Use cached mounts for better performance
+volumes:
+  - ..:/workspace:cached
+```
+
+## Related Documentation
+
+- [Main Repository README](../README.md) - Project overview and setup instructions
+- [Cross-Platform Setup Guide](../docs/evolution/CROSS_PLATFORM_UPDATE.md) - Comprehensive platform compatibility
+- [Local Development Guide](../docs/guides/local-development.md) - Development workflow documentation
+- [CI/CD Integration Guide](../docs/workflows/ci-cd-integration.md) - Container-based automation
