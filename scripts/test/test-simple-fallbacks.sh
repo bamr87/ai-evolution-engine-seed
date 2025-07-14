@@ -21,9 +21,9 @@ cd "$PROJECT_ROOT"
 # Test 1: Simple Context Collector
 echo ""
 echo "📊 Testing simple-context-collector.sh..."
-if [[ -f "scripts/simple-context-collector.sh" ]]; then
-    chmod +x scripts/simple-context-collector.sh
-    if timeout 30 ./scripts/simple-context-collector.sh /tmp/test_context.json; then
+if [[ -f "scripts/fallback/simple-context-collector.sh" ]]; then
+    chmod +x scripts/fallback/simple-context-collector.sh
+    if timeout 30 ./scripts/fallback/simple-context-collector.sh /tmp/test_context.json; then
         echo "✅ Context collector test passed"
         if [[ -f /tmp/test_context.json ]] && jq empty /tmp/test_context.json 2>/dev/null; then
             echo "✅ Output JSON is valid"
@@ -41,9 +41,9 @@ fi
 # Test 2: Simple AI Simulator
 echo ""
 echo "🤖 Testing simple-ai-simulator.sh..."
-if [[ -f "scripts/simple-ai-simulator.sh" ]]; then
-    chmod +x scripts/simple-ai-simulator.sh
-    if timeout 30 ./scripts/simple-ai-simulator.sh /tmp/test_response.json "Test prompt" "adaptive"; then
+if [[ -f "scripts/fallback/simple-ai-simulator.sh" ]]; then
+    chmod +x scripts/fallback/simple-ai-simulator.sh
+    if timeout 30 ./scripts/fallback/simple-ai-simulator.sh /tmp/test_response.json "Test prompt" "adaptive"; then
         echo "✅ AI simulator test passed"
         if [[ -f /tmp/test_response.json ]] && jq empty /tmp/test_response.json 2>/dev/null; then
             echo "✅ Output JSON is valid"
@@ -62,8 +62,8 @@ fi
 # Test 3: Simple Change Applier (dry run)
 echo ""
 echo "🔧 Testing simple-change-applier.sh (validation only)..."
-if [[ -f "scripts/simple-change-applier.sh" ]] && [[ -f /tmp/test_response.json ]]; then
-    chmod +x scripts/simple-change-applier.sh
+if [[ -f "scripts/fallback/simple-change-applier.sh" ]] && [[ -f /tmp/test_response.json ]]; then
+    chmod +x scripts/fallback/simple-change-applier.sh
     echo "✅ Change applier script found and response file available"
     echo "   (Skipping actual execution to avoid git changes)"
 else

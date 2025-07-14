@@ -221,16 +221,16 @@ run_local_evolution() {
     
     # Run the evolution steps
     log "🛠️  Setting up environment..."
-    ./scripts/setup-environment.sh
+    ./scripts/core/setup-environment.sh
     
     log "🔍 Validating prerequisites..."
-    ./scripts/check-prereqs.sh "$GROWTH_MODE" "false"
+    ./scripts/analysis/check-prereqs.sh "$GROWTH_MODE" "false"
     
     log "🧬 Collecting repository context..."
-    ./scripts/collect-context.sh "$PROMPT" "$GROWTH_MODE" "/tmp/repo_context.json"
+    ./scripts/analysis/collect-context.sh "$PROMPT" "$GROWTH_MODE" "/tmp/repo_context.json"
     
     log "🧠 Running AI simulation..."
-    ./scripts/simulate-ai-growth.sh "$PROMPT" "$GROWTH_MODE" "/tmp/repo_context.json" "/tmp/evolution_response.json"
+    ./scripts/core/simulate-ai-growth.sh "$PROMPT" "$GROWTH_MODE" "/tmp/repo_context.json" "/tmp/evolution_response.json"
     
     if [ "$DRY_RUN" = "true" ]; then
         log "🔍 DRY RUN - Previewing changes..."
@@ -239,15 +239,15 @@ run_local_evolution() {
         fi
     else
         log "🌾 Applying changes..."
-        ./scripts/apply-growth-changes.sh "/tmp/evolution_response.json"
+        ./scripts/core/apply-growth-changes.sh "/tmp/evolution_response.json"
         
         if [ "$AUTO_PLANT" = "true" ]; then
             log "🌰 Planting new seeds..."
-            ./scripts/plant-new-seeds.sh "/tmp/evolution_response.json" "$AUTO_PLANT"
+            ./scripts/generation/plant-new-seeds.sh "/tmp/evolution_response.json" "$AUTO_PLANT"
         fi
         
         log "🌳 Creating pull request..."
-        ./scripts/create_pr.sh "/tmp/evolution_response.json" "$PROMPT" "$GROWTH_MODE"
+        ./scripts/core/create_pr.sh "/tmp/evolution_response.json" "$PROMPT" "$GROWTH_MODE"
     fi
     
     success "Evolution cycle completed!"
@@ -283,20 +283,20 @@ run_container_evolution() {
     docker-compose -f "$compose_file" run --rm evolution-engine bash -c "
         set -e
         echo '🌱 Running evolution in container...'
-        ./scripts/setup-environment.sh
-        ./scripts/check-prereqs.sh '$GROWTH_MODE' 'false'
-        ./scripts/collect-context.sh '$PROMPT' '$GROWTH_MODE' '/tmp/repo_context.json'
-        ./scripts/simulate-ai-growth.sh '$PROMPT' '$GROWTH_MODE' '/tmp/repo_context.json' '/tmp/evolution_response.json'
+        ./scripts/core/setup-environment.sh
+        ./scripts/analysis/check-prereqs.sh '$GROWTH_MODE' 'false'
+        ./scripts/analysis/collect-context.sh '$PROMPT' '$GROWTH_MODE' '/tmp/repo_context.json'
+        ./scripts/core/simulate-ai-growth.sh '$PROMPT' '$GROWTH_MODE' '/tmp/repo_context.json' '/tmp/evolution_response.json'
         
         if [ '$DRY_RUN' = 'true' ]; then
             echo '🔍 DRY RUN - Previewing changes...'
             cat '/tmp/evolution_response.json' | jq -r '.changes[] | \"\(.action): \(.path)\"' || true
         else
-            ./scripts/apply-growth-changes.sh '/tmp/evolution_response.json'
+            ./scripts/core/apply-growth-changes.sh '/tmp/evolution_response.json'
             if [ '$AUTO_PLANT' = 'true' ]; then
-                ./scripts/plant-new-seeds.sh '/tmp/evolution_response.json' '$AUTO_PLANT'
+                ./scripts/generation/plant-new-seeds.sh '/tmp/evolution_response.json' '$AUTO_PLANT'
             fi
-            ./scripts/create_pr.sh '/tmp/evolution_response.json' '$PROMPT' '$GROWTH_MODE'
+            ./scripts/core/create_pr.sh '/tmp/evolution_response.json' '$PROMPT' '$GROWTH_MODE'
         fi
         
         echo '✅ Container evolution completed!'

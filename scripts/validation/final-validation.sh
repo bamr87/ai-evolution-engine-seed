@@ -45,7 +45,7 @@ echo "-------------------------------"
 SCRIPT_ERRORS=0
 
 # Test check-prereqs.sh
-if ./scripts/check-prereqs.sh "adaptive" "false" >/dev/null 2>&1; then
+if ./scripts/analysis/check-prereqs.sh "adaptive" "false" >/dev/null 2>&1; then
     echo "  ✅ check-prereqs.sh: Working correctly"
 else
     echo "  ❌ check-prereqs.sh: Still failing"
@@ -53,7 +53,7 @@ else
 fi
 
 # Test analyze-repository-health.sh
-if ./scripts/analyze-repository-health.sh "consistency" "minimal" "false" >/dev/null 2>&1; then
+if ./scripts/analysis/analyze-repository-health.sh "consistency" "minimal" "false" >/dev/null 2>&1; then
     echo "  ✅ analyze-repository-health.sh: Working correctly"
 else
     echo "  ❌ analyze-repository-health.sh: Still failing"
@@ -66,20 +66,20 @@ echo "📋 4. Workflow Script Dependencies"
 echo "----------------------------------"
 MISSING_SCRIPTS=0
 required_scripts=(
-    "setup-environment.sh"
-    "check-prereqs.sh"
-    "analyze-repository-health.sh"
-    "generate-evolution-prompt.sh"
-    "trigger-evolution-workflow.sh"
-    "update-evolution-metrics.sh"
-    "collect-context.sh"
-    "simulate-ai-growth.sh"
-    "apply-growth-changes.sh"
-    "generate_seed.sh"
-    "plant-new-seeds.sh"
-    "generate_ai_response.sh"
-    "create_pr.sh"
-    "test-evolved-seed.sh"
+    "core/setup-environment.sh"
+    "analysis/check-prereqs.sh"
+    "analysis/analyze-repository-health.sh"
+    "generation/generate-evolution-prompt.sh"
+    "trigger/trigger-evolution-workflow.sh"
+    "update/update-evolution-metrics.sh"
+    "analysis/collect-context.sh"
+    "core/simulate-ai-growth.sh"
+    "core/apply-growth-changes.sh"
+    "generation/generate_seed.sh"
+    "generation/plant-new-seeds.sh"
+    "generation/generate_ai_response.sh"
+    "core/create_pr.sh"
+    "test/test-evolved-seed.sh"
 )
 
 for script in "${required_scripts[@]}"; do
@@ -104,7 +104,7 @@ export FORCE_RUN="false"
 export DRY_RUN="true"
 
 echo "  🧪 Testing daily evolution workflow..."
-if ./scripts/test-daily-evolution-local.sh >/dev/null 2>&1; then
+if ./tests/workflows/test-daily-evolution-local.sh >/dev/null 2>&1; then
     echo "  ✅ Daily evolution workflow: Complete simulation successful"
 else
     echo "  ❌ Daily evolution workflow: Simulation failed"
