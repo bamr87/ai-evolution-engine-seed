@@ -1,0 +1,78 @@
+# API Reference
+
+This section contains automatically generated API documentation for all modules and functions.
+
+**Generated on**: 2025-07-14 06:09:10
+
+## Module Documentation
+
+- [bootstrap](../modules/bootstrap.md)
+- [ci](../modules/ci.md)
+- [config](../modules/config.md)
+- [config_simple](../modules/config_simple.md)
+- [engine](../modules/engine.md)
+- [environment](../modules/environment.md)
+- [file_operations](../modules/file_operations.md)
+- [git](../modules/git.md)
+- [github](../modules/github.md)
+- [health](../modules/health.md)
+- [json_processor](../modules/json_processor.md)
+- [logger](../modules/logger.md)
+- [management](../modules/management.md)
+- [metrics](../modules/metrics.md)
+- [seeds](../modules/seeds.md)
+- [testing](../modules/testing.md)
+- [utils](../modules/utils.md)
+- [validation](../modules/validation.md)
+
+## Script Documentation
+
+- [ai-debug-helper](../scripts/ai-debug-helper.md)
+- [analyze-repository-health-simple](../scripts/analyze-repository-health-simple.md)
+- [analyze-repository-health](../scripts/analyze-repository-health.md)
+- [apply-growth-changes](../scripts/apply-growth-changes.md)
+- [apply-periodic-changes](../scripts/apply-periodic-changes.md)
+- [check-prereqs](../scripts/check-prereqs.md)
+- [collect-context](../scripts/collect-context.md)
+- [collect-evolution-metrics](../scripts/collect-evolution-metrics.md)
+- [collect-workflow-errors](../scripts/collect-workflow-errors.md)
+- [create_pr](../scripts/create_pr.md)
+- [debug-prereqs](../scripts/debug-prereqs.md)
+- [emergency-fallback](../scripts/emergency-fallback.md)
+- [evolve](../scripts/evolve.md)
+- [execute-periodic-prompt](../scripts/execute-periodic-prompt.md)
+- [final-validation](../scripts/final-validation.md)
+- [generate-docs](../scripts/generate-docs.md)
+- [generate-evolution-prompt](../scripts/generate-evolution-prompt.md)
+- [generate_ai_response](../scripts/generate_ai_response.md)
+- [generate_seed](../scripts/generate_seed.md)
+- [local-evolution](../scripts/local-evolution.md)
+- [migrate-to-modular](../scripts/migrate-to-modular.md)
+- [modular-evolution](../scripts/modular-evolution.md)
+- [monitor-logs](../scripts/monitor-logs.md)
+- [plant-new-seeds](../scripts/plant-new-seeds.md)
+- [post-ai-validation](../scripts/post-ai-validation.md)
+- [run-workflow](../scripts/run-workflow.md)
+- [send-evolution-notification](../scripts/send-evolution-notification.md)
+- [setup-environment](../scripts/setup-environment.md)
+- [simple-ai-simulator](../scripts/simple-ai-simulator.md)
+- [simple-change-applier](../scripts/simple-change-applier.md)
+- [simple-context-collector](../scripts/simple-context-collector.md)
+- [simulate-ai-growth](../scripts/simulate-ai-growth.md)
+- [test-ai-prompts-config](../scripts/test-ai-prompts-config.md)
+- [test-context-collection](../scripts/test-context-collection.md)
+- [test-enhanced-workflows](../scripts/test-enhanced-workflows.md)
+- [test-fixes](../scripts/test-fixes.md)
+- [test-simple-fallbacks](../scripts/test-simple-fallbacks.md)
+- [trigger-evolution-workflow](../scripts/trigger-evolution-workflow.md)
+- [update-evolution-metrics](../scripts/update-evolution-metrics.md)
+- [validate-docs-organization](../scripts/validate-docs-organization.md)
+- [validate-evolution](../scripts/validate-evolution.md)
+- [validate-periodic-prompts](../scripts/validate-periodic-prompts.md)
+- [validate-workflows](../scripts/validate-workflows.md)
+- [version-integration](../scripts/version-integration.md)
+- [version-manager](../scripts/version-manager.md)
+- [version-tracker](../scripts/version-tracker.md)
+
+---
+*Generated automatically from source code*
