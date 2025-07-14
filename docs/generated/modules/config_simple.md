@@ -24,4 +24,4 @@ Simple configuration management compatible with bash 3.2
 For complete implementation details, see: [`src/lib/core/config_simple.sh`](../../src/lib/core/config_simple.sh)
 
 ---
-*Generated on: 2025-07-14 06:09:10*
+*Generated on: 2025-07-14 06:10:12*

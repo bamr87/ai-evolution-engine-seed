@@ -24,4 +24,4 @@ Workflow management and execution utilities for AI Evolution Engine
 For complete implementation details, see: [`src/lib/workflow/management.sh`](../../src/lib/workflow/management.sh)
 
 ---
-*Generated on: 2025-07-14 06:09:10*
+*Generated on: 2025-07-14 06:10:12*

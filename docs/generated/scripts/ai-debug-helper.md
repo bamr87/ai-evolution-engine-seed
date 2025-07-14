@@ -24,4 +24,4 @@ Comprehensive debugging information collector for AI analysis
 For complete implementation details, see: [`scripts/debug/ai-debug-helper.sh`](../../scripts/debug/ai-debug-helper.sh)
 
 ---
-*Generated on: 2025-07-14 06:09:10*
+*Generated on: 2025-07-14 06:10:12*

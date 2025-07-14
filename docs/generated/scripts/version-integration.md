@@ -24,4 +24,4 @@ Integration helper for version management in AI Evolution workflows
 For complete implementation details, see: [`scripts/version/version-integration.sh`](../../scripts/version/version-integration.sh)
 
 ---
-*Generated on: 2025-07-14 06:09:10*
+*Generated on: 2025-07-14 06:10:12*

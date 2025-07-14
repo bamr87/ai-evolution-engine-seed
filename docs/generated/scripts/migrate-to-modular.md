@@ -24,4 +24,4 @@ Migration helper script to convert existing scripts to use modular library
 For complete implementation details, see: [`scripts/migration/migrate-to-modular.sh`](../../scripts/migration/migrate-to-modular.sh)
 
 ---
-*Generated on: 2025-07-14 06:09:10*
+*Generated on: 2025-07-14 06:10:12*

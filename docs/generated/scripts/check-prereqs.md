@@ -25,4 +25,4 @@
 For complete implementation details, see: [`scripts/analysis/check-prereqs.sh`](../../scripts/analysis/check-prereqs.sh)
 
 ---
-*Generated on: 2025-07-14 06:09:10*
+*Generated on: 2025-07-14 06:10:12*

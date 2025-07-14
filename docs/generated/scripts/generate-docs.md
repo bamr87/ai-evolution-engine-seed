@@ -24,4 +24,4 @@ Automatic documentation generation from source code
 For complete implementation details, see: [`scripts/generate-docs.sh`](../../scripts/generate-docs.sh)
 
 ---
-*Generated on: 2025-07-14 06:09:10*
+*Generated on: 2025-07-14 06:10:12*

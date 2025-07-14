@@ -24,4 +24,4 @@ Sets up the necessary environment for evolution workflows using modular architec
 For complete implementation details, see: [`scripts/core/setup-environment.sh`](../../scripts/core/setup-environment.sh)
 
 ---
-*Generated on: 2025-07-14 06:09:10*
+*Generated on: 2025-07-14 06:10:12*

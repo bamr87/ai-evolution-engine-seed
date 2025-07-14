@@ -32,4 +32,4 @@
 For complete implementation details, see: [`src/lib/core/environment.sh`](../../src/lib/core/environment.sh)
 
 ---
-*Generated on: 2025-07-14 06:09:10*
+*Generated on: 2025-07-14 06:10:12*
