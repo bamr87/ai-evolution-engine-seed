@@ -348,7 +348,7 @@ validate_documentation() {
             log_warning "Undocumented source file: $src_file"
             ((issues++))
         fi
-    done
+    done < <(find "$SRC_DIR" "$PROJECT_ROOT/scripts" -name "*.sh" -type f)
     
     if [[ $issues -eq 0 ]]; then
         log_success "Documentation validation passed"
