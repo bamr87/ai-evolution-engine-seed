@@ -33,6 +33,13 @@ help:
 	@echo "  make evolve-custom     - Run custom evolution (set PROMPT variable)"
 	@echo "  make evolve-dry-run    - Preview evolution changes without applying"
 	@echo ""
+	@echo "Documentation:"
+	@echo "  make docs              - Open main documentation"
+	@echo "  make docs-generate     - Generate documentation from source code"
+	@echo "  make docs-update       - Update and validate generated documentation"
+	@echo "  make docs-validate     - Validate documentation consistency"
+	@echo "  make docs-clean        - Clean generated documentation"
+	@echo ""
 
 # Testing commands
 test:
@@ -101,10 +108,26 @@ validate:
 	@make test
 	@echo "🎉 All validations passed!"
 
-# Advanced commands
+# Documentation commands
 docs:
 	@echo "📚 Opening documentation..."
 	@open docs/README.md 2>/dev/null || cat docs/README.md
+
+docs-generate:
+	@echo "📝 Generating documentation from source code..."
+	@./scripts/generate-docs.sh
+
+docs-update:
+	@echo "🔄 Updating generated documentation..."
+	@./scripts/generate-docs.sh --update --validate
+
+docs-validate:
+	@echo "✅ Validating documentation consistency..."
+	@./scripts/generate-docs.sh --validate
+
+docs-clean:
+	@echo "🧹 Cleaning generated documentation..."
+	@./scripts/generate-docs.sh --clean
 
 structure:
 	@echo "📁 Repository structure:"
