@@ -158,15 +158,23 @@ EOF
 categorize_failures() {
     local failed_tests_json="$1"
     
-    cat << 'EOF'
+    local syntax_errors=$(echo "$failed_tests_json" | jq '[.[] | select(.error_message | test("syntax"))] | length')
+    local logic_errors=$(echo "$failed_tests_json" | jq '[.[] | select(.error_message | test("logic"))] | length')
+    local environment_issues=$(echo "$failed_tests_json" | jq '[.[] | select(.error_message | test("environment"))] | length')
+    local dependency_failures=$(echo "$failed_tests_json" | jq '[.[] | select(.error_message | test("dependency"))] | length')
+    local timeout_failures=$(echo "$failed_tests_json" | jq '[.[] | select(.error_message | test("timeout"))] | length')
+    local permission_errors=$(echo "$failed_tests_json" | jq '[.[] | select(.error_message | test("permission"))] | length')
+    local other=$(echo "$failed_tests_json" | jq '[.[] | select(.error_message | test("syntax|logic|environment|dependency|timeout|permission") | not)] | length')
+    
+    cat << EOF
 {
-  "syntax_errors": 0,
-  "logic_errors": 0,
-  "environment_issues": 0,
-  "dependency_failures": 0,
-  "timeout_failures": 0,
-  "permission_errors": 0,
-  "other": 0
+  "syntax_errors": $syntax_errors,
+  "logic_errors": $logic_errors,
+  "environment_issues": $environment_issues,
+  "dependency_failures": $dependency_failures,
+  "timeout_failures": $timeout_failures,
+  "permission_errors": $permission_errors,
+  "other": $other
 }
 EOF
 }
