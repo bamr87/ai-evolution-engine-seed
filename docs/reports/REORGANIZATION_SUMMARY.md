@@ -24,7 +24,7 @@
 ✅ Clean Structure Achieved:
 ai-evolution-engine-seed/
 ├── 📁 tests/                    # Centralized testing framework
-│   ├── 📄 test_runner.sh        # Main test coordinator
+│   ├── 📄 run_tests.sh          # Unified test management system
 │   ├── 📁 unit/                 # Unit tests
 │   ├── 📁 integration/          # Integration tests
 │   └── 📁 fixtures/             # Test data
@@ -44,7 +44,7 @@ ai-evolution-engine-seed/
 ## 🚀 Key Improvements Implemented
 
 ### ✅ **1. Testing Framework Overhaul**
-- **Comprehensive Test Runner**: Created `tests/test_runner.sh` with unit/integration separation
+- **Comprehensive Test Runner**: Created `tests/run_tests.sh` with unified test management
 - **Automated Validation**: 24 comprehensive tests covering structure, syntax, and functionality
 - **Error Detection**: Enhanced error reporting with verbose debugging options
 - **Cross-Platform Support**: Tests work on macOS, Linux, and Windows

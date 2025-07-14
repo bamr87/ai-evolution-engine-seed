@@ -101,7 +101,7 @@ Each log file contains:
 ## Integration with Test Framework
 
 These logs are automatically generated when:
-- Unit tests are executed via `test_runner.sh`
+- Unit tests are executed via `run_tests.sh`
 - Individual test files are run directly
 - CI/CD workflows execute test suites
 

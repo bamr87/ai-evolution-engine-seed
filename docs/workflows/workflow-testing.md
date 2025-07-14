@@ -38,10 +38,10 @@ tests/
 ### Integration with Main Test Suite
 ```bash
 # Run all tests including workflows
-./tests/test_runner.sh
+./tests/run_tests.sh
 
 # Run only workflow tests
-./tests/test_runner.sh --type workflow
+./tests/run_tests.sh run workflow
 ```
 
 ## Test Categories

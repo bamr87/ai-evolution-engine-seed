@@ -31,7 +31,7 @@ ai-evolution-engine-seed/
 │   └── (project-specific source files)
 │
 ├── 📁 tests/                       # Testing framework
-│   ├── 📄 test_runner.sh           # Main test runner
+│   ├── 📄 run_tests.sh             # Unified test management system
 │   ├── 📁 unit/                    # Unit tests
 │   │   └── 📄 test_project_structure.sh
 │   ├── 📁 integration/             # Integration tests  
@@ -108,16 +108,16 @@ ai-evolution-engine-seed/
 ### Running Tests
 ```bash
 # Run all tests
-./tests/test_runner.sh
+./tests/run_tests.sh
 
 # Run only unit tests
-./tests/test_runner.sh --type unit
+./tests/run_tests.sh run unit
 
 # Run with verbose output
-./tests/test_runner.sh --verbose
+./tests/run_tests.sh run --verbose
 
 # Run specific test category
-./tests/test_runner.sh --type integration
+./tests/run_tests.sh run integration
 ```
 
 ### Using Templates

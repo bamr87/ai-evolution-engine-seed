@@ -556,8 +556,8 @@ make test-integration   # Integration tests only
 make test-workflow      # GitHub Actions workflow tests only
 
 # Enhanced test runner with detailed options
-./tests/test_runner.sh --type all --verbose
-./tests/workflow_test_runner.sh
+./tests/run_tests.sh run --verbose
+./tests/run_tests.sh run workflow
 ```
 
 ### 📊 Test Documentation

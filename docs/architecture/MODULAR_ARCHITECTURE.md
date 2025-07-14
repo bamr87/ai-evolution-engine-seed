@@ -228,7 +228,7 @@ The modular architecture includes comprehensive testing:
 ./tests/comprehensive-refactoring-test.sh
 
 # Run all tests
-./tests/test_runner.sh --type all
+./tests/run_tests.sh run all
 ```
 
 ## Benefits of Modular Architecture

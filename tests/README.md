@@ -38,8 +38,8 @@ tests/
 ├── manage-test-artifacts.sh            # Test artifact management script
 ├── modular-architecture-test.sh        # Core architecture validation
 ├── comprehensive-refactoring-test.sh   # Refactoring validation
-├── test_runner.sh                      # Legacy test runner
-├── workflow_test_runner.sh             # Workflow-specific test runner
+├── run_tests.sh                        # 🆕 Unified test management system
+├── workflow_test_runner.sh             # Workflow-specific test runner (integrated)
 ├── workflows/                           # Workflow testing directory
 │   ├── README.md                      # Workflow testing documentation
 │   ├── test-all-workflows-local.sh   # Comprehensive workflow testing
@@ -179,17 +179,17 @@ Each test category (`unit/`, `integration/`, `unit/workflows/`) maintains its ow
 
 ```bash
 # Run all tests
-./test_runner.sh
+./run_tests.sh
 
 # Run specific test category
-./test_runner.sh --type unit
-./test_runner.sh --type integration
+./run_tests.sh run unit
+./run_tests.sh run integration
 
 # Run workflow-specific tests
-./workflow_test_runner.sh
+./run_tests.sh run workflow
 
 # Run with verbose output
-./test_runner.sh --verbose
+./run_tests.sh run --verbose
 ```
 
 ### Test Results Processing
