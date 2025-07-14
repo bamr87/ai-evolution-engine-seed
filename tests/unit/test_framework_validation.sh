@@ -77,7 +77,7 @@ run_test "Tests directory exists" "[[ -d '$PROJECT_ROOT/tests' ]]"
 run_test "Source directory exists" "[[ -d '$PROJECT_ROOT/src' ]]"
 
 # Test file creation and cleanup
-TEMP_FILE="/tmp/test_framework_$$"
+TEMP_FILE="$(mktemp)"
 run_test "File creation" "touch '$TEMP_FILE'"
 run_test "File deletion" "rm -f '$TEMP_FILE'"
 
