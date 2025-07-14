@@ -391,12 +391,13 @@ generate_all_documentation() {
     while IFS= read -r script_file; do
         if [[ -f "$script_file" && -n "$script_file" ]]; then
             log_info "Processing: $script_file"
-            if generate_script_docs "$script_file"; then
+            if output=$(generate_script_docs "$script_file" 2>&1); then
                 ((script_count++)) || true
                 log_success "Completed: $script_file"
             else
                 local exit_code=$?
                 log_error "Failed to process: $script_file (exit code: $exit_code)"
+                log_error "Error details: $output"
                 # Continue processing other files even if one fails
             fi
         fi
