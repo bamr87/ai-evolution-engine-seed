@@ -475,41 +475,41 @@ Headers use language-appropriate comment syntax (e.g., `/** */` for JS, `""" """
 
 #### Markdown Files (non-README)
 ```markdown
-<!--
-@file project-overview.md
-@description Comprehensive overview of project architecture, goals, and high-level design decisions.
-@author IT-Journey Team <team@it-journey.org>
-@created 2025-07-05
-@lastModified 2025-07-16
-@version 2.0.0
+---
+file: project-overview.md
+description: Comprehensive overview of project architecture, goals, and high-level design decisions.
+author: IT-Journey Team <team@it-journey.org>
+created: 2025-07-05
+lastModified: 2025-07-16
+version: 2.0.0
 
-@relatedIssues 
-  - #123: Update project documentation.
-  - #134: Clarify architecture decisions.
+relatedIssues:
+  - "#123: Update project documentation."
+  - "#134: Clarify architecture decisions."
 
-@relatedEvolutions
-  - v2.0.0: Major restructure with new sections.
-  - v1.5.0: Added technical specifications.
+relatedEvolutions:
+  - "v2.0.0: Major restructure with new sections."
+  - "v1.5.0: Added technical specifications."
 
-@dependencies
-  - Jekyll: >=4.0.0 (for rendering if used).
+dependencies:
+  - "Jekyll: >=4.0.0 (for rendering if used)."
 
-@containerRequirements
-  - baseImage: jekyll/jekyll:4.0
-  - exposedPorts: 4000/tcp
-  - volumes: /srv/jekyll:rw, /usr/gem:ro
-  - environment: JEKYLL_ENV=production
-  - resources: CPU: 0.5, Memory: 512MiB
-  - healthCheck: curl -f http://localhost:4000/health
+containerRequirements:
+  baseImage: jekyll/jekyll:4.0
+  exposedPorts: 4000/tcp
+  volumes: /srv/jekyll:rw, /usr/gem:ro
+  environment: JEKYLL_ENV=production
+  resources: "CPU: 0.5, Memory: 512MiB"
+  healthCheck: "curl -f http://localhost:4000/health"
 
-@changelog
-  - 2025-07-16: Updated diagrams for clarity - ITJ
-  - 2025-07-05: Added new architecture diagrams - ITJ
-  - 2025-06-30: Initial creation - ITJ
+changelog:
+  - "2025-07-16: Updated diagrams for clarity - ITJ"
+  - "2025-07-05: Added new architecture diagrams - ITJ"
+  - "2025-06-30: Initial creation - ITJ"
 
-@usage docker run -p 4000:4000 -v $(pwd):/srv/jekyll jekyll/jekyll:4.0 jekyll serve --host 0.0.0.0
-@notes Synchronize with implementation; builds in containerized env.
--->
+usage: "docker run -p 4000:4000 -v $(pwd):/srv/jekyll jekyll/jekyll:4.0 jekyll serve --host 0.0.0.0"
+notes: "Synchronize with implementation; builds in containerized env."
+---
 ```
 
 #### Additional File Types (Extend as Needed)
