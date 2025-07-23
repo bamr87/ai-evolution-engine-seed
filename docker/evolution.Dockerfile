@@ -15,6 +15,8 @@ RUN apt-get update && apt-get install -y \
     ca-certificates \
     gnupg \
     lsb-release \
+    bc \
+    grep \
     && rm -rf /var/lib/apt/lists/*
 
 # Install GitHub CLI
