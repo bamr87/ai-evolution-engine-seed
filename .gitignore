@@ -40,3 +40,4 @@ temp_cleanup/
 .idea/
 *.iml
 .secrets
+*.DS_Store*
