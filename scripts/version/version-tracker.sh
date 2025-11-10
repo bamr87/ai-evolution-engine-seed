@@ -44,7 +44,7 @@ fi
 
 # Configuration
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-VERSION_CONFIG="$PROJECT_ROOT/.version-config.json"
+VERSION_CONFIG="$PROJECT_ROOT/config/.version-config.json"
 CHANGE_LOG_FILE="$PROJECT_ROOT/version-changes.json"
 CHANGELOG_FILE="$PROJECT_ROOT/CHANGELOG.md"
 

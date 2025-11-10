@@ -11,7 +11,7 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PROMPTS_DIR="$REPO_ROOT/prompts/templates"
-CONFIG_FILE="$REPO_ROOT/.evolution.yml"
+CONFIG_FILE="$REPO_ROOT/config/.evolution.yml"
 WORKFLOW_FILE="$REPO_ROOT/.github/workflows/periodic_evolution.yml"
 
 echo "🔍 Validating Periodic Prompts System"

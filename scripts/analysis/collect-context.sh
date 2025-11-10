@@ -219,19 +219,19 @@ log_info "📊 Loading current metrics and health data..."
 
 # Initialize metrics if not already done - with fallback
 if command -v init_metrics >/dev/null 2>&1; then
-    init_metrics "evolution-metrics.json" 2>/dev/null || log_warn "Could not initialize metrics system"
+    init_metrics "metrics/evolution-metrics.json" 2>/dev/null || log_warn "Could not initialize metrics system"
 else
     log_warn "Metrics system not available, using basic collection"
 fi
 
 # Try to get metrics, but don't fail if it doesn't work
 METRICS_CONTENT="{}"
-if [[ -f "evolution-metrics.json" ]]; then
+if [[ -f "metrics/evolution-metrics.json" ]]; then
     if command -v generate_metrics_report >/dev/null 2>&1; then
-        METRICS_CONTENT=$(generate_metrics_report "evolution-metrics.json" "json" 2>/dev/null || echo "{}")
+        METRICS_CONTENT=$(generate_metrics_report "metrics/evolution-metrics.json" "json" 2>/dev/null || echo "{}")
     else
         # Basic metrics collection fallback
-        METRICS_CONTENT=$(cat "evolution-metrics.json" 2>/dev/null | jq '.' 2>/dev/null || echo "{}")
+        METRICS_CONTENT=$(cat "metrics/evolution-metrics.json" 2>/dev/null | jq '.' 2>/dev/null || echo "{}")
     fi
 fi
 
@@ -344,9 +344,9 @@ else
 fi
 
 # Override with configuration if available
-if [[ -f ".evolution.yml" ]]; then
-    CONFIG_MAX_FILES=$(yq eval '.evolution.max_context_files // 0' .evolution.yml 2>/dev/null || echo 0)
-    CONFIG_MAX_LINES=$(yq eval '.evolution.max_context_line_per_file // 0' .evolution.yml 2>/dev/null || echo 0)
+if [[ -f "config/.evolution.yml" ]]; then
+    CONFIG_MAX_FILES=$(yq eval '.evolution.max_context_files // 0' config/.evolution.yml 2>/dev/null || echo 0)
+    CONFIG_MAX_LINES=$(yq eval '.evolution.max_context_line_per_file // 0' config/.evolution.yml 2>/dev/null || echo 0)
     
     [[ $CONFIG_MAX_FILES -gt 0 ]] && MAX_FILES=$CONFIG_MAX_FILES
     [[ $CONFIG_MAX_LINES -gt 0 ]] && MAX_LINES=$CONFIG_MAX_LINES

@@ -162,8 +162,8 @@ test_file_creation() {
         ".gitignore"
         ".gptignore"
         "README.md"
-        ".evolution.yml"
-        "evolution-metrics.json"
+        "config/.evolution.yml"
+        "metrics/evolution-metrics.json"
         ".seed.md"
         ".github/workflows/ai_evolver.yml"
         "prompts/first_growth.md"
@@ -196,7 +196,7 @@ test_version_consistency() {
     local version_files=(
         "README.md"
         ".seed.md"
-        "evolution-metrics.json"
+        "metrics/evolution-metrics.json"
         ".github/workflows/ai_evolver.yml"
     )
     
@@ -224,12 +224,12 @@ test_version_consistency() {
                 all_consistent=false
             fi
             
-            # Special check for evolution-metrics.json
-            if [[ "$file" == "evolution-metrics.json" ]]; then
+            # Special check for metrics/evolution-metrics.json
+            if [[ "$file" == "metrics/evolution-metrics.json" ]]; then
                 if grep -q '"seed_version": "0.4.1-seed"' "$file"; then
-                    log_info "✓ Correct seed_version field in evolution-metrics.json"
+                    log_info "✓ Correct seed_version field in metrics/evolution-metrics.json"
                 else
-                    log_fail "Incorrect seed_version in evolution-metrics.json"
+                    log_fail "Incorrect seed_version in metrics/evolution-metrics.json"
                     all_consistent=false
                 fi
             fi
@@ -326,22 +326,22 @@ test_no_uuidgen_usage() {
 }
 
 test_evolution_metrics() {
-    log_test "Checking evolution-metrics.json structure"
+    log_test "Checking metrics/evolution-metrics.json structure"
     
     cd "$TEST_DIR"
     
-    if [ -f "evolution-metrics.json" ]; then
+    if [ -f "metrics/evolution-metrics.json" ]; then
         # Check if it's valid JSON
-        if jq '.' evolution-metrics.json > /dev/null 2>&1; then
-            log_pass "evolution-metrics.json is valid JSON"
+        if jq '.' metrics/evolution-metrics.json > /dev/null 2>&1; then
+            log_pass "metrics/evolution-metrics.json is valid JSON"
             
             # Check required fields
             local required_fields=("seed_version" "planted_at" "growth_cycles" "current_generation")
             local all_fields=true
             
             for field in "${required_fields[@]}"; do
-                if jq -e ".$field" evolution-metrics.json > /dev/null 2>&1; then
-                    local value=$(jq -r ".$field" evolution-metrics.json)
+                if jq -e ".$field" metrics/evolution-metrics.json > /dev/null 2>&1; then
+                    local value=$(jq -r ".$field" metrics/evolution-metrics.json)
                     log_info "✓ Field '$field': $value"
                 else
                     log_fail "Missing required field: $field"
@@ -350,14 +350,14 @@ test_evolution_metrics() {
             done
             
             if [ "$all_fields" = true ]; then
-                log_pass "All required fields present in evolution-metrics.json"
+                log_pass "All required fields present in metrics/evolution-metrics.json"
             fi
         else
-            log_fail "evolution-metrics.json is not valid JSON"
+            log_fail "metrics/evolution-metrics.json is not valid JSON"
             return 1
         fi
     else
-        log_fail "evolution-metrics.json not found"
+        log_fail "metrics/evolution-metrics.json not found"
         return 1
     fi
 }

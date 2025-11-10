@@ -2,14 +2,19 @@ name: Comprehensive Test Automation with AI Analysis
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ evolved, main, develop ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ evolved, main, develop ]
   schedule:
     # Run tests daily at 6 AM UTC
     - cron: '0 6 * * *'
   workflow_dispatch:
     inputs:
+      test_branch:
+        description: 'Branch to test (defaults to evolved)'
+        required: false
+        default: 'evolved'
+        type: string
       create_issues:
         description: 'Create GitHub issues for test failures'
         required: false
@@ -32,6 +37,9 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.inputs.test_branch || 'evolved' }}
+        fetch-depth: 0
       
     - name: Setup test environment
       run: |
@@ -98,6 +106,76 @@ jobs:
           tests/results/
           tests/ai_analysis/
         retention-days: 30
+    
+    - name: 🔬 Push Test Results to Test Branch
+      if: always()
+      run: |
+        echo "📊 Pushing test results to 'test' branch..."
+        
+        # Configure git
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        
+        # Create timestamp for branch naming
+        TIMESTAMP=$(date -u +"%Y%m%d-%H%M%S")
+        TEST_BRANCH="test/results-${TIMESTAMP}-${{ github.run_number }}"
+        
+        # Create and switch to test results branch
+        git checkout -b "$TEST_BRANCH"
+        
+        # Stage test results
+        git add tests/results/ tests/ai_analysis/ || true
+        
+        # Commit if there are changes
+        if git diff --staged --quiet; then
+          echo "⚠️ No test results to commit"
+        else
+          git commit -m "🧪 Test Results - Run #${{ github.run_number }}
+
+Branch Tested: ${{ github.event.inputs.test_branch || 'evolved' }}
+Timestamp: ${TIMESTAMP}
+Total Tests: ${{ steps.test_results.outputs.total_tests }}
+Passed: ${{ steps.test_results.outputs.passed_tests }}
+Failed: ${{ steps.test_results.outputs.failed_tests }}
+Success Rate: ${{ steps.test_results.outputs.success_rate }}%
+
+Trigger: ${{ github.event_name }}
+Workflow: ${{ github.workflow }}
+
+View workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          
+          # Push to remote
+          git push origin "$TEST_BRANCH"
+          echo "✅ Test results pushed to branch: $TEST_BRANCH"
+          
+          # Create PR to merge test results into 'test' branch
+          if command -v gh &> /dev/null; then
+            gh pr create \
+              --title "🧪 Test Results: Run #${{ github.run_number }} - ${{ steps.test_results.outputs.success_rate }}% success" \
+              --body "## Test Results Summary
+
+**Branch Tested:** ${{ github.event.inputs.test_branch || 'evolved' }}
+**Run Number:** #${{ github.run_number }}
+**Timestamp:** ${TIMESTAMP}
+
+### Results
+- **Total Tests:** ${{ steps.test_results.outputs.total_tests }}
+- **Passed:** ${{ steps.test_results.outputs.passed_tests }}
+- **Failed:** ${{ steps.test_results.outputs.failed_tests }}
+- **Success Rate:** ${{ steps.test_results.outputs.success_rate }}%
+
+### Details
+View the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for complete logs and artifacts.
+
+---
+*Automated test results from Comprehensive Test Automation framework*" \
+              --base test \
+              --head "$TEST_BRANCH" \
+              --label "testing,automated,results" || echo "PR creation skipped or failed"
+          fi
+        fi
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
     - name: Create GitHub issue for test failures
       if: steps.test_results.outputs.has_failures == 'true' && (github.event_name == 'schedule' || github.event.inputs.create_issues == 'true')

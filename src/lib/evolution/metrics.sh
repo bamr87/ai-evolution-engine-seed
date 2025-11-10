@@ -8,7 +8,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../core/logger.sh"
 
 # Default metrics file
-readonly DEFAULT_METRICS_FILE="evolution-metrics.json"
+readonly DEFAULT_METRICS_FILE="metrics/evolution-metrics.json"
 readonly METRICS_BACKUP_DIR="metrics-backups"
 
 # Initialize metrics system

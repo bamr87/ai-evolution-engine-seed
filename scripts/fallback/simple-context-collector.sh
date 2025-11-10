@@ -90,7 +90,7 @@ FILES_COLLECTED=0
 KEY_FILES=(
   "README.md"
   "CHANGELOG.md"
-  ".evolution.yml"
+  "config/.evolution.yml"
   "init_setup.sh"
   "Makefile"
 )

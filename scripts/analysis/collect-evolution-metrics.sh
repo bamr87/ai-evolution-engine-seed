@@ -71,7 +71,7 @@ done
 # Set defaults
 CYCLE_ID="${CYCLE_ID:-$(date +%Y%m%d%H%M%S)}"
 GROWTH_MODE="${GROWTH_MODE:-adaptive}"
-OUTPUT_FILE="${OUTPUT_FILE:-evolution-metrics.json}"
+OUTPUT_FILE="${OUTPUT_FILE:-metrics/evolution-metrics.json}"
 
 log_info "Collecting evolution metrics..."
 log_info "Cycle ID: $CYCLE_ID"

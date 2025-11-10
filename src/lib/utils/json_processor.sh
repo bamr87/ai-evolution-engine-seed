@@ -374,13 +374,13 @@ json_save_file() {
 # Load AI prompts evolution configuration
 #
 # Arguments:
-#   $1 - config_file: Path to ai_prompts_evolution.json (optional, default: ai_prompts_evolution.json)
+#   $1 - config_file: Path to ai_prompts_evolution.json (optional, default: config/ai_prompts_evolution.json)
 #
 # Returns:
 #   Prints JSON content, 0 on success
 #
 ai_prompts_load_config() {
-    local config_file="${1:-ai_prompts_evolution.json}"
+    local config_file="${1:-config/ai_prompts_evolution.json}"
     local project_root="${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || cd "$(dirname "${BASH_SOURCE[0]}")/../../../.." && pwd)}"
     local full_path="$project_root/$config_file"
     

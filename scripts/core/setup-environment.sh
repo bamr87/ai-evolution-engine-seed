@@ -165,9 +165,10 @@ setup_github_auth
 
 # Validate required files exist
 echo "🔍 Validating required files..."
-if [ ! -f "evolution-metrics.json" ]; then
+if [ ! -f "metrics/evolution-metrics.json" ]; then
     echo "⚠️  evolution-metrics.json not found, creating default..."
-    cat > evolution-metrics.json << 'EOF'
+    mkdir -p metrics
+    cat > metrics/evolution-metrics.json << 'EOF'
 {
   "seed_version": "0.3.0",
   "growth_cycles": 0,
@@ -193,8 +194,8 @@ if command -v jq >/dev/null 2>&1; then
        '.environment.ci_mode = ($ci == "true") | 
         .environment.container_mode = ($container == "true") | 
         .environment.last_setup = $timestamp' \
-       evolution-metrics.json > evolution-metrics.json.tmp && \
-       mv evolution-metrics.json.tmp evolution-metrics.json
+       metrics/evolution-metrics.json > metrics/evolution-metrics.json.tmp && \
+       mv metrics/evolution-metrics.json.tmp metrics/evolution-metrics.json
 fi
 
 # Ensure scripts are executable

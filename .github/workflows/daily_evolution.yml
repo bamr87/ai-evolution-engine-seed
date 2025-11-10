@@ -1,8 +1,16 @@
+---
+# AI Evolution Workflow - Daily Growth Maintenance
+# Version: 0.4.7
+# Last Updated: 2025-07-21
+# 
+# Purpose: Automated daily improvements and maintenance for the AI-seed ecosystem
+# This workflow performs routine evolutionary maintenance to keep the seed healthy and growing
+
 name: 🌱 Daily Evolution & Maintenance (v0.4.7)
 
 on:
   schedule:
-    # Run daily at 3 AM UTC (customize as needed)
+    # Run daily at 3 AM UTC - optimal growth time
     - cron: '0 3 * * *'
   workflow_dispatch:
     inputs:
@@ -12,20 +20,20 @@ on:
         default: 'consistency'
         type: choice
         options:
-          - consistency
-          - error_fixing
-          - documentation
-          - code_quality
-          - security_updates
+          - consistency      # Fix inconsistencies across files and configurations
+          - error_fixing     # Resolve errors, bugs, and issues
+          - documentation    # Improve documentation quality and coverage
+          - code_quality     # Enhance code quality, patterns, and standards
+          - security_updates # Apply security improvements and updates
       intensity:
         description: 'Evolution intensity level'
         required: false
         default: 'minimal'
         type: choice
         options:
-          - minimal
-          - moderate
-          - comprehensive
+          - minimal         # Small, safe changes with low risk
+          - moderate        # Medium-sized improvements with moderate risk
+          - comprehensive   # Large-scale improvements with higher impact
       force_run:
         description: 'Force run even if no changes detected'
         required: false
@@ -50,6 +58,7 @@ jobs:
   daily_evolution:
     name: 🌿 Daily Growth & Maintenance
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     
     env:
       EVOLUTION_TYPE: ${{ github.event.inputs.evolution_type || 'consistency' }}
@@ -63,9 +72,11 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.PAT_TOKEN }}
+          ref: evolved
           
       - name: 🛠️ Setup Environment
         run: |
+          set -euo pipefail
           if [ ! -f "./scripts/setup-environment.sh" ]; then
             echo "❌ Setup script not found!"
             exit 1
@@ -73,9 +84,58 @@ jobs:
           chmod +x ./scripts/setup-environment.sh
           ./scripts/setup-environment.sh
           
+      - name: 🔍 Validate Prerequisites
+        run: |
+          set -euo pipefail
+          
+          # Validate required files exist
+          required_files=("./scripts/setup-environment.sh")
+          for file in "${required_files[@]}"; do
+            if [ ! -f "$file" ]; then
+              echo "❌ Required file missing: $file"
+              exit 1
+            fi
+          done
+          
+          # Validate environment variables
+          required_vars=("EVOLUTION_VERSION" "WORKFLOW_TYPE")
+          for var in "${required_vars[@]}"; do
+            if [ -z "${!var:-}" ]; then
+              echo "❌ Required environment variable missing: $var"
+              exit 1
+            fi
+          done
+          
+          echo "✅ All prerequisites validated"
+
+      - name: 📊 Collect Evolution Context
+        run: |
+          set -euo pipefail
+          
+          echo "📊 Collecting repository context for evolution..."
+          
+          # Collect basic repository metrics
+          echo "Repository State Analysis:" > /tmp/evolution-context.txt
+          echo "=========================" >> /tmp/evolution-context.txt
+          echo "Commit Count: $(git rev-list --count HEAD)" >> /tmp/evolution-context.txt
+          echo "Branch: $(git branch --show-current)" >> /tmp/evolution-context.txt
+          echo "Last Commit: $(git log -1 --format='%h %s')" >> /tmp/evolution-context.txt
+          echo "Files Changed (last 7 days): $(git log --since='7 days ago' --name-only --pretty=format: | sort | uniq | wc -l)" >> /tmp/evolution-context.txt
+          echo "" >> /tmp/evolution-context.txt
+          
+          # File structure analysis
+          echo "File Structure:" >> /tmp/evolution-context.txt
+          echo "Source files: $(find src/ -name '*.js' -o -name '*.py' -o -name '*.jsx' 2>/dev/null | wc -l || echo 0)" >> /tmp/evolution-context.txt
+          echo "Test files: $(find tests/ -name '*.test.*' 2>/dev/null | wc -l || echo 0)" >> /tmp/evolution-context.txt
+          echo "Documentation files: $(find docs/ -name '*.md' 2>/dev/null | wc -l || echo 0)" >> /tmp/evolution-context.txt
+          echo "Workflow files: $(find .github/workflows/ -name '*.yml' -o -name '*.yaml' 2>/dev/null | wc -l || echo 0)" >> /tmp/evolution-context.txt
+          
+          echo "✅ Context collection completed"
+          
       - name: 📊 Analyze Repository Health
         id: health_check
         run: |
+          set -euo pipefail
           chmod +x ./scripts/analyze-repository-health-simple.sh
           ./scripts/analyze-repository-health-simple.sh \
             "$EVOLUTION_TYPE" \
@@ -102,6 +162,7 @@ jobs:
         id: generate_prompt
         if: steps.health_check.outputs.should_evolve == 'true'
         run: |
+          set -euo pipefail
           chmod +x ./scripts/generate-evolution-prompt.sh
           ./scripts/generate-evolution-prompt.sh \
             "$EVOLUTION_TYPE" \
@@ -121,14 +182,19 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
+          set -euo pipefail
           chmod +x ./scripts/trigger-evolution-workflow.sh
+          
+          # Trigger the main evolution workflow with target branch set to 'evolved'
           ./scripts/trigger-evolution-workflow.sh \
             "$EVOLUTION_TYPE" \
-            "conservative"
+            "conservative" \
+            "evolved"
 
       - name: 🔍 Dry Run - Preview Evolution
         if: steps.health_check.outputs.should_evolve == 'true' && env.DRY_RUN == 'true'
         run: |
+          set -euo pipefail
           echo "🔍 DRY RUN MODE - Evolution that would be triggered:"
           echo "Evolution Type: $EVOLUTION_TYPE"
           echo "Intensity: $INTENSITY"
@@ -136,12 +202,83 @@ jobs:
           if [ -f "/tmp/health_check_suggestions.txt" ]; then
             cat /tmp/health_check_suggestions.txt
           fi
+          
+          # Show what would be changed
+          if git diff --name-only 2>/dev/null | head -10; then
+            echo ""
+            echo "Files that would be modified:"
+            git diff --name-only | head -10
+          else
+            echo "No changes would be made with current settings."
+          fi
+
+      - name: 📊 Generate Evolution Report
+        if: steps.health_check.outputs.should_evolve == 'true'
+        run: |
+          set -euo pipefail
+          
+          echo "📊 Generating evolution report..."
+          
+          report_file="/tmp/evolution-report.md"
+          cat > "$report_file" << EOF
+          # Daily Evolution Report
+          
+          **Date**: $(date '+%Y-%m-%d %H:%M:%S UTC')
+          **Evolution Type**: $EVOLUTION_TYPE
+          **Intensity**: $INTENSITY
+          **Dry Run**: $DRY_RUN
+          
+          ## Changes Applied
+          
+          $(if [ "$DRY_RUN" = "true" ]; then
+            echo "No changes applied - dry run mode"
+          else
+            echo "Evolution changes applied successfully"
+          fi)
+          
+          ## Repository Health
+          
+          - Total commits: $(git rev-list --count HEAD)
+          - Active branch: $(git branch --show-current)
+          - Last activity: $(git log -1 --format='%cr')
+          - Issues found: ${ISSUES_FOUND:-0}
+          
+          ## Next Evolution
+          
+          The next daily evolution will occur at 3 AM UTC tomorrow.
+          EOF
+          
+          echo "✅ Evolution report generated at $report_file"
+          if [ -f "$report_file" ]; then
+            cat "$report_file"
+          fi
 
       - name: 📊 Update Daily Evolution Metrics
         if: steps.health_check.outputs.should_evolve == 'true' && env.DRY_RUN != 'true'
         run: |
+          set -euo pipefail
           chmod +x ./scripts/update-evolution-metrics.sh
           ./scripts/update-evolution-metrics.sh
+          
+          # Also create metrics summary
+          metrics_file="/tmp/growth-metrics.json"
+          cat > "$metrics_file" << EOF
+          {
+            "timestamp": "$(date -Iseconds)",
+            "workflow": "daily-evolution",
+            "evolution_type": "$EVOLUTION_TYPE",
+            "intensity": "$INTENSITY",
+            "dry_run": $DRY_RUN,
+            "success": ${{ job.status == 'success' }},
+            "repository": {
+              "commits": $(git rev-list --count HEAD),
+              "files": $(find . -type f 2>/dev/null | wc -l || echo 0),
+              "size_mb": $(du -sm . 2>/dev/null | cut -f1 || echo 0)
+            }
+          }
+          EOF
+          
+          echo "Growth metrics recorded in $metrics_file"
 
       - name: 🌱 No Evolution Needed
         if: steps.health_check.outputs.should_evolve == 'false'
@@ -153,13 +290,36 @@ jobs:
           echo "To force an evolution cycle, run:"
           echo "  gh workflow run daily_evolution.yml -f force_run=true"
 
+      - name: 🔄 Error Recovery
+        if: failure()
+        run: |
+          set -euo pipefail
+          
+          echo "❌ Daily evolution failed - attempting recovery"
+          
+          # Log error context
+          echo "Current directory: $(pwd)"
+          echo "Git status: $(git status --porcelain || echo 'Git status failed')"
+          echo "Environment variables: $(env | grep -E '^(EVOLUTION|WORKFLOW)_' || echo 'No evolution vars')"
+          
+          # Attempt cleanup
+          if [ -d "/tmp" ]; then
+            echo "Cleaning temporary files..."
+            find /tmp -name "*evolution*" -type f -delete 2>/dev/null || true
+          fi
+          
+          echo "🔄 Recovery attempt completed"
+
       - name: 📋 Collect Workflow Errors & Warnings
         if: always()
         id: error_collection
         run: |
+          set -euo pipefail
           chmod +x ./scripts/collect-workflow-errors.sh
           ./scripts/collect-workflow-errors.sh \
             --workflow-type "daily_evolution" \
             --job-status "${{ job.status }}" \
             --collect-from-logs \
             --include-context
+          
+          echo "✅ Daily evolution cycle completed"

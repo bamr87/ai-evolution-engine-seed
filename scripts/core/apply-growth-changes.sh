@@ -141,19 +141,6 @@ echo "$CHANGES_JSON" | jq -c '.[]' | while read -r change_json; do
       ;;
   esac
 done
-    awk -v start="<!-- AI-EVOLUTION-MARKER:START -->" \
-        -v end="<!-- AI-EVOLUTION-MARKER:END -->" \
-        -v new_content="$new_block_content_escaped_for_sed" '
-    BEGIN { p = 1 }
-    $0 == start { print; print new_content; p = 0; next }
-    $0 == end { p = 1 }
-    p { print }
-    ' "$path" > "${path}.tmp" && mv "${path}.tmp" "$path"
-    log_success "README.md block updated for $path"
-  else
-    log_warn "Unknown action: $action for $path"
-  fi
-done
 
 # Commit growth
 log_info "Committing changes..."

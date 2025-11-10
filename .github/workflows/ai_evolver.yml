@@ -1,14 +1,24 @@
-name: 🌱 AI Evolution Growth Engine (v0.4.8)
+name: 🌱 AI Evolution Growth Engine (v0.4.9)
 
 on:
+  # Manual trigger with rich parameters
   workflow_dispatch:
     inputs:
       prompt:
         description: 'Growth instructions for the AI (leave empty for changelog/versioning update)'
         required: false
         type: string
+      prompt_file_path:
+        description: 'Path to the evolution prompt file'
+        required: false
+        default: 'prompts/next_evolution.md'
+        type: string
+      custom_prompt_text:
+        description: 'Direct prompt text (overrides file if provided)'
+        required: false
+        type: string
       growth_mode:
-        description: 'Growth strategy (conservative, adaptive, experimental)'
+        description: 'Growth strategy (conservative, adaptive, experimental, test-automation)'
         required: false
         default: 'adaptive'
         type: choice
@@ -17,6 +27,15 @@ on:
           - adaptive
           - experimental
           - test-automation
+          - balanced
+          - refactor
+          - performance
+          - security
+      target_branch:
+        description: 'Base branch for evolution (always uses evolved branch for results)'
+        required: false
+        default: 'evolved'
+        type: string
       auto_plant_seeds:
         description: 'Automatically commit the newly generated .seed.md for next evolution?'
         required: false
@@ -32,14 +51,32 @@ on:
         required: false
         default: true
         type: boolean
+      auto_merge:
+        description: 'Auto-merge if confidence threshold met'
+        required: false
+        default: false
+        type: boolean
+
+  # Scheduled evolution
+  schedule:
+    - cron: '0 2 * * 1'  # Weekly on Monday at 2 AM UTC
+
+  # Issue-triggered evolution
+  issues:
+    types: [labeled]
+
+  # Repository dispatch for API triggers
+  repository_dispatch:
+    types: [evolution]
 
 permissions:
   contents: write
   pull-requests: write
   issues: write
+  actions: write
 
 env:
-  EVOLUTION_VERSION: "0.4.8"
+  EVOLUTION_VERSION: "0.4.9"
   WORKFLOW_TYPE: "manual_evolution"
   CI_ENVIRONMENT: "true"
   GITHUB_WORKSPACE: ${{ github.workspace }}
@@ -47,15 +84,41 @@ env:
 
 jobs:
   evolve:
-    name: 🌿 Growth Cycle v0.4.8
+    name: 🌿 Growth Cycle v0.4.9
     runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    outputs:
+      evolution_id: ${{ steps.setup.outputs.evolution_id }}
+      branch_name: ${{ steps.setup.outputs.branch_name }}
+      pr_number: ${{ steps.create_pr.outputs.pr_number }}
     
     steps:
+      # Setup and initialization
+      - name: 🎯 Initialize Evolution
+        id: setup
+        run: |
+          echo "🧬 Starting Evolution Cycle..."
+          EVOLUTION_ID=$(uuidgen | tr '[:upper:]' '[:lower:]')
+          echo "evolution_id=$EVOLUTION_ID" >> $GITHUB_OUTPUT
+
+          TIMESTAMP=$(date -u +"%Y%m%d-%H%M%S")
+          echo "timestamp=$TIMESTAMP" >> $GITHUB_OUTPUT
+          
+          # Set branch name for evolution results
+          BRANCH_NAME="evolved/evolution-${TIMESTAMP}-${EVOLUTION_ID:0:8}"
+          echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
+
+          echo "Evolution ID: $EVOLUTION_ID"
+          echo "Timestamp: $TIMESTAMP"
+          echo "Branch: $BRANCH_NAME"
+
       - name: 🌱 Initialize Evolution Environment
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
+          ref: ${{ github.event.inputs.target_branch || 'evolved' }}
 
       - name: 🛠️ Setup Evolution Prerequisites  
         run: |
@@ -71,6 +134,15 @@ jobs:
             echo "✅ timeout command available"
           fi
           
+          # Install additional tools for enhanced functionality
+          sudo apt-get install -y jq tree curl
+
+          # Install GitHub CLI for advanced repository operations
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+          sudo apt update
+          sudo apt install gh -y
+
           if [[ -f "./scripts/setup-environment.sh" ]]; then
             chmod +x ./scripts/setup-environment.sh
             ./scripts/setup-environment.sh || echo "Setup completed with warnings"
@@ -82,17 +154,86 @@ jobs:
           GROWTH_MODE: ${{ github.event.inputs.growth_mode }}
           DRY_RUN: ${{ github.event.inputs.dry_run }}
 
-      - name: 📝 Determine Evolution Prompt
-        id: prompt-selection
+      - name: 🧠 Load Evolution Configuration
+        id: config
         run: |
-          if [ -z "${{ github.event.inputs.prompt }}" ]; then
-            EVOLUTION_PROMPT="Analyze recent commits and update CHANGELOG.md with proper semantic versioning."
+          # Load configuration from .evolution.yml
+          if [ -f .evolution.yml ]; then
+            echo "Loading evolution configuration..."
+
+            # Try to use yq if available, otherwise use jq for basic config
+            if command -v yq >/dev/null 2>&1; then
+              DEFAULT_STRATEGY=$(yq eval '.evolution.default_strategy // "adaptive"' .evolution.yml)
+              MAX_TOKENS=$(yq eval '.evolution.max_tokens_per_evolution // 100000' .evolution.yml)
+              AUTO_MERGE_THRESHOLD=$(yq eval '.evolution.auto_merge_threshold // 0.95' .evolution.yml)
+            else
+              # Fallback to jq or simple defaults
+              DEFAULT_STRATEGY="adaptive"
+              MAX_TOKENS=100000
+              AUTO_MERGE_THRESHOLD=0.95
+              echo "⚠️ yq not available, using fallback configuration"
+            fi
+
+            echo "default_strategy=$DEFAULT_STRATEGY" >> $GITHUB_OUTPUT
+            echo "max_tokens=$MAX_TOKENS" >> $GITHUB_OUTPUT
+            echo "auto_merge_threshold=$AUTO_MERGE_THRESHOLD" >> $GITHUB_OUTPUT
           else
-            EVOLUTION_PROMPT="${{ github.event.inputs.prompt }}"
+            echo "No .evolution.yml found, using defaults"
+            echo "default_strategy=adaptive" >> $GITHUB_OUTPUT
+            echo "max_tokens=100000" >> $GITHUB_OUTPUT
+            echo "auto_merge_threshold=0.95" >> $GITHUB_OUTPUT
           fi
-          
+
+      # Determine evolution trigger and load prompt
+      - name: 🎯 Determine Evolution Trigger
+        id: trigger
+        run: |
+          PROMPT_TEXT=""
+          TRIGGER_TYPE=""
+
+          # Check if triggered by issue
+          if [[ "${{ github.event_name }}" == "issues" ]]; then
+            if [[ "${{ github.event.label.name }}" == "evolution-request" ]]; then
+              TRIGGER_TYPE="issue"
+              PROMPT_TEXT="${{ github.event.issue.body }}"
+              echo "Triggered by issue #${{ github.event.issue.number }}"
+            fi
+          # Check for custom prompt text
+          elif [[ -n "${{ github.event.inputs.custom_prompt_text }}" ]]; then
+            TRIGGER_TYPE="custom"
+            PROMPT_TEXT="${{ github.event.inputs.custom_prompt_text }}"
+            echo "Using custom prompt text"
+          # Check for repository dispatch
+          elif [[ "${{ github.event_name }}" == "repository_dispatch" ]]; then
+            TRIGGER_TYPE="api"
+            PROMPT_TEXT="${{ github.event.client_payload.prompt }}"
+            echo "Triggered via API"
+          # Check for manual prompt input
+          elif [[ -n "${{ github.event.inputs.prompt }}" ]]; then
+            TRIGGER_TYPE="manual"
+            PROMPT_TEXT="${{ github.event.inputs.prompt }}"
+            echo "Using manual prompt input"
+          # Default to file-based prompt
+          else
+            TRIGGER_TYPE="file"
+            PROMPT_FILE="${{ github.event.inputs.prompt_file_path || 'prompts/next_evolution.md' }}"
+
+            if [ -f "$PROMPT_FILE" ]; then
+              PROMPT_TEXT=$(cat "$PROMPT_FILE")
+              echo "Using prompt file: $PROMPT_FILE"
+            else
+              echo "⚠️ Prompt file not found: $PROMPT_FILE, using default evolution prompt"
+              PROMPT_TEXT="Analyze recent commits and update CHANGELOG.md with proper semantic versioning."
+            fi
+          fi
+
+          # Save prompt for later use
+          echo "$PROMPT_TEXT" > /tmp/evolution_prompt.txt
+          echo "trigger_type=$TRIGGER_TYPE" >> $GITHUB_OUTPUT
+
+          # Set environment variable for subsequent steps
           echo "EVOLUTION_PROMPT<<EOF" >> $GITHUB_ENV
-          echo "$EVOLUTION_PROMPT" >> $GITHUB_ENV
+          echo "$PROMPT_TEXT" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
       - name: 🔍 Pre-Evolution Validation
@@ -348,6 +489,44 @@ jobs:
             echo "⚠️ All change application methods failed, but workflow continues"
           fi
 
+      - name: 🌳 Create Evolution Branch & Commit Changes
+        if: github.event.inputs.dry_run == 'false'
+        run: |
+          echo "🌳 Creating evolution branch and committing changes..."
+          
+          # Configure git
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Create and switch to evolution branch
+          BRANCH_NAME="${{ steps.setup.outputs.branch_name }}"
+          echo "Creating branch: $BRANCH_NAME"
+          git checkout -b "$BRANCH_NAME"
+          
+          # Stage all changes
+          git add -A
+          
+          # Commit if there are changes
+          if git diff --staged --quiet; then
+            echo "⚠️ No changes to commit"
+          else
+            git commit -m "🧬 Evolution cycle results - ${{ github.event.inputs.growth_mode }} mode
+
+Evolution ID: ${{ steps.setup.outputs.evolution_id }}
+Timestamp: ${{ steps.setup.outputs.timestamp }}
+Growth Mode: ${{ github.event.inputs.growth_mode }}
+Trigger: ${{ github.event_name }}
+
+This evolution was automatically generated by the AI Evolution Engine.
+Review the changes and merge to 'evolved' branch when ready."
+            
+            # Push to remote
+            git push origin "$BRANCH_NAME"
+            echo "✅ Changes pushed to branch: $BRANCH_NAME"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: 📈 Evolution Tracking
         run: |
           echo "📊 Updating evolution tracking..."
@@ -446,19 +625,71 @@ jobs:
 
       - name: 📋 Create Evolution Pull Request
         if: github.event.inputs.dry_run == 'false'
+        id: create_pr
         run: |
-          if [[ -f "./scripts/create_pr.sh" ]]; then
-            chmod +x ./scripts/create_pr.sh
-            ./scripts/create_pr.sh --prompt "$EVOLUTION_PROMPT" --mode "${{ github.event.inputs.growth_mode }}" || echo "PR creation completed with warnings"
+          # Create PR targeting 'evolved' branch
+          BRANCH_NAME="${{ steps.setup.outputs.branch_name }}"
+          PR_TITLE="🧬 Evolution: ${{ github.event.inputs.growth_mode }} mode - ${{ steps.setup.outputs.timestamp }}"
+          PR_BODY="## AI Evolution Results
+
+**Evolution ID:** ${{ steps.setup.outputs.evolution_id }}
+**Growth Mode:** ${{ github.event.inputs.growth_mode }}
+**Timestamp:** ${{ steps.setup.outputs.timestamp }}
+**Trigger:** ${{ github.event_name }}
+
+### Summary
+This PR contains the results of an automated evolution cycle. The changes have been generated by the AI Evolution Engine and should be reviewed before merging to the \`evolved\` branch.
+
+### Review Checklist
+- [ ] Review all changed files
+- [ ] Verify evolution quality and consistency
+- [ ] Check for any unintended changes
+- [ ] Validate test results
+- [ ] Approve and merge to \`evolved\` branch
+
+### Workflow Run
+[View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
+---
+*This PR was automatically generated by the AI Evolution Engine v${{ env.EVOLUTION_VERSION }}*"
+          
+          # Create PR using GitHub CLI
+          if command -v gh &> /dev/null; then
+            PR_URL=$(gh pr create \
+              --title "$PR_TITLE" \
+              --body "$PR_BODY" \
+              --base evolved \
+              --head "$BRANCH_NAME" \
+              --label "evolution,automated" || echo "")
+            
+            if [[ -n "$PR_URL" ]]; then
+              echo "✅ Pull request created: $PR_URL"
+              PR_NUMBER=$(echo "$PR_URL" | grep -o '[0-9]*$')
+              echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+            else
+              echo "⚠️ PR creation via gh CLI failed, trying fallback..."
+            fi
           else
-            echo "⚠️ PR creation script not found"
+            echo "⚠️ GitHub CLI not available"
+          fi
+          
+          # Fallback: use script if available
+          if [[ -z "$PR_URL" && -f "./scripts/create_pr.sh" ]]; then
+            chmod +x ./scripts/create_pr.sh
+            ./scripts/create_pr.sh \
+              --base evolved \
+              --head "$BRANCH_NAME" \
+              --title "$PR_TITLE" \
+              --body "$PR_BODY" || echo "PR creation completed with warnings"
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 📊 Final Evolution Summary
         run: |
-          echo "🎉 Evolution cycle v0.4.8 completed!"
+          echo "🎉 Evolution cycle v0.4.9 completed!"
+          echo "Evolution ID: ${{ steps.setup.outputs.evolution_id }}"
+          echo "Trigger type: ${{ steps.trigger.outputs.trigger_type }}"
           echo "Growth mode: ${{ github.event.inputs.growth_mode }}"
           echo "Dry run: ${{ github.event.inputs.dry_run }}"
           if [[ -f /tmp/repo_context.json ]]; then

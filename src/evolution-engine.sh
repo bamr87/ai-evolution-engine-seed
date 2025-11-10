@@ -670,9 +670,9 @@ EOF
 create_integration_examples() {
     log_info "🔧 Creating integration examples..."
     
-    mkdir -p "$PROJECT_ROOT/examples"
+    mkdir -p "$PROJECT_ROOT/seeds"
     
-    cat > "$PROJECT_ROOT/examples/basic-evolution.sh" << 'EOF'
+    cat > "$PROJECT_ROOT/seeds/basic-evolution.sh" << 'EOF'
 #!/bin/bash
 # Basic Evolution Example
 # Demonstrates how to use the modular AI Evolution Engine
@@ -727,7 +727,7 @@ generate_metrics_report "example-metrics.json" "summary"
 log_success "✅ Basic evolution example completed"
 EOF
 
-    chmod +x "$PROJECT_ROOT/examples/basic-evolution.sh"
+    chmod +x "$PROJECT_ROOT/seeds/basic-evolution.sh"
     
     log_success "Created integration examples"
 }
@@ -782,7 +782,7 @@ init_git_repo
 init_metrics
 ```
 
-For detailed usage examples, see the `examples/` directory.
+For detailed usage examples, see the `seeds/` directory.
 EOF
     fi
     

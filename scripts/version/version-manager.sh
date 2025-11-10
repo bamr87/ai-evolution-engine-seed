@@ -46,7 +46,7 @@ require_module "core/validation"
 require_module "core/utils"
 
 # Configuration
-VERSION_CONFIG="$PROJECT_ROOT/.version-config.json"
+VERSION_CONFIG="$PROJECT_ROOT/config/.version-config.json"
 CHANGELOG_FILE="$PROJECT_ROOT/CHANGELOG.md"
 
 # Default values

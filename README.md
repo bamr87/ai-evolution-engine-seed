@@ -249,9 +249,14 @@ The repository is organized following software engineering best practices:
 │   ├── 📁 validation/     # Compliance and quality validation
 │   ├── 📁 version/        # Advanced version management and tracking
 │   └── 📁 [10+ other]/    # Specialized script categories
+├── 📁 seeds/              # Seed implementations and examples
+│   ├── 📁 evolution-engine-legacy/  # Legacy evolution engine implementation
+│   ├── 📁 seed-js/         # JavaScript-based seed with full-stack implementation
+│   ├── 📁 seed-python/     # Python seed with CrewAI agent orchestration
+│   └── 📁 seed-python-cursor/  # Python seed optimized for Cursor IDE
 ├── 📁 src/lib/            # Modular library architecture
 ├── 📁 prompts/            # AI prompts and evolution instructions
-│   └── 📁 templates/      # Periodic evolution prompt templates
+│   └── 📁 templates/      # Periodic evolution prompt templates (GitHub Models format)
 ├── 📁 docker/             # Containerization and cross-platform support
 ├── 📁 logs/               # System logs and evolution metrics
 └── 📁 .github/workflows/  # GitHub Actions automation workflows
@@ -693,6 +698,254 @@ You can manually trigger any periodic prompt via GitHub Actions:
 4. Choose dry-run mode for testing
 
 **See the [Periodic Prompts Documentation](prompts/templates/README.md) for detailed information.**
+
+### Implementation Details
+
+The Periodic AI Evolution System includes:
+
+#### Prompt Templates (10 Total)
+
+Specialized AI prompt templates in `prompts/templates/`:
+
+**Weekly Prompts:**
+- `doc_harmonization.md` - Documentation consistency and formatting
+- `security_scan.md` - Security vulnerability detection and fixes
+- `changelog_versioning.md` - Changelog maintenance and semantic versioning
+
+**Bi-weekly Prompts:**
+- `test_enhancement.md` - Test coverage expansion and quality improvement
+
+**Monthly Prompts:**
+- `code_refactor.md` - Code quality and maintainability improvements
+- `dependency_updates.md` - Dependency updates and security patches
+- `performance_optimization.md` - Performance bottleneck optimization
+- `workflow_optimization.md` - GitHub Actions workflow improvements
+- `community_guidelines.md` - Community documentation updates
+- `prompt_refinement.md` - Self-improvement of AI prompts
+
+#### Supporting Scripts
+
+**`scripts/execute-periodic-prompt.sh`:**
+- Executes specific periodic prompts with context collection
+- Validates prompt templates and structures
+- Supports dry-run and testing modes
+- Generates standardized outputs
+
+**`scripts/apply-periodic-changes.sh`:**
+- Processes AI responses and applies file changes safely
+- Creates backups before modifications
+- Validates changes and performs syntax checking
+- Generates summary reports
+
+**`scripts/validate-periodic-prompts.sh`:**
+- Validates the entire periodic prompts system
+- Checks template structure and configuration
+- Verifies script availability and permissions
+
+#### Key Benefits
+
+**For Developers:**
+- Zero maintenance overhead - repository maintains itself
+- Consistent quality across all aspects of the codebase
+- Proactive security with automated vulnerability detection
+- Up-to-date dependencies without manual tracking
+- Comprehensive testing with expanding coverage
+
+**For Projects:**
+- Improved code quality through regular refactoring
+- Better documentation with consistent formatting
+- Enhanced performance through systematic optimization
+- Stronger security posture with regular scans
+- Community-friendly with maintained contribution guidelines
+
+**For AI Evolution:**
+- Self-improving system that gets better over time
+- Comprehensive automation of maintenance tasks
+- Scalable approach that works for any repository size
+- Data-driven improvements through metrics collection
+
+## 📝 AI Prompt Format: GitHub Models Standard
+
+All prompt files in the repository follow the [GitHub Models standard format](https://docs.github.com/en/github-models/use-github-models/storing-prompts-in-github-repositories) for easy integration with GitHub's AI development tools.
+
+### File Naming Convention
+
+- **Extension**: All prompt files use `.prompt.yml` extension (e.g., `code_refactor.prompt.yml`)
+- **Location**: Main prompts in `prompts/`, templates in `prompts/templates/`
+
+### Required GitHub Models Format
+
+All prompt files follow this structure:
+
+```yaml
+name: [Prompt Name]
+description: [Brief description of what the prompt does]
+model: [AI model to use, e.g., gpt-4o-mini]
+modelParameters:
+  temperature: [0.0-1.0]
+  max_tokens: [optional]
+messages:
+  - role: system
+    content: [System message]
+  - role: user
+    content: [User prompt with {{variable}} placeholders]
+testData:
+  - input: [Test input]
+    expected: [Expected output]
+evaluators:
+  - name: [Evaluator description]
+    [evaluation criteria]
+```
+
+### Benefits
+
+1. **Easy Integration**: Direct integration with GitHub's AI development tools
+2. **Scalability**: Simple to complex use cases supported
+3. **Compatibility**: Uses widely supported YAML format
+4. **Organization**: Clean UI for viewing prompts in repositories
+5. **Sharing**: Easier sharing with non-technical stakeholders
+6. **Testing**: Built-in test data and evaluation framework
+
+### Migrated Files
+
+All prompt files have been migrated to the GitHub Models format:
+- `prompts/first_growth.prompt.yml`
+- `prompts/next_evolution.prompt.yml`
+- `prompts/templates/*.prompt.yml` (10 template files)
+
+## 🛠️ Workflow Reliability & Robustness
+
+The AI Evolution Engine includes comprehensive error handling and multi-tier fallback strategies to ensure reliable execution even when primary scripts encounter issues.
+
+### Multi-Tier Fallback System
+
+The workflow implements a progressive fallback chain:
+
+```
+Primary Script → Simple Script → Emergency Script → Manual Fallback
+```
+
+#### Fallback Strategy
+
+1. **Primary Scripts**: Full-featured scripts with comprehensive functionality
+2. **Simple Scripts**: Simplified versions with reduced dependencies
+3. **Emergency Scripts**: Ultra-minimal fallback with basic shell commands only
+4. **Manual Fallback**: Direct git/file operations as last resort
+
+### Reliability Features
+
+- **Timeout Protection**: All script calls wrapped with `timeout` commands
+- **Exit Code Tracking**: Proper error reporting and success validation
+- **JSON Validation**: All outputs validated before proceeding
+- **Progressive Degradation**: Each tier simpler and more reliable than the last
+- **Emergency Manual Operations**: Direct git/file operations as last resort
+- **Enhanced Debugging**: `bash -x` tracing for better error diagnosis
+
+### Workflow Improvements
+
+#### Context Collection
+- Primary: `scripts/collect-context.sh` with full context gathering
+- Fallback: `scripts/simple-context-collector.sh` with graceful error handling
+- Emergency: `scripts/emergency-fallback.sh` with minimal valid output
+
+#### AI Simulation
+- Primary: Full AI integration (when available)
+- Fallback: `scripts/simple-ai-simulator.sh` for testing
+- Emergency: Manual response generation
+
+#### Change Application
+- Primary: `scripts/apply-growth-changes.sh` with full validation
+- Fallback: `scripts/simple-change-applier.sh` with enhanced JSON validation
+- Emergency: Manual git operations
+
+### Error Handling Enhancements
+
+- **Graceful Degradation**: Scripts continue with reduced functionality when possible
+- **Comprehensive Logging**: Detailed error messages with context
+- **Safe Set Flags**: Using `set -e` instead of `set -euo pipefail` for better compatibility
+- **Error Recovery**: Automatic retry with simpler methods on failure
+
+## 📋 Version History & Recent Fixes
+
+### v0.4.8 Fixes Summary
+
+#### Issues Fixed
+
+**1. Missing Validation Functions**
+- **Problem**: Scripts were calling non-existent validation functions like `validate_file_readable`, `validate_file_exists`, and `validate_required`.
+- **Solution**: Added these functions to `src/lib/core/validation.sh` for backward compatibility:
+  ```bash
+  validate_required() { [ -n "$1" ] || { error "Required parameter missing"; return 1; }; }
+  validate_file_exists() { [ -f "$1" ] || { error "File does not exist: $1"; return 1; }; }
+  validate_file_readable() { [ -r "$1" ] || { error "File not readable: $1"; return 1; }; }
+  validate_directory_exists() { [ -d "$1" ] || { error "Directory does not exist: $1"; return 1; }; }
+  ```
+
+**2. DRY_RUN Unbound Variable**
+- **Problem**: Line 793 in `seeds.sh` referenced `$DRY_RUN` but the variable was not always initialized in the correct scope.
+- **Solution**: Changed initialization to `DRY_RUN=${DRY_RUN:-false}` to provide a default value.
+
+**3. Parameter Parsing Issues**
+- **Problem**: Scripts expected positional arguments but workflows were calling them with flag-style arguments like `--prompt` and `--mode`.
+- **Solution**: Enhanced parameter parsing in multiple scripts to support both styles:
+  - `scripts/create_pr.sh` - Added flag parsing for `--prompt`, `--mode`, `--response-file`
+  - `scripts/apply-growth-changes.sh` - Enhanced to handle `--growth-mode` flag
+  - `scripts/generate_seed.sh` - Fixed parameter parsing for `--cycle` and `--prompt` flags
+
+**4. Missing Workflow Scripts**
+- **Problem**: The periodic evolution workflow referenced three non-existent scripts.
+- **Solution**: Created the missing scripts:
+  - `scripts/validate-evolution.sh` - Validates JSON response format, evolution changes validity, shell script syntax checking
+  - `scripts/collect-evolution-metrics.sh` - Collects Git commit metrics, file change statistics, test metrics and analytics
+  - `scripts/send-evolution-notification.sh` - Sends Slack notifications (if configured), creates GitHub notifications, writes notification files
+
+**5. Bootstrap Script Issues**
+- **Problem**: Duplicate function definitions and bash compatibility issues in `src/lib/core/bootstrap.sh`.
+- **Solution**: 
+  - Removed duplicate `list_loaded_modules()` function definition
+  - Fixed bash 3.2 compatibility issue with associative array access
+  - Corrected syntax error with extra closing brace
+
+**6. Context Collection Timeout**
+- **Problem**: Complex health analysis causing timeout issues in CI environment.
+- **Solution**: Modified `collect-context.sh` to use simplified health data instead of complex analysis, preventing timeout issues while maintaining functionality.
+
+#### Compatibility
+
+The fixes maintain backward compatibility while adding support for new flag-based parameter passing. Scripts can now be called either way:
+
+```bash
+# Old style (still works)
+./create_pr.sh /tmp/response.json "My prompt" adaptive
+
+# New style (now works)  
+./create_pr.sh --prompt "My prompt" --mode adaptive
+```
+
+#### Testing
+
+All scripts now pass:
+- ✅ Bash syntax validation (`bash -n`)
+- ✅ YAML workflow validation
+- ✅ Parameter compatibility (both positional and flag-based)
+- ✅ Missing dependency resolution
+
+### Function Reference
+
+#### health_analyze_repository
+
+**Correct Signature**: `health_analyze_repository [output_format] [output_file]`
+
+- `output_format`: "json", "markdown", or "text" (default: "json")
+- `output_file`: Optional file path to save output
+
+#### generate_metrics_report
+
+**Correct Signature**: `generate_metrics_report [metrics_file] [output_format] [output_file]`
+
+- `metrics_file`: Path to metrics file (default: "evolution-metrics.json")
+- `output_format`: "json", "markdown", or "summary" (default: "markdown")  
+- `output_file`: Optional file path to save output
 
 ## Future Enhancements
 

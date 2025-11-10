@@ -226,7 +226,7 @@ check_prerequisites() {
     fi
     
     # Check for evolution infrastructure
-    if [[ ! -f "evolution-metrics.json" ]]; then
+    if [[ ! -f "metrics/evolution-metrics.json" ]]; then
         warn "evolution-metrics.json not found - this may not be an AI Evolution Engine repository"
     fi
     

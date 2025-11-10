@@ -1,6 +1,27 @@
+---
+file: .github/copilot-instructions.md
+description: "Operational guide for AI coding agents inside AI Evolution Engine"
+author: "AI Evolution Engine Team"
+created: 2025-07-05
+lastModified: 2025-01-14
+version: 2.0.0
+applyTo: "**/*"
+---
+
 # Copilot Instructions
 
 These instructions guide AI-powered development practices through the fundamental principle of **Paths** - the natural, organic routes that emerge in software development. Like water finding its way through terrain, code and information follow paths of least resistance, creating interconnected networks of knowledge and functionality. AI agents continuously discover, define, and refine these paths, enabling sustainable growth and evolution. The guidelines emphasize container-first development within this path-based framework, ensuring all activities occur within isolated, reproducible environments that can flow seamlessly across different contexts.
+
+## Repository Snapshot
+- AI Evolution Engine couples bash-centric libraries under `src/lib` with automation scripts in `scripts/core` and GitHub workflows so the repo can self-evolve; changes should respect that modular layout.
+- Always source `src/lib/core/bootstrap.sh` then call `load_module "<namespace>/<module>"` instead of rewriting utilities; modules provide logging, validation, git, metrics, and GitHub helpers.
+- Automation behavior is driven by `config/.evolution.yml`, `config/ai_prompts_evolution.json`, and `config/.version-config.json`; keep scripts and workflows consistent with these contracts before shipping changes.
+
+## Daily Workflow
+- Validate locally with `make test`, `./tests/run_tests.sh run <unit|integration|workflow>`, or `./tests/comprehensive_test_runner.sh`; artifacts live in `tests/<category>/{logs,results,reports}` and are consumed by CI.
+- Primary entrypoints are `scripts/core/modular-evolution.sh` (subcommands `help|analyze|evolve|simulate|workflows`) and `scripts/core/local-evolution.sh`; avoid calling lower-level helpers directly unless the library lacks the behavior.
+- GitHub workflows (`ai_evolver.yml`, `daily_evolution.yml`, `periodic_evolution.yml`, `testing_automation_evolver.yml`) are triggered via `gh workflow run <file> -f growth_mode=... -f evolution_type=... -f intensity=... -f dry_run=`; log-friendly inputs are required for automation metrics.
+- Documentation rule: keep non-root markdown inside `docs/`, update front matter `lastmod`, and cross-link related guides whenever features or commands change.
 
 ## 🌊 The Path Philosophy: Natural Flow in Software Development
 
@@ -41,6 +62,106 @@ Repositories grow like living organisms:
 - **Adaptive Evolution**: Paths adjust to changing requirements and contexts
 - **Collective Intelligence**: Multiple AI agents contribute to path definition
 - **Sustainable Expansion**: Growth follows established patterns while allowing innovation
+
+## MCP-Enhanced Path-Driven Development
+
+### Model Context Protocol (MCP) Integration
+
+The repository now leverages Model Context Protocol (MCP) to standardize AI application context sharing and tool orchestration. MCP serves as the universal interface for AI applications to access external context through well-defined paths.
+
+### Front Matter: Structured Metadata for AI-Enhanced Development
+
+Front matter provides structured metadata at the beginning of files, serving as intelligent context for AI agents working with the codebase. In AI-seed projects, front matter acts as a bridge between human intent and AI understanding, enabling more precise code generation, testing, and documentation.
+
+#### Front Matter Elements for AI Development
+
+- **AI Directives**: Specific instructions for AI agents on coding style, patterns, and approaches
+- **Component Architecture**: Clear definition of React/JavaScript component relationships and data flow
+- **API Integration Points**: Documentation of external services and endpoints
+- **Testing Requirements**: Specifications for test coverage and testing approaches
+- **Performance Considerations**: Optimization guidelines and performance metrics
+
+#### Front Matter Structure for React Components
+
+```javascript
+/**
+ * Front Matter: AI-Enhanced React Component
+ * 
+ * Title: User Dashboard Component
+ * Description: Main dashboard interface with real-time data and interactive widgets
+ * Component Type: Container Component
+ * Path Context:
+ *   - Parent Components: [App.jsx, Layout.jsx]
+ *   - Child Components: [UserProfile.jsx, DataChart.jsx, NotificationPanel.jsx]
+ *   - State Management: Redux store with user slice and dashboard slice
+ * Dependencies:
+ *   - react: "^18.2.0"
+ *   - redux: "^4.2.0"
+ *   - recharts: "^2.5.0"
+ * API Integrations:
+ *   - "/api/user/profile": GET user profile data
+ *   - "/api/dashboard/metrics": GET real-time metrics
+ *   - "/ws/notifications": WebSocket for live notifications
+ * AI Directives:
+ *   - patterns: ["hooks-preferred", "functional-components"]
+ *   - stateManagement: "redux-toolkit"
+ *   - styling: "styled-components"
+ *   - testing: "react-testing-library"
+ * Performance:
+ *   - memo: "wrap expensive renders"
+ *   - lazy: "code-split non-critical components"
+ * Security: "validate all user inputs, sanitize display data"
+ * Accessibility: "ARIA labels, keyboard navigation, screen reader support"
+ */
+```
+
+#### Front Matter for API Routes
+
+```javascript
+/**
+ * Front Matter: API Route Handler
+ * 
+ * Title: User Authentication API
+ * Description: Handles user login, logout, and token refresh operations
+ * Route: /api/auth
+ * Methods: [POST /login, POST /logout, POST /refresh]
+ * Path Context:
+ *   - Middleware: [cors, rateLimit, validateInput]
+ *   - Database: User model, Session model
+ *   - External Services: [JWT service, email service]
+ * Dependencies:
+ *   - express: "^4.18.0"
+ *   - jsonwebtoken: "^9.0.0"
+ *   - bcrypt: "^5.1.0"
+ * AI Directives:
+ *   - errorHandling: "structured-responses"
+ *   - validation: "joi-schema"
+ *   - logging: "winston-structured"
+ * Security:
+ *   - authentication: "JWT with refresh tokens"
+ *   - rateLimiting: "5 requests per minute per IP"
+ *   - inputValidation: "strict schema validation"
+ * Testing:
+ *   - unit: "jest with supertest"
+ *   - integration: "test database required"
+ */
+```
+
+#### MCP Path Principles
+- **Standardized Context Paths**: MCP servers expose resources, tools, and prompts through standardized interfaces
+- **Path-Aware Server Architecture**: All MCP servers follow path-based execution patterns with comprehensive logging
+- **Container-First Deployment**: MCP servers run within isolated containers with defined resource boundaries
+- **Tool Orchestration Paths**: Complex workflows chain multiple MCP tools along defined execution paths
+- **Context Aggregation Paths**: Multiple MCP servers provide comprehensive context for AI operations
+
+#### MCP-Enhanced Development Workflow
+1. **Context Discovery**: Identify available MCP servers and their capabilities
+2. **Resource Mapping**: Map application needs to available MCP resources and tools
+3. **Path Design**: Design optimal paths through MCP server capabilities
+4. **Implementation**: Build applications using standardized MCP client libraries
+5. **Integration Testing**: Validate MCP integrations across all server types
+6. **Monitoring**: Track MCP operation performance and health
+7. **Evolution**: Use MCP context to enhance AI-driven development
 
 ## Path-Driven Development Standards
 
@@ -397,31 +518,216 @@ Headers now include path information to show how files connect:
  */
 ```
 
+### MCP-Enhanced Code Examples
+
+#### Python with MCP Context
+```python
+# Path: mcp-enhanced-data-processing
+# File: src/processors/data_processor.py
+
+"""
+Data processor with MCP context integration
+"""
+
+import asyncio
+from src.mcp.clients.mcp_client import PathAwareMCPClient
+from src.utils.path_tracker import pathTracker
+
+class MCPEnhancedDataProcessor:
+    """Data processor that leverages MCP servers for context and tools"""
+    
+    def __init__(self):
+        self.fs_client = None
+        self.db_client = None
+    
+    async def process_with_mcp_context(self, data_source: str):
+        """Process data using MCP context and tools"""
+        return await pathTracker.executeInPath('mcp_data_processing', async () => {
+            # Path: mcp-context-collection
+            context = await self._collect_mcp_context(data_source)
+            
+            # Path: mcp-tool-orchestration
+            processed_data = await self._orchestrate_processing_tools(data_source, context)
+            
+            # Path: mcp-result-validation
+            validated_result = await self._validate_with_mcp_tools(processed_data)
+            
+            return validated_result
+        })
+    
+    async def _collect_mcp_context(self, data_source: str) -> dict:
+        """Collect comprehensive context from MCP servers"""
+        context = {}
+        
+        # Filesystem context
+        self.fs_client = PathAwareMCPClient("docker", ["exec", "-i", "mcp-filesystem"])
+        await self.fs_client.connect()
+        
+        try:
+            # Get file metadata and related files
+            resources = await self.fs_client.listResources()
+            related_files = [r for r in resources if data_source in r.uri]
+            context['filesystem'] = {
+                'source_file': data_source,
+                'related_files': [r.uri for r in related_files],
+                'file_count': len(resources)
+            }
+        finally:
+            await self.fs_client.disconnect()
+        
+        return context
+```
+
+#### JavaScript with MCP Integration
+```javascript
+// Path: mcp-enhanced-api-service
+// File: src/services/api_service.ts
+
+import { PathAwareMCPClient } from '../mcp/clients/mcp-client';
+import { pathTracker } from '../utils/path-tracker';
+
+export class MCPEnhancedApiService {
+    private mcpClients: Map<string, PathAwareMCPClient> = new Map();
+    
+    async processRequest(request: ApiRequest): Promise<ApiResponse> {
+        return pathTracker.executeInPath('mcp_api_processing', async () => {
+            // Path: mcp-server-discovery
+            const availableServers = await this.discoverMCPServers();
+            
+            // Path: context-enhanced-processing
+            const context = await this.gatherMCPContext(request, availableServers);
+            
+            // Path: mcp-tool-assisted-processing
+            const result = await this.processWithMCPTools(request, context);
+            
+            return this.formatResponse(result, context);
+        });
+    }
+    
+    private async discoverMCPServers(): Promise<string[]> {
+        return pathTracker.executeInPath('server_discovery', async () => {
+            const fsClient = new PathAwareMCPClient('docker', ['exec', '-i', 'mcp-filesystem']);
+            await fsClient.connect();
+            
+            try {
+                const configContent = await fsClient.readResource('file://config/mcp/client_config.json');
+                const config = JSON.parse(configContent);
+                return Object.keys(config.servers || {});
+            } finally {
+                await fsClient.disconnect();
+            }
+        });
+    }
+}
+```
+
+#### Bash with MCP Automation
+```bash
+#!/bin/bash
+# Path: mcp-enhanced-deployment-script
+# File: scripts/deploy/mcp-enhanced-deploy.sh
+
+set -euo pipefail
+
+# Load MCP automation libraries
+source "${SCRIPT_DIR}/../lib/mcp_context.sh"
+source "${SCRIPT_DIR}/../lib/path_management.sh"
+
+# Path: mcp-enhanced-deployment-workflow
+deploy_with_mcp_context() {
+    local environment="$1"
+    local deployment_config="$2"
+    
+    execute_in_path "mcp_enhanced_deployment" \
+        "_deploy_with_context '$environment' '$deployment_config'"
+}
+
+_deploy_with_context() {
+    local environment="$1"
+    local deployment_config="$2"
+    
+    # Path: mcp-context-collection-for-deployment
+    execute_in_path "deployment_context_collection" \
+        "collect_comprehensive_deployment_context '$environment'"
+    
+    # Path: mcp-server-health-validation
+    execute_in_path "mcp_server_validation" \
+        "validate_mcp_servers_for_deployment"
+    
+    # Path: context-informed-deployment
+    execute_in_path "context_informed_deployment" \
+        "deploy_using_mcp_context '$environment' '$deployment_config'"
+}
+
+collect_comprehensive_deployment_context() {
+    local environment="$1"
+    local context_dir="/tmp/deployment_context"
+    
+    mkdir -p "$context_dir"
+    
+    # Collect context from all available MCP servers
+    local mcp_servers
+    mcp_servers=($(discover_mcp_servers))
+    
+    for server in "${mcp_servers[@]}"; do
+        log_info "Collecting context from MCP server: $server" "context_collection"
+        collect_mcp_context "$server" "$context_dir/${server}_context.json"
+    done
+}
+```
+
+## Pattern Highlights
+- Script headers must include the standard metadata block (file, description, author, created/last modified, version, dependencies, usage); mirror existing style when adding new bash files.
+- Evolution pipeline is `setup-environment.sh` → `scripts/analysis/collect-context.sh` → `scripts/core/simulate-ai-growth.sh` → `scripts/core/apply-growth-changes.sh` → seed/version updates; new tooling should hook into that sequence rather than bypass it.
+- Prompts in `prompts/` and `prompts/templates/` use GitHub-style prompt front matter plus embedded test cases; use kebab-case names and document additions in `prompts/README.md`.
+- Seeds under `seeds/seed-*` show language-specific bootstraps; align new examples with the relevant seed instead of inventing fresh structures.
+- Analytics pipelines expect JSON emitted via `jq`-friendly structures; when extending scripts, return machine-readable output so metrics and validation gates keep working.
+
+## Safety & Reviews
+- Honor `quality_gates` in `.evolution.yml` (tests + lint required, max evolution time, rollback on failure) when modifying automation or workflows.
+- Expose new behavior through existing CLI flags (`--dry-run`, `--force-run`, intensity levels) rather than special environment variables; workflows rely on those switches.
+- When touching files tracked in `config/.version-config.json`, update version markers and changelog entries together to keep automated version audits green.
+
 ## Integration with Existing Principles
 
-### Path-Enhanced Core Principles
-- **DRY**: Reuse established paths instead of creating redundant routes
-- **KIS**: Choose the simplest path that accomplishes the goal
-- **DFF**: Design multiple paths to handle failures gracefully
-- **REnO**: Release along incremental paths, building on previous releases
-- **MVP**: Define the minimal path to deliver value
-- **COLAB**: Create clear paths for team communication and contribution
-- **AIPD**: Let AI agents discover and optimize paths
-- **RFD**: READMEs map the paths through the codebase
-- **SCD**: Scripts orchestrate journeys along defined paths
-- **CFD**: Containers provide consistent paths across environments
+### Front Matter Enhanced AI Development Principles
+- **DRY**: Reuse front matter templates and MCP server capabilities to avoid redundant context collection
+- **KIS**: Use clear, concise front matter that provides essential AI context without complexity
+- **DFF**: Include fallback strategies and error handling approaches in front matter directives
+- **REnO**: Update front matter version information with each release to track evolution
+- **MVP**: Define minimal front matter elements that provide maximum AI assistance value
+- **COLAB**: Standardize front matter formats across team for consistent AI collaboration
+- **AIPD**: Use front matter AI directives to optimize AI-assisted development workflows
+- **RFD**: Combine README documentation with front matter for comprehensive project guidance
+- **SCD**: Include deployment and automation instructions in front matter for AI script generation
+- **CFD**: Specify container and environment requirements in front matter for consistent development
 
-### Path-First Development Workflow
-1. **Identify Natural Paths**: Before coding, map the natural flow of data and control
-2. **Design Path Networks**: Create interconnected routes that build on each other
-3. **Implement Along Paths**: Code follows the designed pathways
-4. **Test Path Integrity**: Verify all paths function as expected
-5. **Document Path Maps**: Create guides for navigating the codebase
-6. **Monitor Path Health**: Track usage and performance of different routes
-7. **Evolve Path Networks**: Let paths grow and adapt organically
+### AI-Specific Development Benefits
+- **Component Generation**: AI uses component front matter to generate related components with proper integration
+- **API Development**: AI leverages API route front matter to create consistent endpoints and validation
+- **Testing Automation**: Test specifications in front matter guide AI in generating comprehensive test suites
+- **Performance Optimization**: Performance hints in front matter direct AI toward efficient code patterns
+- **Security Implementation**: Security requirements in front matter ensure AI generates secure code
+- **Documentation Sync**: Front matter keeps documentation aligned with code through AI-assisted updates
 
-## Conclusion: The Living Path Network
+### Front Matter Enhanced AI Development Workflow
+1. **Define Front Matter Standards**: Establish templates for React components, API routes, and utility modules
+2. **Component Architecture Planning**: Use front matter to define component hierarchies and data flow paths
+3. **API Design**: Document endpoints, validation, and integration points in API route front matter
+4. **AI-Assisted Implementation**: Let AI agents use front matter directives to generate consistent, high-quality code
+5. **Testing Integration**: Use front matter test specifications to generate comprehensive test suites
+6. **Performance Optimization**: Apply front matter performance hints during development and optimization
+7. **Security Validation**: Ensure front matter security requirements are implemented throughout the codebase
+8. **Documentation Evolution**: Keep front matter synchronized with code changes through AI-assisted maintenance
 
-Software repositories are living networks of interconnected paths. Like a garden where footpaths emerge from regular use, our codebases develop natural routes that connect functionality, knowledge, and people. AI agents act as gardeners, tending these paths, creating new connections, and ensuring the network remains healthy and navigable. By embracing the path of least resistance, we create software that flows naturally, scales organically, and evolves sustainably.
+## Conclusion: The Front Matter Enhanced AI Development Ecosystem
 
-Every line of code, every test, every document is both a step on a path and a potential junction for new routes. As paths interconnect and build upon each other, they create a rich ecosystem where information and functionality flow freely, enabling rapid development and continuous evolution.
+Software repositories in the AI-seed project are living networks of interconnected paths enhanced by both Model Context Protocol (MCP) capabilities and intelligent front matter metadata. Like a garden where footpaths emerge from regular use, our codebases develop natural routes that connect functionality, knowledge, and people - now with standardized AI context sharing through MCP servers and comprehensive front matter that serves as intelligent guideposts for AI-assisted development.
+
+AI agents act as sophisticated collaborators, interpreting front matter directives to understand not just what code does, but how it should be written, tested, and integrated. By combining the path of least resistance with MCP capabilities and front matter intelligence, we create software that flows naturally, scales organically, and evolves sustainably with unprecedented AI understanding and assistance.
+
+Every React component, API route, utility function, and test file becomes both a functional piece of software and an intelligent node in an AI-enhanced development network. Front matter provides the contextual bridge between human intent and AI capability, while MCP servers offer the tools and resources needed for comprehensive development automation.
+
+As paths interconnect and build upon each other through front matter guidance and MCP-enhanced capabilities, they enable rapid prototyping, consistent code generation, comprehensive testing, and continuous evolution guided by AI intelligence that truly understands the project's architecture, requirements, and development philosophy.
+
+The future of AI-assisted software development lies in this symbiotic relationship between structured metadata intelligence, path-based organic growth, and standardized AI context protocols, where front matter serves as the blueprint and MCP provides the tools for AI applications to understand, interact with, and enhance our development ecosystem with unprecedented precision, consistency, and understanding.

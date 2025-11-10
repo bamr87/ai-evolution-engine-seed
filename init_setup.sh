@@ -179,7 +179,7 @@ We believe in software that grows organically, much like a plant from a seed. Th
 2.  **`init_setup.sh`**: The germination script. It now sets up a complete v0.4.1 environment, including this README, the AI workflow, and initial configurations.
 3.  **`.github/workflows/ai_evolver.yml`**: The heart of the growth engine. In v0.4.1, it simulates AI-driven changes more deeply, including README updates and dynamic generation of the next seed.
 4.  **`.seed.md`**: The blueprint for the *next* generation. The v0.4.1 workflow generates a `.seed.md` that outlines the path towards v0.4.2, based on the current cycle's "learnings."
-5.  **`evolution-metrics.json`**: Tracks the quantitative aspects of growth.
+5.  **`metrics/evolution-metrics.json`**: Tracks the quantitative aspects of growth.
 6.  **`.gptignore`**: A new file to help guide the AI's focus by excluding irrelevant files from its context.
 
 ## 🚀 Quick Germination & Growth
@@ -238,7 +238,8 @@ EOF
 # Create .evolution.yml configuration
 create_evolution_config() {
     echo -e "${CYAN}Creating .evolution.yml configuration...${NC}"
-    cat > .evolution.yml << 'EOF'
+    mkdir -p config
+    cat > config/.evolution.yml << 'EOF'
 # 🌱 Evolution Configuration
 version: 1.0
 growth:
@@ -268,7 +269,8 @@ EOF
 # Create evolution-metrics.json
 create_evolution_metrics() {
     echo -e "${CYAN}Creating evolution-metrics.json...${NC}"
-    cat > evolution-metrics.json << EOF
+    mkdir -p metrics
+    cat > metrics/evolution-metrics.json << EOF
 {
   "seed_version": "${SEED_VERSION}",
   "planted_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
@@ -301,9 +303,9 @@ It describes the capabilities and structure of this specific seed generation.
     - (Simulated) AI generates complete new versions of `README.md` and `evolution-metrics.json`.
     - Utilizes `.gptignore` for more focused context collection.
     - Dynamically generates a *new* `.seed.md` file after each growth cycle, outlining the next evolutionary step (e.g., towards v0.4.2).
-- **`evolution-metrics.json`**: Tracks key metrics about the repository's growth and evolution.
+- **`metrics/evolution-metrics.json`**: Tracks key metrics about the repository's growth and evolution.
 - **`.gptignore`**: Allows fine-tuning of files included in the AI's context, improving focus and efficiency.
-- **`.evolution.yml`**: Configuration for the evolution process.
+- **`config/.evolution.yml`**: Configuration for the evolution process.
 
 ## 🚀 How to Use This Seed
 
@@ -312,7 +314,7 @@ It describes the capabilities and structure of this specific seed generation.
     ```bash
     gh workflow run ai_evolver.yml -f prompt="Your evolutionary goal here"
     ```
-3.  **Observe**: A new branch will be created with changes (simulated by the AI). `README.md` and `evolution-metrics.json` will be updated. A new `.seed.md` pointing towards the next evolution (v0.4.2) will be generated.
+3.  **Observe**: A new branch will be created with changes (simulated by the AI). `README.md` and `metrics/evolution-metrics.json` will be updated. A new `.seed.md` pointing towards the next evolution (v0.4.2) will be generated.
 4.  **Iterate**: Merge the changes and repeat the process.
 
 ## 🌱 What's Next? (The Role of the *Generated* `.seed.md`)
@@ -382,7 +384,7 @@ jobs:
           CONTEXT_FILE="/tmp/repo_context.json"
           
           # Initialize context with metadata and metrics
-          METRICS_CONTENT=$(cat evolution-metrics.json || echo '{}')
+          METRICS_CONTENT=$(cat metrics/evolution-metrics.json || echo '{}')
           jq -n \
             --argjson metrics "$METRICS_CONTENT" \
             --arg prompt "${{ inputs.prompt }}" \
@@ -405,13 +407,13 @@ jobs:
             fi
           fi
           
-          find . -type f | grep -Ev "$IGNORE_PATTERNS" | head -n $(jq -r '.evolution.max_context_files // 50' .evolution.yml 2>/dev/null || echo 50) | \
+          find . -type f | grep -Ev "$IGNORE_PATTERNS" | head -n $(jq -r '.evolution.max_context_files // 50' config/.evolution.yml 2>/dev/null || echo 50) | \
           while IFS= read -r file; do
             echo "Adding $file to context..."
             # Ensure file path is a valid JSON string key
             file_key=$(echo "$file" | sed 's|^\./||')
             jq --arg path "$file_key" \
-               --arg content "$(cat "$file" | head -n $(jq -r '.evolution.max_context_line_per_file // 1000' .evolution.yml 2>/dev/null || echo 1000))" \
+               --arg content "$(cat "$file" | head -n $(jq -r '.evolution.max_context_line_per_file // 1000' config/.evolution.yml 2>/dev/null || echo 1000))" \
               '.files[$path] = $content' "$CONTEXT_FILE" > "${CONTEXT_FILE}.tmp" && mv "${CONTEXT_FILE}.tmp" "$CONTEXT_FILE"
           done
           echo "Context collected in $CONTEXT_FILE"
@@ -505,7 +507,7 @@ jobs:
           # This is where a real LLM would be prompted with the old README and new stats.
           # For simulation, we'll just indicate it changed.
           # For a better simulation, one could use sed to replace the block, but it's tricky.
-          # For now, the "change" will be to evolution-metrics.json and a new .seed.md.
+          # For now, the "change" will be to metrics/evolution-metrics.json and a new .seed.md.
           # README update will be a simplified "touch" or small modification.
           # Let's make the AI output the *new content for the dynamic block only*.
           # And the apply step will use sed. This is more realistic for an AI.
@@ -526,7 +528,7 @@ This seed was generated after growth cycle **#$NEW_CYCLE**.
 
 This cycle (simulated) focused on:
 - Incrementing growth cycle to $NEW_CYCLE and generation to $NEW_GENERATION.
-- Updating \`evolution-metrics.json\` with the latest statistics.
+- Updating \`metrics/evolution-metrics.json\` with the latest statistics.
 - Modifying \`README.md\` to reflect these new metrics within the \`AI-EVOLUTION-MARKER\` block.
 
 ## 🧬 Proposed Enhancements for v0.4.2 (Next Evolution)
@@ -569,7 +571,7 @@ EOF_NEXT_SEED
   "new_branch": "growth/$(date +%Y%m%d-%H%M%S)-${{ inputs.growth_mode }}-$NEW_CYCLE",
   "changes": [
     {
-      "path": "evolution-metrics.json",
+      "path": "metrics/evolution-metrics.json",
       "action": "replace_content",
       "content": $(echo "$NEW_METRICS_CONTENT" | jq -Rsa)
     },
@@ -652,7 +654,7 @@ EOF_RESPONSE
           echo "✓ New .seed.md generated for the next evolutionary cycle."
           
           git add .seed.md
-          git commit -m "🌰 Planted new seed for next evolution (post cycle $(jq -r '.changes[] | select(.path=="evolution-metrics.json") | .content' "$RESPONSE_FILE" | jq -r .growth_cycles))" || echo "No changes to .seed.md or commit failed."
+          git commit -m "🌰 Planted new seed for next evolution (post cycle $(jq -r '.changes[] | select(.path=="metrics/evolution-metrics.json") | .content' "$RESPONSE_FILE" | jq -r .growth_cycles))" || echo "No changes to .seed.md or commit failed."
           git push origin "$BRANCH_NAME" || true # Allow if branch already up-to-date
           
       - name: 🌳 Create Growth Pull Request
@@ -672,7 +674,7 @@ EOF_RESPONSE
 
 ### 🌿 Summary of Changes in this Cycle:
 This cycle focused on evolving the codebase based on the prompt. Key changes include:
-- Updates to \`evolution-metrics.json\`.
+- Updates to \`metrics/evolution-metrics.json\`.
 - Modifications to \`README.md\` dynamic block.
 - Other changes as per the AI's plan (see commit details).
 

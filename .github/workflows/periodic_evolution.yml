@@ -202,6 +202,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
+          ref: evolved
 
       - name: 🛠️ Setup Evolution Prerequisites
         run: |
@@ -290,6 +291,8 @@ jobs:
           ./scripts/create_pr.sh \
             --prompt "${{ needs.determine-prompt.outputs.prompt_name }}" \
             --type "periodic_evolution" \
+            --base "evolved" \
+            --label "periodic,automated"
             --execution-mode "${{ needs.determine-prompt.outputs.execution_mode }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
